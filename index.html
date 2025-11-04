@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DSS Monitoring Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              'primary': '#0080ff',
+              'primary-light': '#4da3ff',
+              'primary-dark': '#0066cc',
+              'success': '#5ec269',
+              'danger': '#ff5252',
+              'neutral': '#8b95a1',
+              'warning': '#ffc107',
+              'orange': '#ff9800',
+              'light-bg': '#f5f7fa',
+              'light-bg-secondary': '#e8ecf1',
+              'light-card': '#ffffff',
+              'light-text': '#1a1a1a',
+              'light-text-secondary': '#666666',
+              'dark-bg': '#1A202C',
+              'dark-bg-secondary': '#2D3748',
+              'dark-card': '#2D3748',
+              'dark-text': '#f7fafc',
+              'dark-text-secondary': '#a0aec0',
+            },
+          },
+        },
+      }
+    </script>
+    
+    <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "firebase/app": "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js",
+    "firebase/": "https://aistudiocdn.com/firebase@^12.5.0/"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
