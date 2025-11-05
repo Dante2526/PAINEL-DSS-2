@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Employee, StatusType } from '../types';
 import { ShiftIcon, AbsentIcon, TrashIcon } from './icons';

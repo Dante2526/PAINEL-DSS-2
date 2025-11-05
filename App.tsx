@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Header from './components/Header';
 import EmployeeCard from './components/EmployeeCard';
@@ -378,9 +377,11 @@ const App: React.FC = () => {
             return;
         }
         try {
-            const existingUser = employees.find(e => e.matricula === matricula);
-            if(existingUser) {
-                throw new Error('Matrícula já existe.');
+            if (matricula) {
+                const existingUser = employees.find(e => e.matricula === matricula);
+                if(existingUser) {
+                    throw new Error('Matrícula já existe.');
+                }
             }
             await addDoc(collection(db, 'employees'), {
                 name,
@@ -621,7 +622,7 @@ const AddUserModal: React.FC<{isOpen: boolean, onClose: () => void, onAdd: (name
     const [matricula, setMatricula] = useState('');
     
     const handleSubmit = () => {
-        if (name && matricula) {
+        if (name) {
             onAdd(name, matricula);
             setName('');
             setMatricula('');
