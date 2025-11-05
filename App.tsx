@@ -8,7 +8,7 @@ import Footer from './components/Footer';
 import { SubjectIcon, UserIcon, TrashIcon } from './components/icons';
 import { Employee, StatusType, ModalType } from './types';
 import type { NotificationData } from './components/Notification';
-import { db, auth } from './services/firebase';
+import { db, auth, isConfigured } from './services/firebase';
 import { 
     collection, 
     query, 
@@ -78,12 +78,14 @@ const App: React.FC = () => {
         let unsubscribe = () => {};
 
         const signInAndSetupListener = async () => {
-             if (!auth || !db) {
-                showNotification("Configuração do Firebase ausente. Configure as variáveis de ambiente para conectar.", "error");
+             if (!isConfigured) {
+                showNotification("Modo de pré-visualização: Faça o deploy no Vercel para carregar dados ao vivo.", "error");
                 setLoading(false);
                 return;
             }
             try {
+                if (!auth || !db) throw new Error("Firebase not initialized correctly.");
+                
                 await signInAnonymously(auth);
                 console.log("Signed in anonymously");
 
@@ -118,7 +120,7 @@ const App: React.FC = () => {
 
             } catch (error) {
                 console.error("Anonymous sign-in failed:", error);
-                showNotification("Falha na autenticação com o servidor.", "error");
+                showNotification("Falha na autenticação. Verifique as credenciais do Firebase e as regras de segurança.", "error");
                 setLoading(false);
             }
         };

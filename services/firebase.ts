@@ -2,54 +2,41 @@ import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
 
-
 // =======================================================================================
-// ! ! ! IMPORTANT CONFIGURATION NOTICE ! ! !
+// ! ! ! PRODUCTION CONFIGURATION FOR VERCEL ! ! !
 // =======================================================================================
-// This file is configured for the AI Studio development environment.
-// Because this environment does not support environment variables (`import.meta.env`),
-// you must temporarily place your Firebase credentials below to run the app.
+// This configuration reads credentials directly from environment variables using `import.meta.env`.
+// This is the correct setup for a Vite project deployed on Vercel.
 //
-// THIS IS FOR DEVELOPMENT ONLY.
-//
-// BEFORE you deploy this code to a public repository (GitHub) or a hosting service (Vercel),
-// you MUST replace this configuration with a secure method like environment variables
-// to avoid exposing your secret keys.
+// CRITICAL DEPLOYMENT INSTRUCTIONS:
+// 1. Set the Environment Variables in your Vercel project settings.
+// 2. Use the exact names below for the keys (e.g., VITE_FIREBASE_API_KEY).
+// 3. In Vercel, go to Project Settings -> General -> Framework Preset and set it to "Vite".
+//    This is required for Vercel to correctly inject `VITE_` variables into your site.
+// 4. You MUST redeploy your project after changing variables or the framework preset.
 // =======================================================================================
 
-// --- DEVELOPMENT CONFIGURATION (Use for AI Studio Preview) ---
-// Replace the placeholder strings with your actual Firebase project credentials.
+// Using `(import.meta as any).env` to access Vite environment variables.
+// This is the correct method for a Vite build environment like Vercel.
+// `process.env` will not work here for client-side code.
+const env = (import.meta as any).env || {};
+
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY_HERE",
-    authDomain: "YOUR_AUTH_DOMAIN_HERE",
-    projectId: "YOUR_PROJECT_ID_HERE",
-    storageBucket: "YOUR_STORAGE_BUCKET_HERE",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID_HERE",
-    appId: "YOUR_APP_ID_HERE"
+    apiKey: env.VITE_FIREBASE_API_KEY,
+    authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: env.VITE_FIREBASE_APP_ID
 };
 
-/*
-// --- PRODUCTION CONFIGURATION (Use for Vercel, Netlify, etc.) ---
-// When you are ready to deploy, comment out the development configuration above
-// and uncomment this section. You will need to set up these environment variables
-// in your hosting provider's project settings.
-const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_APP_ID
-};
-*/
-
-// Initialize Firebase
+// Initialize Firebase services
 let db: Firestore | null = null;
 let auth: Auth | null = null;
 let app: FirebaseApp | null = null;
 
-// A simple check to see if the placeholder values have been replaced.
-const isConfigured = firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith("YOUR_");
+// Check if the API key is present. It will be a string on Vercel, but undefined in the preview environment.
+const isConfigured = !!firebaseConfig.apiKey;
 
 if (isConfigured) {
     try {
@@ -62,16 +49,16 @@ if (isConfigured) {
         db = getFirestore(app);
         auth = getAuth(app);
     } catch(e) {
-        console.error("Error initializing Firebase. Please check your credentials in services/firebase.ts.", e);
+        console.error("Error initializing Firebase. Please check your environment variables and Vercel project settings.", e);
         // Ensure services are null if initialization fails
         db = null;
         auth = null;
         app = null;
     }
 } else {
-    // This warning will appear in the developer console if credentials are still placeholders.
-    // The main App.tsx component will show a user-facing notification.
-    console.warn("Firebase configuration is missing or incomplete. Please replace the placeholder values in services/firebase.ts.");
+    // This warning will appear in the developer console in the preview environment where
+    // environment variables are not available. The main App.tsx component will show a user-facing notification.
+    console.warn("Firebase environment variables not found. The app is in preview mode.");
 }
 
-export { db, auth, app };
+export { db, auth, app, isConfigured };
