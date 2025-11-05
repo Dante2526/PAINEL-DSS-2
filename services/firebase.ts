@@ -18,16 +18,15 @@ import { getAuth, Auth } from 'firebase/auth';
 
 // Using `(import.meta as any).env` to access Vite environment variables.
 // This is the correct method for a Vite build environment like Vercel.
-// `process.env` will not work here for client-side code.
 const env = (import.meta as any).env || {};
 
 const firebaseConfig = {
     apiKey: env.VITE_FIREBASE_API_KEY,
     authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET,
+    projectId: env.ID_DO_PROJETO_VITE_FIREBASE,
+    storageBucket: env.BALDE_DE_ARMAZENAMENTO_VITE_FIREBASE,
     messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: env.VITE_FIREBASE_APP_ID
+    appId: env.ID_DO_APLICATIVO_VITE_FIREBASE
 };
 
 // Initialize Firebase services
