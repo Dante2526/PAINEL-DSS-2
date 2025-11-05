@@ -8,7 +8,7 @@ import Footer from './components/Footer';
 import { SubjectIcon, UserIcon, TrashIcon } from './components/icons';
 import { Employee, StatusType, ModalType } from './types';
 import type { NotificationData } from './components/Notification';
-import { db, auth } from './services/firebase';
+import { db, auth, isConfigured } from './services/firebase';
 import { 
     collection, 
     query, 
@@ -54,12 +54,19 @@ const App: React.FC = () => {
     });
 
     useEffect(() => {
+        const themeColorMeta = document.getElementById('theme-color-meta');
         if (isDarkMode) {
             document.documentElement.classList.add('dark');
             localStorage.setItem('theme', 'dark');
+            if (themeColorMeta) {
+                themeColorMeta.setAttribute('content', '#1A202C');
+            }
         } else {
             document.documentElement.classList.remove('dark');
             localStorage.setItem('theme', 'light');
+            if (themeColorMeta) {
+                themeColorMeta.setAttribute('content', '#e8ecf1');
+            }
         }
     }, [isDarkMode]);
 
@@ -78,11 +85,19 @@ const App: React.FC = () => {
         let unsubscribe = () => {};
 
         const signInAndSetupListener = async () => {
-             if (!auth || !db) {
-                showNotification("Configuração do Firebase ausente. Configure as variáveis de ambiente para conectar.", "error");
+             // Immediately exit if Firebase isn't configured (i.e., in a preview environment)
+             if (!isConfigured) {
+                showNotification("Modo de pré-visualização: Faça o deploy no Vercel para carregar dados ao vivo.", "error");
                 setLoading(false);
                 return;
             }
+
+            if (!auth || !db) {
+                showNotification("A inicialização do Firebase falhou.", "error");
+                setLoading(false);
+                return;
+            }
+
             try {
                 await signInAnonymously(auth);
                 console.log("Signed in anonymously");
@@ -118,7 +133,7 @@ const App: React.FC = () => {
 
             } catch (error) {
                 console.error("Anonymous sign-in failed:", error);
-                showNotification("Falha na autenticação com o servidor.", "error");
+                showNotification("Falha na autenticação com o servidor. Verifique suas credenciais do Firebase.", "error");
                 setLoading(false);
             }
         };
@@ -128,7 +143,7 @@ const App: React.FC = () => {
         return () => {
             unsubscribe();
         };
-    }, [showNotification, loading]);
+    }, [showNotification]);
 
     const setScale = useCallback((newScale: number, scrollX?: number, scrollY?: number) => {
         const viewport = viewportRef.current;
@@ -501,7 +516,7 @@ const App: React.FC = () => {
     const rightColumn = mainTeam.slice(columnSize);
 
     return (
-        <div className="bg-light-bg-secondary dark:bg-dark-bg min-h-screen text-light-text dark:text-dark-text transition-colors">
+        <div className="min-h-screen bg-light-bg-secondary dark:bg-dark-bg text-light-text dark:text-dark-text transition-colors">
             <div ref={viewportRef} className="viewport fixed inset-0">
                 <div ref={scalableContainerRef} className="scalable-container w-[2448px] min-h-full p-8">
                     <Header
