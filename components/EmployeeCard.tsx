@@ -2,7 +2,7 @@
 import React from 'react';
 import { Employee, StatusType } from '../types';
 import { ShiftIcon, AbsentIcon, TrashIcon } from './icons';
-import { formatTimestamp } from '../App';
+import { formatTimestamp } from '../services/employeeService';
 
 interface EmployeeCardProps {
     employee: Employee;
