@@ -78,6 +78,11 @@ const App: React.FC = () => {
         let unsubscribe = () => {};
 
         const signInAndSetupListener = async () => {
+             if (!auth || !db) {
+                showNotification("Configuração do Firebase ausente. Configure as variáveis de ambiente para conectar.", "error");
+                setLoading(false);
+                return;
+            }
             try {
                 await signInAnonymously(auth);
                 console.log("Signed in anonymously");
@@ -252,6 +257,10 @@ const App: React.FC = () => {
     }, [initializeScale, setScale]);
 
     const handleStatusChange = async (id: string, type: StatusType) => {
+        if (!db) {
+            showNotification("A conexão com o banco de dados não está disponível.", "error");
+            return;
+        }
         const employee = employees.find(e => e.id === id);
         if (!employee) return;
 
@@ -314,6 +323,10 @@ const App: React.FC = () => {
     };
     
     const handleToggleSpecialTeam = async (id: string) => {
+        if (!db) {
+            showNotification("A conexão com o banco de dados não está disponível.", "error");
+            return;
+        }
         setTogglingSpecialTeamId(id);
         const employee = employees.find(e => e.id === id);
         if (!employee) {
@@ -351,6 +364,10 @@ const App: React.FC = () => {
     };
 
     const handleAdminLogin = async (email: string) => {
+        if (!db) {
+            showNotification("A conexão com o banco de dados não está disponível.", "error");
+            return;
+        }
         if (!email) {
             showNotification('Por favor, insira um e-mail.', 'error');
             return;
@@ -372,6 +389,10 @@ const App: React.FC = () => {
     };
     
     const handleAddUser = async (name: string, matricula: string) => {
+        if (!db) {
+            showNotification("A conexão com o banco de dados não está disponível.", "error");
+            return;
+        }
         if (!isAdmin) {
             showNotification('Apenas administradores podem adicionar usuários.', 'error');
             return;
@@ -402,6 +423,10 @@ const App: React.FC = () => {
     };
 
     const handleDeleteUser = async (employeeId: string) => {
+        if (!db) {
+            showNotification("A conexão com o banco de dados não está disponível.", "error");
+            return;
+        }
         if (!isAdmin) {
             showNotification('Apenas administradores podem deletar usuários.', 'error');
             return;
@@ -425,6 +450,10 @@ const App: React.FC = () => {
     };
 
     const handleClearData = async () => {
+        if (!db) {
+            showNotification("A conexão com o banco de dados não está disponível.", "error");
+            return;
+        }
         if (!isAdmin) {
             showNotification('Apenas administradores podem limpar os dados.', 'error');
             return;
@@ -610,7 +639,7 @@ const AdminOptionsModal: React.FC<{
     <Modal isOpen={isOpen} onClose={onClose} title="Opções Administrativas">
         <div className="space-y-4">
             <button onClick={onClear} className="w-full py-4 font-bold text-white bg-orange rounded-lg hover:bg-orange-600 transition">LIMPAR STATUS</button>
-            <button onClick={onSendReport} className="w-full py-4 font-bold text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition">ENVIAR RELATÓRIO</button>
+            <button onClick={onSendReport} className="w-full py-4 font-bold text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition">GERAR RELATÓRIO</button>
             <button onClick={onReorganize} className="w-full py-4 font-bold text-white bg-danger rounded-lg hover:bg-red-600 transition">REORGANIZAR PAINEL</button>
             <button onClick={onAddUser} className="w-full py-4 font-bold text-white bg-success rounded-lg hover:bg-green-600 transition">NOVO USUÁRIO</button>
         </div>
@@ -751,17 +780,38 @@ ${specialTeamNames}`;
         }
     };
 
+    const handleEmailReport = () => {
+        const today = new Date().toLocaleDateString('pt-BR');
+        const subject = `Relatório de Status DSS - ${today}`;
+        const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(reportText)}`;
+        
+        // Mailto links have character limits that vary by client/browser (often around 2000).
+        if (mailtoLink.length > 2000) {
+            navigator.clipboard.writeText(reportText).then(() => {
+                showNotification('Relatório muito longo para e-mail! Copiado para a área de transferência.', 'success');
+            }).catch(err => {
+                console.error('Failed to copy report: ', err);
+                showNotification('Relatório muito longo e falha ao copiar para a área de transferência.', 'error');
+            });
+        } else {
+            window.location.href = mailtoLink;
+        }
+    };
+
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Relatório de Status">
             <div className="text-left bg-light-bg dark:bg-dark-bg-secondary p-4 rounded-lg max-h-96 overflow-y-auto">
                 <pre className="whitespace-pre-wrap text-sm font-mono text-light-text dark:text-dark-text">{reportText}</pre>
             </div>
-            <div className="mt-6 flex flex-col sm:flex-row gap-4">
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <button onClick={handleCopyReport} className="w-full py-4 font-bold text-white bg-primary rounded-lg hover:bg-primary-dark transition">
-                    COPIAR RELATÓRIO
+                    COPIAR
                 </button>
                 <button onClick={handleDownloadReport} className="w-full py-4 font-bold text-white bg-success rounded-lg hover:bg-green-600 transition">
-                    BAIXAR RELATÓRIO
+                    BAIXAR
+                </button>
+                <button onClick={handleEmailReport} className="w-full py-4 font-bold text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition">
+                    E-MAIL
                 </button>
             </div>
         </Modal>
