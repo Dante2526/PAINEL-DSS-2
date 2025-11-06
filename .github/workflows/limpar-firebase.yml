@@ -8,18 +8,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Passo 1: Baixa o código para o lugar certo (sem duplicar pasta)
       - name: Checkout código
         uses: actions/checkout@v4
 
+      # Passo 2: Configura o Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20' 
-          # A linha 'cache: npm' foi removida daqui
 
+      # Passo 3: Instala as dependências (incluindo firebase-admin)
       - name: Instalar dependências
         run: npm install
 
+      # Passo 4: Roda o seu script
       - name: Rodar script de limpeza
         run: node scripts/limpar-firebase.js 
         env:
