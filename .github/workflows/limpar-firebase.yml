@@ -1,7 +1,7 @@
 name: Limpar Checkboxes no Firebase (Manual)
 
 on:
-  workflow_dispatch: # Adiciona o botão "Run workflow" na aba Actions
+  workflow_dispatch: 
 
 jobs:
   limpar-dados-firebase:
@@ -15,14 +15,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20' 
-          cache: 'npm'
+          # A linha 'cache: npm' foi removida daqui
 
       - name: Instalar dependências
         run: npm install
 
       - name: Rodar script de limpeza
-        # Verifique se o caminho do script está certo (sem 'scripts' duplicado)
         run: node scripts/limpar-firebase.js 
         env:
-          # Injeta o Secret do GitHub no script
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
