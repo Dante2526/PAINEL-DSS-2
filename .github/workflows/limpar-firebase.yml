@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Passo 1: Baixa o código para o lugar certo (sem duplicar pasta)
+      # Passo 1: Baixa o código para a pasta principal
       - name: Checkout código
         uses: actions/checkout@v4
 
@@ -22,7 +22,7 @@ jobs:
       - name: Instalar dependências
         run: npm install
 
-      # Passo 4: Roda o seu script
+      # Passo 4: Roda o seu script (no caminho correto)
       - name: Rodar script de limpeza
         run: node scripts/limpar-firebase.js 
         env:
