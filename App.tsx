@@ -45,7 +45,7 @@ const App: React.FC = () => {
     const [manualRegistrations, setManualRegistrations] = useState<ManualRegistration[]>([]);
     const viewportRef = useRef<HTMLDivElement>(null);
     const scalableContainerRef = useRef<HTMLDivElement>(null);
-    const scaleStateRef = useRef({ currentScale: 1, minScale: 0.1 });
+    const scaleStateRef = useRef({ currentScale: 1 });
     
     const [isDarkMode, setIsDarkMode] = useState(() => {
         const savedTheme = localStorage.getItem('theme');
@@ -137,8 +137,15 @@ const App: React.FC = () => {
         const scalableContainer = scalableContainerRef.current;
         if (!viewport || !scalableContainer) return;
 
-        scaleStateRef.current.currentScale = Math.max(scaleStateRef.current.minScale, Math.min(newScale, 2.0));
-        scalableContainer.style.transform = `scale(${scaleStateRef.current.currentScale})`;
+        const finalScale = Math.max(0.1, Math.min(newScale, 2.0)); // Use a small fixed minimum
+        scaleStateRef.current.currentScale = finalScale;
+
+        // Dynamically set minWidth and minHeight to ensure the container always fills the viewport,
+        // effectively expanding it when zoomed out.
+        scalableContainer.style.minWidth = `${viewport.clientWidth / finalScale}px`;
+        scalableContainer.style.minHeight = `${viewport.clientHeight / finalScale}px`;
+
+        scalableContainer.style.transform = `scale(${finalScale})`;
         if (scrollX !== undefined) viewport.scrollLeft = scrollX;
         if (scrollY !== undefined) viewport.scrollTop = scrollY;
     }, []);
@@ -148,9 +155,9 @@ const App: React.FC = () => {
         const scalableContainer = scalableContainerRef.current;
         if (!viewport || !scalableContainer) return;
 
-        const fitScale = viewport.clientWidth / scalableContainer.offsetWidth;
-        scaleStateRef.current.minScale = fitScale;
+        // The logic of fitting to screen is now handled by the dynamic min-width/height
         if (window.innerWidth < 768) {
+            const fitScale = viewport.clientWidth / scalableContainer.offsetWidth;
             setScale(fitScale, 0, 0);
         } else {
             setScale(1.0, 0, 0);
@@ -224,19 +231,11 @@ const App: React.FC = () => {
 
         let lastWidth = window.innerWidth;
         const handleResize = () => {
-            const currentViewport = viewportRef.current;
-            const currentScalableContainer = scalableContainerRef.current;
-            if (!currentViewport || !currentScalableContainer) return;
-            
             if (window.innerWidth !== lastWidth) {
                 lastWidth = window.innerWidth;
-                
-                const fitScale = currentViewport.clientWidth / currentScalableContainer.offsetWidth;
-                scaleStateRef.current.minScale = fitScale;
-
-                if (scaleStateRef.current.currentScale < fitScale) {
-                    setScale(fitScale);
-                }
+                // Re-applying the scale will trigger a recalculation of minWidth/minHeight
+                // based on the new viewport dimensions.
+                setScale(scaleStateRef.current.currentScale);
             }
         };
 
@@ -505,7 +504,7 @@ const App: React.FC = () => {
     return (
         <div className="bg-light-bg-secondary dark:bg-dark-bg min-h-screen text-light-text dark:text-dark-text transition-colors">
             <div ref={viewportRef} className="viewport fixed inset-0">
-                <div ref={scalableContainerRef} className="scalable-container w-[2448px] min-h-full p-8">
+                <div ref={scalableContainerRef} className="scalable-container w-[2448px] p-8">
                     <Header
                         stats={stats}
                         loading={loading}
