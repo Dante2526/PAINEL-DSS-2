@@ -151,7 +151,7 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onStatusChange, o
                     darkBg="green-800"
                 />
                 <CheckboxItem
-                    label="NÃO ESTOU BEM"
+                    label="ESTOU MAL"
                     icon="😟"
                     type="mal"
                     checked={employee.mal}

@@ -726,7 +726,7 @@ STATUS "ESTOU BEM"
 --------------------------------------------------
 ${bemNames}
 
-STATUS "NÃO ESTOU BEM"
+STATUS "ESTOU MAL"
 --------------------------------------------------
 ${malNames}
 

@@ -57,7 +57,7 @@ const Header: React.FC<HeaderProps> = ({ stats, loading, onAdminClick, isDarkMod
                 </div>
                  <div className="flex gap-6">
                     <StatCard label="Estou Bem" value={stats.bem} colorClass="text-success" />
-                    <StatCard label="Não Bem" value={stats.mal} colorClass="text-danger" />
+                    <StatCard label="Estou Mal" value={stats.mal} colorClass="text-danger" />
                     <StatCard label="Ausente" value={stats.absent} colorClass="text-warning" />
                     <StatCard label="Total" value={stats.total} colorClass="text-neutral" />
                 </div>
