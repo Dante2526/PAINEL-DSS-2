@@ -469,12 +469,11 @@ const App: React.FC = () => {
                     mal: false,
                     absent: false,
                     time: null,
-                    inSpecialTeam: false,
                 });
             });
             await batch.commit();
             setActiveModal(ModalType.None);
-            showNotification('Dados de status foram limpos!', 'success');
+            showNotification('Dados de status diário foram limpos!', 'success');
         } catch(error) {
             console.error("Error clearing data:", error);
             showNotification('Falha ao limpar dados.', 'error');
@@ -639,7 +638,7 @@ const AdminOptionsModal: React.FC<{
 }> = ({isOpen, onClose, onClear, onReorganize, onAddUser, onSendReport}) => (
     <Modal isOpen={isOpen} onClose={onClose} title="Opções Administrativas">
         <div className="space-y-4">
-            <button onClick={onClear} className="w-full py-4 font-bold text-white bg-orange rounded-lg hover:bg-orange-600 transition">LIMPAR STATUS</button>
+            <button onClick={onClear} className="w-full py-4 font-bold text-white bg-orange rounded-lg hover:bg-orange-600 transition">LIMPAR STATUS DIÁRIO</button>
             <button onClick={onSendReport} className="w-full py-4 font-bold text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition">GERAR RELATÓRIO</button>
             <button onClick={onReorganize} className="w-full py-4 font-bold text-white bg-danger rounded-lg hover:bg-red-600 transition">REORGANIZAR PAINEL</button>
             <button onClick={onAddUser} className="w-full py-4 font-bold text-white bg-success rounded-lg hover:bg-green-600 transition">NOVO USUÁRIO</button>
