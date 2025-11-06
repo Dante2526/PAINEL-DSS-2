@@ -2,31 +2,21 @@ import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
 
-// =======================================================================================
-// ! ! ! PRODUCTION CONFIGURATION FOR VERCEL ! ! !
-// =======================================================================================
-// This configuration reads credentials directly from environment variables using `import.meta.env`.
-// This is the correct setup for a Vite project deployed on Vercel.
-//
-// CRITICAL DEPLOYMENT INSTRUCTIONS:
-// 1. Set the Environment Variables in your Vercel project settings.
-// 2. Use the exact names below for the keys (e.g., VITE_FIREBASE_API_KEY).
-// 3. In Vercel, go to Project Settings -> General -> Framework Preset and set it to "Vite".
-//    This is required for Vercel to correctly inject `VITE_` variables into your site.
-// 4. You MUST redeploy your project after changing variables or the framework preset.
-// =======================================================================================
+// Firebase configuration is loaded from environment variables provided by the build tool (e.g., Vite).
+// These variables should be prefixed with VITE_ and are set in your hosting provider's (e.g., Vercel) settings.
+// FIX: Cast import.meta to any to resolve TypeScript error about 'env' property. This is a workaround because a vite-env.d.ts file cannot be added to declare the types for import.meta.env.
+const env = (import.meta as any).env;
 
-// Using `(import.meta as any).env` to access Vite environment variables.
-// This is the correct method for a Vite build environment like Vercel.
-const env = (import.meta as any).env || {};
-
+// FIX: Use optional chaining (?.) to prevent a crash if `env` is undefined.
+// This can happen if the build environment (like Vercel) is misconfigured or fails to inject the variables.
+// This allows the app to fall back to the existing "preview mode" gracefully.
 const firebaseConfig = {
-    apiKey: env.VITE_FIREBASE_API_KEY,
-    authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: env.ID_DO_PROJETO_VITE_FIREBASE,
-    storageBucket: env.BALDE_DE_ARMAZENAMENTO_VITE_FIREBASE,
-    messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: env.ID_DO_APLICATIVO_VITE_FIREBASE
+    apiKey: env?.VITE_FIREBASE_API_KEY,
+    authDomain: env?.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: env?.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: env?.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: env?.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: env?.VITE_FIREBASE_APP_ID
 };
 
 // Initialize Firebase services
@@ -34,7 +24,7 @@ let db: Firestore | null = null;
 let auth: Auth | null = null;
 let app: FirebaseApp | null = null;
 
-// Check if the API key is present. It will be a string on Vercel, but undefined in the preview environment.
+// Check if the API key is present. The app will enter a "preview mode" if it's missing.
 const isConfigured = !!firebaseConfig.apiKey;
 
 if (isConfigured) {
@@ -48,16 +38,16 @@ if (isConfigured) {
         db = getFirestore(app);
         auth = getAuth(app);
     } catch(e) {
-        console.error("Error initializing Firebase. Please check your environment variables and Vercel project settings.", e);
+        console.error("Error initializing Firebase. Please check your environment variables.", e);
         // Ensure services are null if initialization fails
         db = null;
         auth = null;
         app = null;
     }
 } else {
-    // This warning will appear in the developer console in the preview environment where
-    // environment variables are not available. The main App.tsx component will show a user-facing notification.
-    console.warn("Firebase environment variables not found. The app is in preview mode.");
+    // This warning will appear in the developer console if the API key is missing.
+    // The main App.tsx component will show a user-facing notification.
+    console.warn("Firebase API key is missing. Please check your VITE_FIREBASE_API_KEY environment variable. The app is in preview mode.");
 }
 
 export { db, auth, app, isConfigured };
