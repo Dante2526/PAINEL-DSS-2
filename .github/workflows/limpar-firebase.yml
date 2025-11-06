@@ -24,6 +24,6 @@ jobs:
 
       # Passo 4: Roda o seu script (no caminho correto)
       - name: Rodar script de limpeza
-        run: node scripts/limpar-firebase.js 
+        run: node scripts/limpar-firebase.cjs 
         env:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
