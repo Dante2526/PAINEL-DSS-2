@@ -1,0 +1,52 @@
+name: Limpar Checkboxes (Manual e Agendado 2x2)
+
+on:
+  # 1. O botão manual para rodar quando você quiser
+  workflow_dispatch: 
+
+  # 2. O agendamento: Roda TODO DIA às 04:00 UTC (01:00 da manhã em Brasília)
+  schedule:
+    - cron: '0 4 * * *'
+
+jobs:
+  limpar-dados-firebase:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      # Este é o passo que verifica seu ciclo 2x2
+      - name: Verificar se é dia de trabalho (Ciclo 2x2)
+        id: verificar-dia 
+        run: |
+          # Data base: 7 de Novembro de 2025 (Dia que sabemos que é TRABALHO)
+          ANCHOR_DATE="2025-11-07"
+
+          # Cálculo da diferença de dias desde a data base
+          ANCHOR_SECONDS=$(date -d "$ANCHOR_DATE" +%s)
+          CURRENT_SECONDS=$(date +%s)
+
+          DIFF_DAYS=$(((CURRENT_SECONDS - ANCHOR_SECONDS) / 86400))
+          CYCLE_DAY=$((DIFF_DAYS %% 4))
+
+          # Se o resultado for 0 ou 1, é dia de trabalho (2/2 ciclo)
+          if [[ $CYCLE_DAY -eq 0 || $CYCLE_DAY -eq 1 ]]; then
+            echo "Hoje é um dia de TRABALHO (Dia $CYCLE_DAY do ciclo). O script VAI rodar."
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "Hoje é um dia de FOLGA (Dia $CYCLE_DAY do ciclo). O script NÃO vai rodar."
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          fi
+
+      # Este passo SÓ RODA se for dia de trabalho
+      - name: Instalar dependências
+        if: steps.verificar-dia.outputs.should_run == 'true'
+        run: npm install
+
+      # Este passo SÓ RODA se for dia de trabalho
+      - name: Rodar script de limpeza
+        if: steps.verificar-dia.outputs.should_run == 'true'
+        run: node scripts/limpar-firebase.cjs 
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
