@@ -4,7 +4,6 @@ import EmployeeCard from './components/EmployeeCard';
 import SpecialTeamPanel from './components/SpecialTeamPanel';
 import Modal from './components/Modal';
 import Notification from './components/Notification';
-import Footer from './components/Footer';
 import { SubjectIcon, UserIcon, TrashIcon } from './components/icons';
 import { Employee, StatusType, ModalType } from './types';
 import type { NotificationData } from './components/Notification';
@@ -533,7 +532,6 @@ const App: React.FC = () => {
                             onDelete={handleDeleteUser}
                         />
                     </div>
-                    <Footer />
                 </div>
             </div>
             
