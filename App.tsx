@@ -4,7 +4,7 @@ import EmployeeCard from './components/EmployeeCard';
 import SpecialTeamPanel from './components/SpecialTeamPanel';
 import Modal from './components/Modal';
 import Notification from './components/Notification';
-import { SubjectIcon, UserIcon, TrashIcon } from './components/icons';
+import { SubjectIcon, UserIcon } from './components/icons';
 import { Employee, StatusType, ModalType, ManualRegistration } from './types';
 import type { NotificationData } from './components/Notification';
 import { db, auth, isConfigured } from './services/firebase';
@@ -26,11 +26,9 @@ import {
 import { signInAnonymously } from 'firebase/auth';
 import './styles.css';
 import { formatTimestamp } from './services/employeeService';
-import ManualRegistrationsList from './components/ManualRegistrationsList';
 
 const App: React.FC = () => {
     const [employees, setEmployees] = useState<Employee[]>([]);
-    const [manualRegistrations, setManualRegistrations] = useState<ManualRegistration[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeModal, setActiveModal] = useState<ModalType>(ModalType.None);
     const [notifications, setNotifications] = useState<NotificationData[]>([]);
@@ -40,6 +38,12 @@ const App: React.FC = () => {
     const scalableContainerRef = useRef<HTMLDivElement>(null);
     const scaleStateRef = useRef({ currentScale: 1 });
     
+    // State for manual registration inputs
+    const [mainSubject, setMainSubject] = useState('');
+    const [mainMatricula, setMainMatricula] = useState('');
+    const [specialSubject, setSpecialSubject] = useState('');
+    const [specialMatricula, setSpecialMatricula] = useState('');
+
     const [isDarkMode, setIsDarkMode] = useState(() => {
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) return savedTheme === 'dark';
@@ -108,18 +112,21 @@ const App: React.FC = () => {
                     setLoading(false);
                 });
                 
-                // Listener for manual registrations
+                // Listener for manual registrations to persist fields
                 const registrationsQuery = query(collection(db, 'registrosDSS'));
                 unsubscribeRegistrations = onSnapshot(registrationsQuery, (querySnapshot) => {
-                    const registrationsData: ManualRegistration[] = querySnapshot.docs.map(doc => ({
-                        id: doc.id,
-                        ...doc.data()
-                    } as ManualRegistration));
-                    setManualRegistrations(registrationsData);
-                }, (error) => {
-                    console.error("Error listening to manual registrations:", error);
-                    showNotification(`Erro ao carregar registros manuais: ${error.message}`, "error");
+                    const registrations = querySnapshot.docs.map(d => ({ id: d.id, ...d.data() })) as ManualRegistration[];
+                    
+                    const mainReg = registrations.find(r => r.TURNO === '7H-19H');
+                    const specialReg = registrations.find(r => r.TURNO === '6H');
+
+                    setMainSubject(mainReg?.assunto || '');
+                    setMainMatricula(mainReg?.matricula || '');
+                    
+                    setSpecialSubject(specialReg?.assunto || '');
+                    setSpecialMatricula(specialReg?.matricula || '');
                 });
+
 
                 showNotification('Dados carregados com sucesso!', 'success');
 
@@ -361,18 +368,20 @@ const App: React.FC = () => {
         }
     };
 
-    const handleManualRegister = async (matricula: string, subject: string, turno: '7H-19H' | '6H') => {
+    const handleManualRegister = async (turno: '7H-19H' | '6H') => {
         if (!db) {
             showNotification("A conexão com o banco de dados não está disponível.", "error");
             return;
         }
+
+        const matricula = turno === '7H-19H' ? mainMatricula : specialMatricula;
+        const subject = turno === '7H-19H' ? mainSubject : specialSubject;
+
         if (!matricula) {
             showNotification('Por favor, insira uma matrícula.', 'error');
             return;
         }
         
-        // Explicit data object to ensure ONLY the 3 correct fields are saved.
-        // This fixes the issue where extra fields like 'employeeName' and 'origin' were being saved.
         const registrationData = {
             matricula,
             assunto: subject || 'Não informado',
@@ -380,8 +389,19 @@ const App: React.FC = () => {
         };
 
         try {
-            await addDoc(collection(db, 'registrosDSS'), registrationData);
-            showNotification(`Registro para matrícula ${matricula} salvo com sucesso.`, 'success');
+            // Upsert logic: Check if a registration for this turn already exists
+            const q = query(collection(db, 'registrosDSS'), where("TURNO", "==", turno));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                // Update the existing document
+                const docRef = doc(db, 'registrosDSS', querySnapshot.docs[0].id);
+                await updateDoc(docRef, registrationData);
+            } else {
+                // Add a new document
+                await addDoc(collection(db, 'registrosDSS'), registrationData);
+            }
+            showNotification(`Registro para turno ${turno} salvo com sucesso.`, 'success');
         } catch (error) {
             console.error("Error saving manual registration:", error);
             const message = error instanceof Error ? error.message : 'Ocorreu um erro desconhecido.';
@@ -389,26 +409,6 @@ const App: React.FC = () => {
         }
     };
     
-    const handleDeleteManualRegistration = async (id: string) => {
-        if (!db) {
-            showNotification("A conexão com o banco de dados não está disponível.", "error");
-            return;
-        }
-        if (!isAdmin) {
-            showNotification('Apenas administradores podem deletar registros.', 'error');
-            return;
-        }
-
-        try {
-            await deleteDoc(doc(db, 'registrosDSS', id));
-            showNotification('Registro manual deletado com sucesso!', 'success');
-        } catch (error) {
-            console.error("Error deleting manual registration:", error);
-            const message = error instanceof Error ? error.message : 'Ocorreu um erro desconhecido.';
-            showNotification(`Falha ao deletar registro: ${message}`, 'error');
-        }
-    };
-
     const handleAdminLogin = async (email: string) => {
         if (!db) {
             showNotification("A conexão com o banco de dados não está disponível.", "error");
@@ -543,9 +543,6 @@ const App: React.FC = () => {
     
     const mainTeam = useMemo(() => employees.filter(e => !e.inSpecialTeam), [employees]);
     const specialTeam = useMemo(() => employees.filter(e => e.inSpecialTeam), [employees]);
-    const mainRegistrations = useMemo(() => manualRegistrations.filter(r => r.TURNO === '7H-19H'), [manualRegistrations]);
-    const specialRegistrations = useMemo(() => manualRegistrations.filter(r => r.TURNO === '6H'), [manualRegistrations]);
-
 
     const columnSize = Math.ceil(mainTeam.length / 2);
     const leftColumn = mainTeam.slice(0, columnSize);
@@ -565,16 +562,13 @@ const App: React.FC = () => {
                     
                     <div className="flex gap-8 w-[2384px]">
                        <div className="w-[1536px] flex flex-col gap-8">
-                            <ManualRegisterSection onRegister={(matricula, subject) => handleManualRegister(matricula, subject, '7H-19H')} />
-                            {mainRegistrations.length > 0 && (
-                                <ManualRegistrationsList
-                                    title="Registros Manuais do Dia (7H-19H)"
-                                    registrations={mainRegistrations}
-                                    employees={employees}
-                                    isAdmin={isAdmin}
-                                    onDelete={handleDeleteManualRegistration}
-                                />
-                            )}
+                            <ManualRegisterSection 
+                                subject={mainSubject}
+                                matricula={mainMatricula}
+                                onSubjectChange={setMainSubject}
+                                onMatriculaChange={setMainMatricula}
+                                onRegister={() => handleManualRegister('7H-19H')} 
+                            />
                             <div className="flex-grow flex gap-8">
                                 <div className="flex flex-col gap-6 w-[752px]">
                                     {leftColumn.map(emp => <EmployeeCard key={emp.id} employee={emp} onStatusChange={handleStatusChange} onToggleSpecialTeam={handleToggleSpecialTeam} isTogglingSpecialTeam={togglingSpecialTeamId === emp.id} isAdmin={isAdmin} onDelete={handleDeleteUser} />)}
@@ -586,15 +580,17 @@ const App: React.FC = () => {
                        </div>
                         <SpecialTeamPanel 
                             specialTeam={specialTeam} 
-                            specialRegistrations={specialRegistrations}
                             onStatusChange={handleStatusChange}
                             onToggleSpecialTeam={handleToggleSpecialTeam}
-                            onRegister={(matricula, subject) => handleManualRegister(matricula, subject, '6H')}
                             togglingSpecialTeamId={togglingSpecialTeamId}
                             isAdmin={isAdmin}
                             onDeleteUser={handleDeleteUser}
-                            onDeleteManualRegistration={handleDeleteManualRegistration}
-                            employees={employees}
+                            // Props for controlled inputs
+                            subject={specialSubject}
+                            matricula={specialMatricula}
+                            onSubjectChange={setSpecialSubject}
+                            onMatriculaChange={setSpecialMatricula}
+                            onRegister={() => handleManualRegister('6H')}
                         />
                     </div>
                 </div>
@@ -614,7 +610,6 @@ const App: React.FC = () => {
                 isOpen={activeModal === ModalType.Report}
                 onClose={() => setActiveModal(ModalType.None)}
                 employees={employees}
-                manualRegistrations={manualRegistrations}
                 showNotification={showNotification}
             />
             <div className="fixed top-5 right-5 z-[100] space-y-3">
@@ -624,26 +619,36 @@ const App: React.FC = () => {
     );
 };
 
-const ManualRegisterSection: React.FC<{onRegister: (matricula: string, subject: string) => void}> = ({onRegister}) => {
-    const [subject, setSubject] = useState('');
-    const [matricula, setMatricula] = useState('');
+interface ManualRegisterSectionProps {
+    subject: string;
+    matricula: string;
+    onSubjectChange: (value: string) => void;
+    onMatriculaChange: (value: string) => void;
+    onRegister: () => void;
+}
 
-    const handleRegisterClick = () => {
-        if (!matricula) return;
-        onRegister(matricula, subject);
-        setSubject('');
-        setMatricula('');
-    };
-    
+const ManualRegisterSection: React.FC<ManualRegisterSectionProps> = ({
+    subject,
+    matricula,
+    onSubjectChange,
+    onMatriculaChange,
+    onRegister
+}) => {
     const handleMatriculaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setMatricula(e.target.value.replace(/[^0-9]/g, ''));
+        onMatriculaChange(e.target.value.replace(/[^0-9]/g, ''));
     };
 
     return (
         <div className="bg-light-card dark:bg-dark-card rounded-3xl p-8 shadow-lg flex items-center gap-6">
             <div className="relative flex-1 max-w-md">
                 <SubjectIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input type="text" value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Assunto do DSS (7H-19H)" className="w-full pl-12 pr-4 py-4 bg-light-bg dark:bg-dark-bg border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"/>
+                <input 
+                    type="text" 
+                    value={subject} 
+                    onChange={(e) => onSubjectChange(e.target.value)} 
+                    placeholder="Assunto do DSS (7H-19H)" 
+                    className="w-full pl-12 pr-4 py-4 bg-light-bg dark:bg-dark-bg border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"
+                />
             </div>
             <div className="relative flex-1 max-w-md">
                 <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -657,7 +662,7 @@ const ManualRegisterSection: React.FC<{onRegister: (matricula: string, subject: 
                     pattern="[0-9]*"
                 />
             </div>
-            <button onClick={handleRegisterClick} className="px-9 py-4 font-bold text-white bg-gradient-to-r from-primary to-primary-dark rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+            <button onClick={onRegister} className="px-9 py-4 font-bold text-white bg-gradient-to-r from-primary to-primary-dark rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
                 REGISTRAR
             </button>
         </div>
@@ -757,9 +762,29 @@ const ReportModal: React.FC<{
     isOpen: boolean;
     onClose: () => void;
     employees: Employee[];
-    manualRegistrations: ManualRegistration[];
     showNotification: (message: string, type?: 'success' | 'error') => void;
-}> = ({ isOpen, onClose, employees, manualRegistrations, showNotification }) => {
+}> = ({ isOpen, onClose, employees, showNotification }) => {
+    const [manualRegistrations, setManualRegistrations] = useState<ManualRegistration[]>([]);
+    
+    useEffect(() => {
+        if (isOpen && db) {
+            const fetchRegistrations = async () => {
+                try {
+                    const registrationsQuery = query(collection(db, 'registrosDSS'));
+                    const querySnapshot = await getDocs(registrationsQuery);
+                    const registrationsData: ManualRegistration[] = querySnapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    } as ManualRegistration));
+                    setManualRegistrations(registrationsData);
+                } catch (error) {
+                    console.error("Error fetching manual registrations for report:", error);
+                    showNotification('Erro ao carregar registros manuais para o relatório.', 'error');
+                }
+            };
+            fetchRegistrations();
+        }
+    }, [isOpen, showNotification]);
 
     const reportText = useMemo(() => {
         if (!employees.length && !manualRegistrations.length) return "Nenhum dado para exibir.";

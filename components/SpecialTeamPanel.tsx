@@ -1,46 +1,38 @@
-import React, { useState } from 'react';
-import { Employee, StatusType, ManualRegistration } from '../types';
+import React from 'react';
+import { Employee, StatusType } from '../types';
 import EmployeeCard from './EmployeeCard';
 import { SubjectIcon, UserIcon } from './icons';
-import ManualRegistrationsList from './ManualRegistrationsList';
 
 interface SpecialTeamPanelProps {
     specialTeam: Employee[];
-    specialRegistrations: ManualRegistration[];
     onStatusChange: (id: string, type: StatusType) => void;
     onToggleSpecialTeam: (id: string) => void;
-    onRegister: (matricula: string, subject: string) => void;
     togglingSpecialTeamId: string | null;
     isAdmin: boolean;
     onDeleteUser: (id: string) => void;
-    onDeleteManualRegistration: (id: string) => void;
-    employees: Employee[];
+    // New props for controlled inputs
+    subject: string;
+    matricula: string;
+    onSubjectChange: (value: string) => void;
+    onMatriculaChange: (value: string) => void;
+    onRegister: () => void;
 }
 
 const SpecialTeamPanel: React.FC<SpecialTeamPanelProps> = ({ 
     specialTeam, 
-    specialRegistrations, 
     onStatusChange, 
     onToggleSpecialTeam, 
-    onRegister, 
     togglingSpecialTeamId, 
     isAdmin, 
     onDeleteUser,
-    onDeleteManualRegistration,
-    employees
+    subject,
+    matricula,
+    onSubjectChange,
+    onMatriculaChange,
+    onRegister
 }) => {
-    const [matricula, setMatricula] = useState('');
-    const [subject, setSubject] = useState('');
-
-    const handleRegister = () => {
-        if (!matricula) return;
-        onRegister(matricula, subject);
-        setMatricula('');
-        setSubject('');
-    };
-
     const handleMatriculaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setMatricula(e.target.value.replace(/[^0-9]/g, ''));
+        onMatriculaChange(e.target.value.replace(/[^0-9]/g, ''));
     };
 
     return (
@@ -53,7 +45,7 @@ const SpecialTeamPanel: React.FC<SpecialTeamPanelProps> = ({
                     <input 
                         type="text" 
                         value={subject}
-                        onChange={(e) => setSubject(e.target.value)}
+                        onChange={(e) => onSubjectChange(e.target.value)}
                         placeholder="Assunto do DSS" 
                         className="w-full pl-12 pr-4 py-4 bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"
                     />
@@ -73,24 +65,12 @@ const SpecialTeamPanel: React.FC<SpecialTeamPanelProps> = ({
             </div>
 
             <button
-                onClick={handleRegister}
+                onClick={onRegister}
                 className="w-full py-4 text-center font-bold text-white bg-gradient-to-r from-primary to-primary-dark rounded-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 mb-8"
             >
                 REGISTRAR
             </button>
             
-            {specialRegistrations.length > 0 && (
-                <div className="mb-8">
-                     <ManualRegistrationsList
-                        title="Registros Manuais do Dia (6H)"
-                        registrations={specialRegistrations}
-                        employees={employees}
-                        isAdmin={isAdmin}
-                        onDelete={onDeleteManualRegistration}
-                     />
-                </div>
-            )}
-
             <div className="space-y-6">
                 {specialTeam.map(employee => (
                     <EmployeeCard 
