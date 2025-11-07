@@ -27,13 +27,6 @@ import { signInAnonymously } from 'firebase/auth';
 import './styles.css';
 import { formatTimestamp } from './services/employeeService';
 
-interface ManualRegistration {
-  matricula: string;
-  subject: string;
-  origin: 'main' | 'special';
-  timestamp: Date;
-}
-
 const App: React.FC = () => {
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [loading, setLoading] = useState(true);
@@ -41,7 +34,6 @@ const App: React.FC = () => {
     const [notifications, setNotifications] = useState<NotificationData[]>([]);
     const [togglingSpecialTeamId, setTogglingSpecialTeamId] = useState<string | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
-    const [manualRegistrations, setManualRegistrations] = useState<ManualRegistration[]>([]);
     const viewportRef = useRef<HTMLDivElement>(null);
     const scalableContainerRef = useRef<HTMLDivElement>(null);
     const scaleStateRef = useRef({ currentScale: 1 });
@@ -346,21 +338,31 @@ const App: React.FC = () => {
         }
     };
 
-    const handleManualRegister = (matricula: string, subject: string, origin: 'main' | 'special') => {
+    const handleManualRegister = async (matricula: string, subject: string, origin: 'main' | 'special') => {
+        if (!db) {
+            showNotification("A conexão com o banco de dados não está disponível.", "error");
+            return;
+        }
         if (!matricula) {
             showNotification('Por favor, insira uma matrícula.', 'error');
             return;
         }
         
-        const newRegistration: ManualRegistration = {
-            matricula,
-            subject: subject || 'Não informado',
-            origin,
-            timestamp: new Date(),
-        };
+        const employee = employees.find(e => e.matricula === matricula);
+        const employeeName = employee ? employee.name : 'Matrícula não encontrada';
 
-        setManualRegistrations(prev => [...prev, newRegistration]);
-        showNotification(`Registro para matrícula ${matricula} adicionado ao relatório.`, 'success');
+        try {
+            await addDoc(collection(db, 'registrosDSS'), {
+                matricula,
+                assunto: subject || 'Não informado',
+                origin,
+                employeeName,
+            });
+            showNotification(`Registro para matrícula ${matricula} salvo com sucesso.`, 'success');
+        } catch (error) {
+            console.error("Error saving manual registration:", error);
+            showNotification('Falha ao salvar o registro manual.', 'error');
+        }
     };
 
     const handleAdminLogin = async (email: string) => {
@@ -549,7 +551,6 @@ const App: React.FC = () => {
                 isOpen={activeModal === ModalType.Report}
                 onClose={() => setActiveModal(ModalType.None)}
                 employees={employees}
-                manualRegistrations={manualRegistrations}
                 showNotification={showNotification}
             />
             <div className="fixed top-5 right-5 z-[100] space-y-3">
@@ -565,6 +566,8 @@ const ManualRegisterSection: React.FC<{onRegister: (matricula: string, subject: 
 
     const handleRegisterClick = () => {
         onRegister(matricula, subject);
+        setSubject('');
+        setMatricula('');
     };
     
     const handleMatriculaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -689,10 +692,33 @@ const ReportModal: React.FC<{
     isOpen: boolean;
     onClose: () => void;
     employees: Employee[];
-    manualRegistrations: ManualRegistration[];
     showNotification: (message: string, type?: 'success' | 'error') => void;
-}> = ({ isOpen, onClose, employees, manualRegistrations, showNotification }) => {
-    
+}> = ({ isOpen, onClose, employees, showNotification }) => {
+    const [manualRegistrations, setManualRegistrations] = useState<any[]>([]);
+    const [isFetching, setIsFetching] = useState(false);
+
+    useEffect(() => {
+        if (isOpen && db) {
+            const fetchRegistrations = async () => {
+                setIsFetching(true);
+                try {
+                    // Since the collection is cleared daily by an external process,
+                    // we can simply fetch all documents in the collection without a date filter.
+                    const q = query(collection(db, 'registrosDSS'));
+                    const querySnapshot = await getDocs(q);
+                    const registrationsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    setManualRegistrations(registrationsData);
+                } catch (error) {
+                    console.error("Failed to fetch manual registrations:", error);
+                    showNotification("Falha ao buscar registros manuais.", "error");
+                } finally {
+                    setIsFetching(false);
+                }
+            };
+            fetchRegistrations();
+        }
+    }, [isOpen, showNotification]);
+
     const reportText = useMemo(() => {
         if (!employees.length && !manualRegistrations.length) return "Nenhum dado para exibir.";
 
@@ -735,17 +761,17 @@ EQUIPE TURNO 6H
 ${specialTeamNames}`;
 
         let manualRegistrationsText = 'Nenhum registro manual adicionado.';
-        if (manualRegistrations.length > 0) {
-            manualRegistrationsText = [...manualRegistrations]
-              .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+        if (isFetching) {
+            manualRegistrationsText = 'Buscando registros manuais...';
+        } else if (manualRegistrations.length > 0) {
+            manualRegistrationsText = manualRegistrations
               .map(reg => {
-                const formattedTimestamp = `${reg.timestamp.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'})} ${reg.timestamp.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
-                return `- Matrícula: ${reg.matricula} | Assunto: ${reg.subject} | Turno: ${reg.origin === 'main' ? '7H-19H' : '6H'} | Hora: ${formattedTimestamp}`
+                return `- Matrícula: ${reg.matricula} (${reg.employeeName}) | Assunto: ${reg.assunto} | Turno: ${reg.origin === 'main' ? '7H-19H' : '6H'}`
               }).join('\n');
         }
 
         return `${employeeReport}\n\n==================================================\n\nREGISTROS MANUAIS\n--------------------------------------------------\n${manualRegistrationsText}`;
-    }, [employees, manualRegistrations]);
+    }, [employees, manualRegistrations, isFetching]);
 
     const handleCopyReport = () => {
         navigator.clipboard.writeText(reportText).then(() => {

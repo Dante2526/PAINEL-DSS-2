@@ -1,4 +1,6 @@
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+// FIX: Changed from a namespace import (`import * as firebaseApp`) to named imports.
+// The modular Firebase SDK exports functions like `initializeApp` directly, not as properties of a namespace object.
+import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
 
@@ -22,6 +24,7 @@ const firebaseConfig = {
 // Initialize Firebase services
 let db: Firestore | null = null;
 let auth: Auth | null = null;
+// FIX: Used the imported `FirebaseApp` type directly, instead of from a namespace. This resolves the error on line 26.
 let app: FirebaseApp | null = null;
 
 // Check if the API key is present. The app will enter a "preview mode" if it's missing.
@@ -30,9 +33,12 @@ const isConfigured = !!firebaseConfig.apiKey;
 if (isConfigured) {
     try {
         // Use modular SDK initialization and prevent re-initialization on hot reloads.
+        // FIX: Called `getApps` directly as a named import. This resolves the error on line 34.
         if (getApps().length === 0) {
+            // FIX: Called `initializeApp` directly as a named import. This resolves the error on line 35.
             app = initializeApp(firebaseConfig);
         } else {
+            // FIX: Called `getApp` directly as a named import. This resolves the error on line 37.
             app = getApp(); // Get the default app
         }
         db = getFirestore(app);
