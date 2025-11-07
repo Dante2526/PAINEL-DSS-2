@@ -1,24 +1,42 @@
 import React, { useState } from 'react';
-import { Employee, StatusType } from '../types';
+import { Employee, StatusType, ManualRegistration } from '../types';
 import EmployeeCard from './EmployeeCard';
 import { SubjectIcon, UserIcon } from './icons';
+import ManualRegistrationsList from './ManualRegistrationsList';
 
 interface SpecialTeamPanelProps {
     specialTeam: Employee[];
+    specialRegistrations: ManualRegistration[];
     onStatusChange: (id: string, type: StatusType) => void;
     onToggleSpecialTeam: (id: string) => void;
     onRegister: (matricula: string, subject: string) => void;
     togglingSpecialTeamId: string | null;
     isAdmin: boolean;
-    onDelete: (id: string) => void;
+    onDeleteUser: (id: string) => void;
+    onDeleteManualRegistration: (id: string) => void;
+    employees: Employee[];
 }
 
-const SpecialTeamPanel: React.FC<SpecialTeamPanelProps> = ({ specialTeam, onStatusChange, onToggleSpecialTeam, onRegister, togglingSpecialTeamId, isAdmin, onDelete }) => {
+const SpecialTeamPanel: React.FC<SpecialTeamPanelProps> = ({ 
+    specialTeam, 
+    specialRegistrations, 
+    onStatusChange, 
+    onToggleSpecialTeam, 
+    onRegister, 
+    togglingSpecialTeamId, 
+    isAdmin, 
+    onDeleteUser,
+    onDeleteManualRegistration,
+    employees
+}) => {
     const [matricula, setMatricula] = useState('');
     const [subject, setSubject] = useState('');
 
     const handleRegister = () => {
+        if (!matricula) return;
         onRegister(matricula, subject);
+        setMatricula('');
+        setSubject('');
     };
 
     const handleMatriculaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,6 +79,18 @@ const SpecialTeamPanel: React.FC<SpecialTeamPanelProps> = ({ specialTeam, onStat
                 REGISTRAR
             </button>
             
+            {specialRegistrations.length > 0 && (
+                <div className="mb-8">
+                     <ManualRegistrationsList
+                        title="Registros Manuais do Dia (6H)"
+                        registrations={specialRegistrations}
+                        employees={employees}
+                        isAdmin={isAdmin}
+                        onDelete={onDeleteManualRegistration}
+                     />
+                </div>
+            )}
+
             <div className="space-y-6">
                 {specialTeam.map(employee => (
                     <EmployeeCard 
@@ -70,7 +100,7 @@ const SpecialTeamPanel: React.FC<SpecialTeamPanelProps> = ({ specialTeam, onStat
                         onToggleSpecialTeam={onToggleSpecialTeam}
                         isTogglingSpecialTeam={togglingSpecialTeamId === employee.id}
                         isAdmin={isAdmin}
-                        onDelete={onDelete}
+                        onDelete={onDeleteUser}
                     />
                 ))}
             </div>

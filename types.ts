@@ -1,4 +1,3 @@
-
 export interface Employee {
   id: string;
   name: string;
@@ -9,6 +8,13 @@ export interface Employee {
   absent: boolean;
   time: string | null;
   inSpecialTeam: boolean;
+}
+
+export interface ManualRegistration {
+  id: string;
+  matricula: string;
+  assunto: string;
+  TURNO: string;
 }
 
 export type StatusType = 'assDss' | 'bem' | 'mal' | 'absent';

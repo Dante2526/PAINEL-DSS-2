@@ -5,7 +5,7 @@ import SpecialTeamPanel from './components/SpecialTeamPanel';
 import Modal from './components/Modal';
 import Notification from './components/Notification';
 import { SubjectIcon, UserIcon, TrashIcon } from './components/icons';
-import { Employee, StatusType, ModalType } from './types';
+import { Employee, StatusType, ModalType, ManualRegistration } from './types';
 import type { NotificationData } from './components/Notification';
 import { db, auth, isConfigured } from './services/firebase';
 import { 
@@ -26,9 +26,11 @@ import {
 import { signInAnonymously } from 'firebase/auth';
 import './styles.css';
 import { formatTimestamp } from './services/employeeService';
+import ManualRegistrationsList from './components/ManualRegistrationsList';
 
 const App: React.FC = () => {
     const [employees, setEmployees] = useState<Employee[]>([]);
+    const [manualRegistrations, setManualRegistrations] = useState<ManualRegistration[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeModal, setActiveModal] = useState<ModalType>(ModalType.None);
     const [notifications, setNotifications] = useState<NotificationData[]>([]);
@@ -66,9 +68,10 @@ const App: React.FC = () => {
     };
 
     useEffect(() => {
-        let unsubscribe = () => {};
+        let unsubscribeEmployees = () => {};
+        let unsubscribeRegistrations = () => {};
 
-        const signInAndSetupListener = async () => {
+        const signInAndSetupListeners = async () => {
              if (!isConfigured) {
                 showNotification("Modo de pré-visualização: Faça o deploy no Vercel para carregar dados ao vivo.", "error");
                 setLoading(false);
@@ -80,12 +83,12 @@ const App: React.FC = () => {
                 await signInAnonymously(auth);
                 console.log("Signed in anonymously");
 
-                const q = query(collection(db, 'employees'), orderBy("name", "asc"));
-                unsubscribe = onSnapshot(q, (querySnapshot) => {
-                    const employeesData: Employee[] = [];
-                    querySnapshot.forEach((doc) => {
+                // Listener for employees
+                const employeesQuery = query(collection(db, 'employees'), orderBy("name", "asc"));
+                unsubscribeEmployees = onSnapshot(employeesQuery, (querySnapshot) => {
+                    const employeesData: Employee[] = querySnapshot.docs.map(doc => {
                         const data = doc.data();
-                        employeesData.push({
+                        return {
                             id: doc.id,
                             name: data.name,
                             matricula: data.matricula,
@@ -95,33 +98,44 @@ const App: React.FC = () => {
                             absent: data.absent,
                             time: data.time ? formatTimestamp(data.time as Timestamp) : null,
                             inSpecialTeam: data.inSpecialTeam,
-                        });
+                        };
                     });
                     setEmployees(employeesData);
-                    
-                    if (loading) {
-                        setLoading(false);
-                        showNotification('Dados carregados com sucesso!', 'success');
-                    }
+                    if (loading) setLoading(false);
                 }, (error) => {
                     console.error("Error listening to employee updates:", error);
-                    const message = error instanceof Error ? error.message : 'Verifique sua conexão e as regras de segurança.';
-                    showNotification(`Não foi possível conectar ao banco de dados: ${message}`, "error");
+                    showNotification(`Erro ao carregar funcionários: ${error.message}`, "error");
                     setLoading(false);
                 });
+                
+                // Listener for manual registrations
+                const registrationsQuery = query(collection(db, 'registrosDSS'));
+                unsubscribeRegistrations = onSnapshot(registrationsQuery, (querySnapshot) => {
+                    const registrationsData: ManualRegistration[] = querySnapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    } as ManualRegistration));
+                    setManualRegistrations(registrationsData);
+                }, (error) => {
+                    console.error("Error listening to manual registrations:", error);
+                    showNotification(`Erro ao carregar registros manuais: ${error.message}`, "error");
+                });
+
+                showNotification('Dados carregados com sucesso!', 'success');
 
             } catch (error) {
-                console.error("Anonymous sign-in failed:", error);
-                const message = error instanceof Error ? error.message : 'Verifique as credenciais do Firebase e as regras de segurança.';
-                showNotification(`Falha na autenticação: ${message}`, "error");
+                console.error("Authentication or listener setup failed:", error);
+                const message = error instanceof Error ? error.message : 'Verifique as credenciais e as regras de segurança do Firebase.';
+                showNotification(`Falha na conexão: ${message}`, "error");
                 setLoading(false);
             }
         };
 
-        signInAndSetupListener();
+        signInAndSetupListeners();
 
         return () => {
-            unsubscribe();
+            unsubscribeEmployees();
+            unsubscribeRegistrations();
         };
     }, [showNotification, loading]);
 
@@ -347,7 +361,7 @@ const App: React.FC = () => {
         }
     };
 
-    const handleManualRegister = async (matricula: string, subject: string, origin: 'main' | 'special') => {
+    const handleManualRegister = async (matricula: string, subject: string, turno: '7H-19H' | '6H') => {
         if (!db) {
             showNotification("A conexão com o banco de dados não está disponível.", "error");
             return;
@@ -357,21 +371,41 @@ const App: React.FC = () => {
             return;
         }
         
-        const employee = employees.find(e => e.matricula === matricula);
-        const employeeName = employee ? employee.name : 'Matrícula não encontrada';
+        // Explicit data object to ensure ONLY the 3 correct fields are saved.
+        // This fixes the issue where extra fields like 'employeeName' and 'origin' were being saved.
+        const registrationData = {
+            matricula,
+            assunto: subject || 'Não informado',
+            TURNO: turno,
+        };
 
         try {
-            await addDoc(collection(db, 'registrosDSS'), {
-                matricula,
-                assunto: subject || 'Não informado',
-                origin,
-                employeeName,
-            });
+            await addDoc(collection(db, 'registrosDSS'), registrationData);
             showNotification(`Registro para matrícula ${matricula} salvo com sucesso.`, 'success');
         } catch (error) {
             console.error("Error saving manual registration:", error);
             const message = error instanceof Error ? error.message : 'Ocorreu um erro desconhecido.';
             showNotification(`Falha ao salvar registro: ${message}`, 'error');
+        }
+    };
+    
+    const handleDeleteManualRegistration = async (id: string) => {
+        if (!db) {
+            showNotification("A conexão com o banco de dados não está disponível.", "error");
+            return;
+        }
+        if (!isAdmin) {
+            showNotification('Apenas administradores podem deletar registros.', 'error');
+            return;
+        }
+
+        try {
+            await deleteDoc(doc(db, 'registrosDSS', id));
+            showNotification('Registro manual deletado com sucesso!', 'success');
+        } catch (error) {
+            console.error("Error deleting manual registration:", error);
+            const message = error instanceof Error ? error.message : 'Ocorreu um erro desconhecido.';
+            showNotification(`Falha ao deletar registro: ${message}`, 'error');
         }
     };
 
@@ -509,6 +543,9 @@ const App: React.FC = () => {
     
     const mainTeam = useMemo(() => employees.filter(e => !e.inSpecialTeam), [employees]);
     const specialTeam = useMemo(() => employees.filter(e => e.inSpecialTeam), [employees]);
+    const mainRegistrations = useMemo(() => manualRegistrations.filter(r => r.TURNO === '7H-19H'), [manualRegistrations]);
+    const specialRegistrations = useMemo(() => manualRegistrations.filter(r => r.TURNO === '6H'), [manualRegistrations]);
+
 
     const columnSize = Math.ceil(mainTeam.length / 2);
     const leftColumn = mainTeam.slice(0, columnSize);
@@ -525,26 +562,39 @@ const App: React.FC = () => {
                         isDarkMode={isDarkMode}
                         onToggleDarkMode={handleToggleDarkMode}
                     />
-
-                    <ManualRegisterSection onRegister={(matricula, subject) => handleManualRegister(matricula, subject, 'main')} />
-
+                    
                     <div className="flex gap-8 w-[2384px]">
-                        <div className="flex-grow flex gap-8">
-                            <div className="flex flex-col gap-6 w-[752px]">
-                                {leftColumn.map(emp => <EmployeeCard key={emp.id} employee={emp} onStatusChange={handleStatusChange} onToggleSpecialTeam={handleToggleSpecialTeam} isTogglingSpecialTeam={togglingSpecialTeamId === emp.id} isAdmin={isAdmin} onDelete={handleDeleteUser} />)}
+                       <div className="w-[1536px] flex flex-col gap-8">
+                            <ManualRegisterSection onRegister={(matricula, subject) => handleManualRegister(matricula, subject, '7H-19H')} />
+                            {mainRegistrations.length > 0 && (
+                                <ManualRegistrationsList
+                                    title="Registros Manuais do Dia (7H-19H)"
+                                    registrations={mainRegistrations}
+                                    employees={employees}
+                                    isAdmin={isAdmin}
+                                    onDelete={handleDeleteManualRegistration}
+                                />
+                            )}
+                            <div className="flex-grow flex gap-8">
+                                <div className="flex flex-col gap-6 w-[752px]">
+                                    {leftColumn.map(emp => <EmployeeCard key={emp.id} employee={emp} onStatusChange={handleStatusChange} onToggleSpecialTeam={handleToggleSpecialTeam} isTogglingSpecialTeam={togglingSpecialTeamId === emp.id} isAdmin={isAdmin} onDelete={handleDeleteUser} />)}
+                                </div>
+                                <div className="flex flex-col gap-6 w-[752px]">
+                                    {rightColumn.map(emp => <EmployeeCard key={emp.id} employee={emp} onStatusChange={handleStatusChange} onToggleSpecialTeam={handleToggleSpecialTeam} isTogglingSpecialTeam={togglingSpecialTeamId === emp.id} isAdmin={isAdmin} onDelete={handleDeleteUser} />)}
+                                </div>
                             </div>
-                            <div className="flex flex-col gap-6 w-[752px]">
-                                {rightColumn.map(emp => <EmployeeCard key={emp.id} employee={emp} onStatusChange={handleStatusChange} onToggleSpecialTeam={handleToggleSpecialTeam} isTogglingSpecialTeam={togglingSpecialTeamId === emp.id} isAdmin={isAdmin} onDelete={handleDeleteUser} />)}
-                            </div>
-                        </div>
+                       </div>
                         <SpecialTeamPanel 
                             specialTeam={specialTeam} 
+                            specialRegistrations={specialRegistrations}
                             onStatusChange={handleStatusChange}
                             onToggleSpecialTeam={handleToggleSpecialTeam}
-                            onRegister={(matricula, subject) => handleManualRegister(matricula, subject, 'special')}
+                            onRegister={(matricula, subject) => handleManualRegister(matricula, subject, '6H')}
                             togglingSpecialTeamId={togglingSpecialTeamId}
                             isAdmin={isAdmin}
-                            onDelete={handleDeleteUser}
+                            onDeleteUser={handleDeleteUser}
+                            onDeleteManualRegistration={handleDeleteManualRegistration}
+                            employees={employees}
                         />
                     </div>
                 </div>
@@ -564,6 +614,7 @@ const App: React.FC = () => {
                 isOpen={activeModal === ModalType.Report}
                 onClose={() => setActiveModal(ModalType.None)}
                 employees={employees}
+                manualRegistrations={manualRegistrations}
                 showNotification={showNotification}
             />
             <div className="fixed top-5 right-5 z-[100] space-y-3">
@@ -578,6 +629,7 @@ const ManualRegisterSection: React.FC<{onRegister: (matricula: string, subject: 
     const [matricula, setMatricula] = useState('');
 
     const handleRegisterClick = () => {
+        if (!matricula) return;
         onRegister(matricula, subject);
         setSubject('');
         setMatricula('');
@@ -588,7 +640,7 @@ const ManualRegisterSection: React.FC<{onRegister: (matricula: string, subject: 
     };
 
     return (
-        <div className="bg-light-card dark:bg-dark-card rounded-3xl p-8 mb-8 shadow-lg flex items-center gap-6 w-[1536px]">
+        <div className="bg-light-card dark:bg-dark-card rounded-3xl p-8 shadow-lg flex items-center gap-6">
             <div className="relative flex-1 max-w-md">
                 <SubjectIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input type="text" value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Assunto do DSS (7H-19H)" className="w-full pl-12 pr-4 py-4 bg-light-bg dark:bg-dark-bg border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"/>
@@ -705,33 +757,9 @@ const ReportModal: React.FC<{
     isOpen: boolean;
     onClose: () => void;
     employees: Employee[];
+    manualRegistrations: ManualRegistration[];
     showNotification: (message: string, type?: 'success' | 'error') => void;
-}> = ({ isOpen, onClose, employees, showNotification }) => {
-    const [manualRegistrations, setManualRegistrations] = useState<any[]>([]);
-    const [isFetching, setIsFetching] = useState(false);
-
-    useEffect(() => {
-        if (isOpen && db) {
-            const fetchRegistrations = async () => {
-                setIsFetching(true);
-                try {
-                    // Since the collection is cleared daily by an external process,
-                    // we can simply fetch all documents in the collection without a date filter.
-                    const q = query(collection(db, 'registrosDSS'));
-                    const querySnapshot = await getDocs(q);
-                    const registrationsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    setManualRegistrations(registrationsData);
-                } catch (error) {
-                    console.error("Failed to fetch manual registrations:", error);
-                    const message = error instanceof Error ? error.message : 'Ocorreu um erro desconhecido.';
-                    showNotification(`Falha ao buscar registros: ${message}`, "error");
-                } finally {
-                    setIsFetching(false);
-                }
-            };
-            fetchRegistrations();
-        }
-    }, [isOpen, showNotification]);
+}> = ({ isOpen, onClose, employees, manualRegistrations, showNotification }) => {
 
     const reportText = useMemo(() => {
         if (!employees.length && !manualRegistrations.length) return "Nenhum dado para exibir.";
@@ -775,17 +803,17 @@ EQUIPE TURNO 6H
 ${specialTeamNames}`;
 
         let manualRegistrationsText = 'Nenhum registro manual adicionado.';
-        if (isFetching) {
-            manualRegistrationsText = 'Buscando registros manuais...';
-        } else if (manualRegistrations.length > 0) {
+        if (manualRegistrations.length > 0) {
             manualRegistrationsText = manualRegistrations
               .map(reg => {
-                return `- Matrícula: ${reg.matricula} (${reg.employeeName}) | Assunto: ${reg.assunto} | Turno: ${reg.origin === 'main' ? '7H-19H' : '6H'}`
+                const employee = employees.find(e => e.matricula === reg.matricula);
+                const employeeName = employee ? employee.name : 'Matrícula não encontrada';
+                return `- Matrícula: ${reg.matricula} (${employeeName}) | Assunto: ${reg.assunto} | Turno: ${reg.TURNO}`
               }).join('\n');
         }
 
         return `${employeeReport}\n\n==================================================\n\nREGISTROS MANUAIS\n--------------------------------------------------\n${manualRegistrationsText}`;
-    }, [employees, manualRegistrations, isFetching]);
+    }, [employees, manualRegistrations]);
 
     const handleCopyReport = () => {
         navigator.clipboard.writeText(reportText).then(() => {
