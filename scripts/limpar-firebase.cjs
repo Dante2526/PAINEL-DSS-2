@@ -1,30 +1,55 @@
-name: Limpar Checkboxes no Firebase (Manual)
+const admin = require('firebase-admin');
 
-on:
-  workflow_dispatch: 
+// Pega o JSON de dentro do Secret do GitHub
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
 
-jobs:
-  limpar-dados-firebase:
-    runs-on: ubuntu-latest
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 
-    steps:
-      - name: Checkout código
-        uses: actions/checkout@v4
+const db = admin.firestore();
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20' 
+async function limparCheckboxes() {
+  console.log('Iniciando limpeza no Firestore...');
 
-      - name: Instalar dependências
-        run: npm install
+  try {
+    // 1. Apontar para a coleção 'employees'
+    const collectionRef = db.collection('employees');
+    
+    // 2. Buscar TODOS os documentos da coleção
+    const snapshot = await collectionRef.get();
 
-      # ---- PASSO DE DEBUG MAIS FOCADO ----
-      - name: Listar arquivos na pasta 'scripts' (debug)
-        run: ls -l scripts
-      # ------------------------------------
+    if (snapshot.empty) {
+      console.log('Nenhum documento encontrado na coleção "employees".');
+      return;
+    }
 
-      - name: Rodar script de limpeza
-        run: node scripts/limpar-firebase.cjs 
-        env:
-          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+    // 3. Preparar um "lote" de atualizações (é mais rápido)
+    const batch = db.batch();
+
+    snapshot.forEach(doc => {
+      console.log(`Preparando atualização para o documento: ${doc.id}`);
+      const docRef = db.collection('employees').doc(doc.id);
+      
+      // 4. Adicionar a atualização ao lote
+      // Usando os nomes exatos da sua imagem: assDss, bem, mal
+      batch.update(docRef, {
+        assDss: false,
+        bem: false,
+        mal: false
+      });
+    });
+    
+    // 5. Executar todas as atualizações de uma vez
+    await batch.commit();
+    
+    console.log(`Sucesso! ${snapshot.size} documentos foram atualizados.`);
+
+  } catch (error) {
+    console.error('ERRO ao limpar checkboxes:', error);
+    process.exit(1); // Faz o GitHub Action falhar
+  }
+}
+
+// Roda a função
+limparCheckboxes();
