@@ -7,7 +7,7 @@ import Notification from './components/Notification';
 import { SubjectIcon, UserIcon } from './components/icons';
 import { Employee, StatusType, ModalType, ManualRegistration } from './types';
 import type { NotificationData } from './components/Notification';
-import { db, auth, isConfigured } from './services/firebase';
+import { db, auth, isConfigured } from './firebase';
 import { 
     collection, 
     query, 
