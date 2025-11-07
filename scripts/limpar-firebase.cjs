@@ -10,7 +10,7 @@ admin.initializeApp({
 const db = admin.firestore();
 
 async function limparCheckboxes() {
-  console.log('Iniciando limpeza no Firestore...');
+  console.log('Iniciando limpeza no Firestore (assDss, bem, mal E time)...');
 
   try {
     // 1. Apontar para a coleção 'employees'
@@ -32,11 +32,12 @@ async function limparCheckboxes() {
       const docRef = db.collection('employees').doc(doc.id);
       
       // 4. Adicionar a atualização ao lote
-      // Usando os nomes exatos da sua imagem: assDss, bem, mal
+      // Usando os nomes exatos da sua imagem
       batch.update(docRef, {
         assDss: false,
         bem: false,
-        mal: false
+        mal: false,
+        time: null // <-- ESTA É A NOVA LINHA QUE ADICIONAMOS
       });
     });
     
