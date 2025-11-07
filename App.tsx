@@ -105,13 +105,15 @@ const App: React.FC = () => {
                     }
                 }, (error) => {
                     console.error("Error listening to employee updates:", error);
-                    showNotification("Não foi possível conectar ao banco de dados. Verifique sua conexão e as regras de segurança.", "error");
+                    const message = error instanceof Error ? error.message : 'Verifique sua conexão e as regras de segurança.';
+                    showNotification(`Não foi possível conectar ao banco de dados: ${message}`, "error");
                     setLoading(false);
                 });
 
             } catch (error) {
                 console.error("Anonymous sign-in failed:", error);
-                showNotification("Falha na autenticação. Verifique as credenciais do Firebase e as regras de segurança.", "error");
+                const message = error instanceof Error ? error.message : 'Verifique as credenciais do Firebase e as regras de segurança.';
+                showNotification(`Falha na autenticação: ${message}`, "error");
                 setLoading(false);
             }
         };
@@ -310,8 +312,14 @@ const App: React.FC = () => {
             updatedData.time = null;
         }
         
-        const docRef = doc(db, 'employees', id);
-        await updateDoc(docRef, updatedData);
+        try {
+            const docRef = doc(db, 'employees', id);
+            await updateDoc(docRef, updatedData);
+        } catch (error) {
+            console.error("Error updating status:", error);
+            const message = error instanceof Error ? error.message : 'Ocorreu um erro desconhecido.';
+            showNotification(`Falha ao atualizar status: ${message}`, 'error');
+        }
     };
     
     const handleToggleSpecialTeam = async (id: string) => {
@@ -332,7 +340,8 @@ const App: React.FC = () => {
             showNotification(`${employee.name} ${!employee.inSpecialTeam ? 'adicionado à' : 'removido da'} turma.`, 'success');
         } catch (error) {
             console.error("Failed to toggle special team status:", error);
-            showNotification('Falha ao atualizar status.', 'error');
+            const message = error instanceof Error ? error.message : 'Ocorreu um erro desconhecido.';
+            showNotification(`Falha ao atualizar status: ${message}`, 'error');
         } finally {
             setTogglingSpecialTeamId(null);
         }
@@ -361,7 +370,8 @@ const App: React.FC = () => {
             showNotification(`Registro para matrícula ${matricula} salvo com sucesso.`, 'success');
         } catch (error) {
             console.error("Error saving manual registration:", error);
-            showNotification('Falha ao salvar o registro manual.', 'error');
+            const message = error instanceof Error ? error.message : 'Ocorreu um erro desconhecido.';
+            showNotification(`Falha ao salvar registro: ${message}`, 'error');
         }
     };
 
@@ -386,7 +396,8 @@ const App: React.FC = () => {
             }
         } catch (error) {
             console.error("Admin login error:", error);
-            showNotification('Erro ao tentar fazer login.', 'error');
+            const message = error instanceof Error ? error.message : 'Ocorreu um erro desconhecido.';
+            showNotification(`Erro no login: ${message}`, 'error');
         }
     };
     
@@ -446,7 +457,8 @@ const App: React.FC = () => {
                 showNotification(`Usuário ${employeeToDelete.name} deletado com sucesso!`, 'success');
             } catch (error) {
                 console.error("Error deleting user:", error);
-                showNotification('Falha ao deletar usuário.', 'error');
+                const message = error instanceof Error ? error.message : 'Ocorreu um erro desconhecido.';
+                showNotification(`Falha ao deletar: ${message}`, 'error');
             }
         }
     };
@@ -477,7 +489,8 @@ const App: React.FC = () => {
             showNotification('Dados de status diário foram limpos!', 'success');
         } catch(error) {
             console.error("Error clearing data:", error);
-            showNotification('Falha ao limpar dados.', 'error');
+            const message = error instanceof Error ? error.message : 'Ocorreu um erro desconhecido.';
+            showNotification(`Falha ao limpar dados: ${message}`, 'error');
         }
     };
 
@@ -710,7 +723,8 @@ const ReportModal: React.FC<{
                     setManualRegistrations(registrationsData);
                 } catch (error) {
                     console.error("Failed to fetch manual registrations:", error);
-                    showNotification("Falha ao buscar registros manuais.", "error");
+                    const message = error instanceof Error ? error.message : 'Ocorreu um erro desconhecido.';
+                    showNotification(`Falha ao buscar registros: ${message}`, "error");
                 } finally {
                     setIsFetching(false);
                 }
