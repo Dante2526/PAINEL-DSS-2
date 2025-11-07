@@ -21,18 +21,16 @@ jobs:
       - name: Verificar se é dia de trabalho (Ciclo 2x2)
         id: verificar-dia 
         run: |
-          # Data base: 7 de Novembro de 2025 (Seu dia de trabalho atual)
-          # ANCHOR_DATE="2025-11-07"
-          # Atualizando para a data de hoje (7/Nov) que você confirmou que é trabalho
-          ANCHOR_DATE=$(date +%Y-%m-%d)
-
+          # Data base: 7 de Novembro de 2025 (Hoje, que é dia de trabalho)
+          ANCHOR_DATE="2025-11-07"
+          
           ANCHOR_SECONDS=$(date -d "$ANCHOR_DATE" +%s)
           CURRENT_SECONDS=$(date +%s)
           
           DIFF_DAYS=$(((CURRENT_SECONDS - ANCHOR_SECONDS) / 86400))
           CYCLE_DAY=$((DIFF_DAYS %% 4))
           
-          # Se o resultado for 0 ou 1, é dia de trabalho (2/2 ciclo)
+          # Se o resultado for 0 ou 1, é dia de trabalho
           if [[ $CYCLE_DAY -eq 0 || $CYCLE_DAY -eq 1 ]]; then
             echo "Hoje é um dia de TRABALHO (Dia $CYCLE_DAY do ciclo). O script VAI rodar."
             echo "should_run=true" >> $GITHUB_OUTPUT
