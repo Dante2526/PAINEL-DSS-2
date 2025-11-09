@@ -39,9 +39,6 @@ const App: React.FC = () => {
     const scalableContainerRef = useRef<HTMLDivElement>(null);
     const scaleStateRef = useRef({ currentScale: 1 });
     const [currentScale, setCurrentScale] = useState(1);
-    // FIX: Changed mobile detection to check for touch events, which is more reliable
-    // when using a fixed-width viewport that emulates a desktop.
-    const [isMobile] = useState('ontouchstart' in window || navigator.maxTouchPoints > 0);
     
     // State for manual registration inputs
     const [mainSubject, setMainSubject] = useState('');
@@ -175,14 +172,14 @@ const App: React.FC = () => {
         const scalableContainer = scalableContainerRef.current;
         if (!viewport || !scalableContainer) return;
 
-        // The logic of fitting to screen is now handled by the dynamic min-width/height
-        if (isMobile) {
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        if (isTouchDevice) {
             const fitScale = viewport.clientWidth / scalableContainer.offsetWidth;
             setScale(fitScale, 0, 0);
         } else {
             setScale(1.0, 0, 0);
         }
-    }, [setScale, isMobile]);
+    }, [setScale]);
 
 
     useEffect(() => {
@@ -554,6 +551,9 @@ const App: React.FC = () => {
     const leftColumn = mainTeam.slice(0, columnSize);
     const rightColumn = mainTeam.slice(columnSize);
 
+    // The modal's scale is the inverse of the page's scale to keep it a consistent size on screen.
+    const modalScale = 1 / currentScale;
+
     return (
         <div className="bg-light-bg-secondary dark:bg-dark-bg min-h-screen text-light-text dark:text-dark-text transition-colors">
             <div ref={viewportRef} className="viewport fixed inset-0">
@@ -602,7 +602,7 @@ const App: React.FC = () => {
                 </div>
             </div>
             
-            <AdminLoginModal isOpen={activeModal === ModalType.AdminLogin} onClose={() => setActiveModal(ModalType.None)} onLogin={handleAdminLogin} scale={currentScale} isMobile={isMobile} />
+            <AdminLoginModal isOpen={activeModal === ModalType.AdminLogin} onClose={() => setActiveModal(ModalType.None)} onLogin={handleAdminLogin} scale={modalScale} />
             <AdminOptionsModal 
                 isOpen={activeModal === ModalType.AdminOptions} 
                 onClose={() => setActiveModal(ModalType.None)} 
@@ -610,17 +610,15 @@ const App: React.FC = () => {
                 onReorganize={handleReorganize} 
                 onAddUser={() => setActiveModal(ModalType.AddUser)}
                 onSendReport={() => setActiveModal(ModalType.Report)}
-                scale={currentScale}
-                isMobile={isMobile}
+                scale={modalScale}
             />
-            <AddUserModal isOpen={activeModal === ModalType.AddUser} onClose={() => setActiveModal(ModalType.None)} onAdd={handleAddUser} scale={currentScale} isMobile={isMobile} />
+            <AddUserModal isOpen={activeModal === ModalType.AddUser} onClose={() => setActiveModal(ModalType.None)} onAdd={handleAddUser} scale={modalScale} />
             <ReportModal 
                 isOpen={activeModal === ModalType.Report}
                 onClose={() => setActiveModal(ModalType.None)}
                 employees={employees}
                 showNotification={showNotification}
-                scale={currentScale}
-                isMobile={isMobile}
+                scale={modalScale}
             />
             <div className="fixed top-5 right-5 z-[100] space-y-3">
                 {notifications.map(n => <Notification key={n.id} notification={n} onDismiss={dismissNotification} />)}
@@ -679,7 +677,7 @@ const ManualRegisterSection: React.FC<ManualRegisterSectionProps> = ({
     );
 };
 
-const AdminLoginModal: React.FC<{isOpen: boolean, onClose: () => void, onLogin: (email: string) => void, scale?: number, isMobile: boolean}> = ({isOpen, onClose, onLogin, scale, isMobile}) => {
+const AdminLoginModal: React.FC<{isOpen: boolean, onClose: () => void, onLogin: (email: string) => void, scale?: number}> = ({isOpen, onClose, onLogin, scale}) => {
     const [email, setEmail] = useState('');
 
     const handleSubmit = () => {
@@ -688,7 +686,7 @@ const AdminLoginModal: React.FC<{isOpen: boolean, onClose: () => void, onLogin: 
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Acesso Administrativo" scale={scale} isMobile={isMobile}>
+        <Modal isOpen={isOpen} onClose={onClose} title="Acesso Administrativo" scale={scale}>
             <div className="space-y-4">
                 <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
                     Insira o e-mail de administrador para continuar.
@@ -716,10 +714,9 @@ const AdminOptionsModal: React.FC<{
     onReorganize: () => void, 
     onAddUser: () => void, 
     onSendReport: () => void,
-    scale?: number,
-    isMobile: boolean
-}> = ({isOpen, onClose, onClear, onReorganize, onAddUser, onSendReport, scale, isMobile}) => (
-    <Modal isOpen={isOpen} onClose={onClose} title="Opções Administrativas" scale={scale} isMobile={isMobile}>
+    scale?: number
+}> = ({isOpen, onClose, onClear, onReorganize, onAddUser, onSendReport, scale}) => (
+    <Modal isOpen={isOpen} onClose={onClose} title="Opções Administrativas" scale={scale}>
         <div className="space-y-4">
             <button onClick={onClear} className="w-full py-4 font-bold text-white bg-orange rounded-lg hover:bg-orange-600 transition">LIMPAR STATUS DIÁRIO</button>
             <button onClick={onSendReport} className="w-full py-4 font-bold text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition">GERAR RELATÓRIO</button>
@@ -729,7 +726,7 @@ const AdminOptionsModal: React.FC<{
     </Modal>
 );
 
-const AddUserModal: React.FC<{isOpen: boolean, onClose: () => void, onAdd: (name: string, matricula: string) => void, scale?: number, isMobile: boolean}> = ({isOpen, onClose, onAdd, scale, isMobile}) => {
+const AddUserModal: React.FC<{isOpen: boolean, onClose: () => void, onAdd: (name: string, matricula: string) => void, scale?: number}> = ({isOpen, onClose, onAdd, scale}) => {
     const [name, setName] = useState('');
     const [matricula, setMatricula] = useState('');
     
@@ -746,7 +743,7 @@ const AddUserModal: React.FC<{isOpen: boolean, onClose: () => void, onAdd: (name
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Adicionar Novo Usuário" scale={scale} isMobile={isMobile}>
+        <Modal isOpen={isOpen} onClose={onClose} title="Adicionar Novo Usuário" scale={scale}>
             <div className="space-y-4">
                 <div className="relative">
                     <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -776,8 +773,7 @@ const ReportModal: React.FC<{
     employees: Employee[];
     showNotification: (message: string, type?: 'success' | 'error') => void;
     scale?: number;
-    isMobile: boolean;
-}> = ({ isOpen, onClose, employees, showNotification, scale, isMobile }) => {
+}> = ({ isOpen, onClose, employees, showNotification, scale }) => {
     const [manualRegistrations, setManualRegistrations] = useState<ManualRegistration[]>([]);
     
     useEffect(() => {
@@ -904,7 +900,7 @@ ${specialTeamNames}`;
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Relatório de Status" scale={scale} isMobile={isMobile}>
+        <Modal isOpen={isOpen} onClose={onClose} title="Relatório de Status" scale={scale}>
             <div className="text-left bg-light-bg dark:bg-dark-bg-secondary p-4 rounded-lg max-h-96 overflow-y-auto">
                 <pre className="whitespace-pre-wrap text-sm font-mono text-light-text dark:text-dark-text">{reportText}</pre>
             </div>
