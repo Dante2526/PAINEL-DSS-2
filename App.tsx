@@ -4,6 +4,7 @@ import EmployeeCard from './components/EmployeeCard';
 import SpecialTeamPanel from './components/SpecialTeamPanel';
 import Modal from './components/Modal';
 import Notification from './components/Notification';
+import ZoomIndicator from './components/ZoomIndicator';
 import { SubjectIcon, UserIcon } from './components/icons';
 import { Employee, StatusType, ModalType, ManualRegistration } from './types';
 import type { NotificationData } from './components/Notification';
@@ -37,6 +38,9 @@ const App: React.FC = () => {
     const viewportRef = useRef<HTMLDivElement>(null);
     const scalableContainerRef = useRef<HTMLDivElement>(null);
     const scaleStateRef = useRef({ currentScale: 1 });
+    const [zoomLevel, setZoomLevel] = useState(100);
+    const [showZoomIndicator, setShowZoomIndicator] = useState(false);
+    const zoomIndicatorTimeoutRef = useRef<number | null>(null);
     
     // State for manual registration inputs
     const [mainSubject, setMainSubject] = useState('');
@@ -151,8 +155,20 @@ const App: React.FC = () => {
         const scalableContainer = scalableContainerRef.current;
         if (!viewport || !scalableContainer) return;
 
-        const finalScale = Math.max(0.1, Math.min(newScale, 2.0)); // Use a small fixed minimum
+        const finalScale = Math.max(0.1, Math.min(newScale, 2.0));
         scaleStateRef.current.currentScale = finalScale;
+
+        // Zoom indicator logic
+        const percentage = Math.round(finalScale * 100);
+        setZoomLevel(percentage);
+        setShowZoomIndicator(true);
+
+        if (zoomIndicatorTimeoutRef.current) {
+            clearTimeout(zoomIndicatorTimeoutRef.current);
+        }
+        zoomIndicatorTimeoutRef.current = window.setTimeout(() => {
+            setShowZoomIndicator(false);
+        }, 2000); // Hide after 2 seconds
 
         // Dynamically set minWidth and minHeight to ensure the container always fills the viewport,
         // effectively expanding it when zoomed out.
@@ -612,6 +628,7 @@ const App: React.FC = () => {
                 employees={employees}
                 showNotification={showNotification}
             />
+            <ZoomIndicator level={zoomLevel} isVisible={showZoomIndicator} />
             <div className="fixed top-5 right-5 z-[100] space-y-3">
                 {notifications.map(n => <Notification key={n.id} notification={n} onDismiss={dismissNotification} />)}
             </div>
