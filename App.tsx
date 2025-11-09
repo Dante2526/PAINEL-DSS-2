@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Header from './components/Header';
 import EmployeeCard from './components/EmployeeCard';
@@ -67,16 +66,10 @@ const App: React.FC = () => {
             const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
             
             if (isTouchDevice) {
-                // The modal has max-w-sm (384px). The layout viewport is 2448px.
-                // We want the modal to be ~90% of the visual viewport width.
-                // Scale = (target_width_on_screen / base_width) * (layout_viewport / visual_viewport)
-                // Since target_width_on_screen = 0.9 * visual_viewport, this simplifies to:
-                // Scale = (0.9 * layout_viewport) / base_width
-                const layoutViewportWidth = 2448;
-                const modalBaseWidth = 384; // Corresponds to max-w-sm
-                const desiredScreenWidthRatio = 0.9;
-                const scale = (layoutViewportWidth * desiredScreenWidthRatio) / modalBaseWidth;
-                setModalScale(scale);
+                // The previous scale factor made the modal too large.
+                // This new, smaller factor provides a better balance, making the modal
+                // large and legible without taking over the entire screen.
+                setModalScale(4.5);
             } else {
                 setModalScale(1); // Default scale for desktop
             }
