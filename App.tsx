@@ -39,7 +39,9 @@ const App: React.FC = () => {
     const scalableContainerRef = useRef<HTMLDivElement>(null);
     const scaleStateRef = useRef({ currentScale: 1 });
     const [currentScale, setCurrentScale] = useState(1);
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    // FIX: Changed mobile detection to check for touch events, which is more reliable
+    // when using a fixed-width viewport that emulates a desktop.
+    const [isMobile] = useState('ontouchstart' in window || navigator.maxTouchPoints > 0);
     
     // State for manual registration inputs
     const [mainSubject, setMainSubject] = useState('');
@@ -53,14 +55,6 @@ const App: React.FC = () => {
         return window.matchMedia('(prefers-color-scheme: dark)').matches;
     });
     
-    useEffect(() => {
-        const handleResizeForMobile = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
-        window.addEventListener('resize', handleResizeForMobile);
-        return () => window.removeEventListener('resize', handleResizeForMobile);
-    }, []);
-
     useEffect(() => {
         if (isDarkMode) {
             document.documentElement.classList.add('dark');
