@@ -38,7 +38,7 @@ const App: React.FC = () => {
     const viewportRef = useRef<HTMLDivElement>(null);
     const scalableContainerRef = useRef<HTMLDivElement>(null);
     const scaleStateRef = useRef({ currentScale: 1 });
-    const [currentScale, setCurrentScale] = useState(1);
+    const [modalScale, setModalScale] = useState(1);
     
     // State for manual registration inputs
     const [mainSubject, setMainSubject] = useState('');
@@ -61,6 +61,31 @@ const App: React.FC = () => {
             localStorage.setItem('theme', 'light');
         }
     }, [isDarkMode]);
+
+    useEffect(() => {
+        const calculateModalScale = () => {
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            
+            if (isTouchDevice) {
+                // The modal has max-w-sm (384px). The layout viewport is 2448px.
+                // We want the modal to be ~90% of the visual viewport width.
+                // Scale = (target_width_on_screen / base_width) * (layout_viewport / visual_viewport)
+                // Since target_width_on_screen = 0.9 * visual_viewport, this simplifies to:
+                // Scale = (0.9 * layout_viewport) / base_width
+                const layoutViewportWidth = 2448;
+                const modalBaseWidth = 384; // Corresponds to max-w-sm
+                const desiredScreenWidthRatio = 0.9;
+                const scale = (layoutViewportWidth * desiredScreenWidthRatio) / modalBaseWidth;
+                setModalScale(scale);
+            } else {
+                setModalScale(1); // Default scale for desktop
+            }
+        };
+
+        calculateModalScale();
+        window.addEventListener('resize', calculateModalScale);
+        return () => window.removeEventListener('resize', calculateModalScale);
+    }, []);
 
     const handleToggleDarkMode = () => setIsDarkMode(prev => !prev);
 
@@ -155,7 +180,6 @@ const App: React.FC = () => {
 
         const finalScale = Math.max(0.1, Math.min(newScale, 2.0));
         scaleStateRef.current.currentScale = finalScale;
-        setCurrentScale(finalScale);
 
         // Dynamically set minWidth and minHeight to ensure the container always fills the viewport,
         // effectively expanding it when zoomed out.
@@ -550,9 +574,6 @@ const App: React.FC = () => {
     const columnSize = Math.ceil(mainTeam.length / 2);
     const leftColumn = mainTeam.slice(0, columnSize);
     const rightColumn = mainTeam.slice(columnSize);
-
-    // The modal's scale is the inverse of the page's scale to keep it a consistent size on screen.
-    const modalScale = 1 / currentScale;
 
     return (
         <div className="bg-light-bg-secondary dark:bg-dark-bg min-h-screen text-light-text dark:text-dark-text transition-colors">
