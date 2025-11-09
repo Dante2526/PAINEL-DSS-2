@@ -4,6 +4,7 @@ import EmployeeCard from './components/EmployeeCard';
 import SpecialTeamPanel from './components/SpecialTeamPanel';
 import Modal from './components/Modal';
 import Notification from './components/Notification';
+import Footer from './components/Footer';
 import { SubjectIcon, UserIcon } from './components/icons';
 import { Employee, StatusType, ModalType, ManualRegistration } from './types';
 import type { NotificationData } from './components/Notification';
@@ -27,6 +28,8 @@ import { signInAnonymously } from 'firebase/auth';
 import './styles.css';
 import { formatTimestamp } from './services/employeeService';
 
+const DESIGN_WIDTH = 2400; // The fixed width of the design
+
 const App: React.FC = () => {
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [loading, setLoading] = useState(true);
@@ -34,10 +37,6 @@ const App: React.FC = () => {
     const [notifications, setNotifications] = useState<NotificationData[]>([]);
     const [togglingSpecialTeamId, setTogglingSpecialTeamId] = useState<string | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
-    const viewportRef = useRef<HTMLDivElement>(null);
-    const scalableContainerRef = useRef<HTMLDivElement>(null);
-    const scaleStateRef = useRef({ currentScale: 1 });
-    const [modalScale, setModalScale] = useState(1);
     
     // State for manual registration inputs
     const [mainSubject, setMainSubject] = useState('');
@@ -50,6 +49,37 @@ const App: React.FC = () => {
         if (savedTheme) return savedTheme === 'dark';
         return window.matchMedia('(prefers-color-scheme: dark)').matches;
     });
+
+    // Scaling state and refs
+    const [scale, setScale] = useState(1);
+    const scalableContainerRef = useRef<HTMLDivElement>(null);
+    const heightSizerRef = useRef<HTMLDivElement>(null);
+
+    const updateLayout = useCallback(() => {
+        const newScale = window.innerWidth / DESIGN_WIDTH;
+        setScale(newScale);
+
+        // Update the height of the sizer element to ensure correct scrolling behavior
+        // Use a timeout to wait for the DOM to render and calculate correct scrollHeight
+        setTimeout(() => {
+            if (scalableContainerRef.current && heightSizerRef.current) {
+                const containerHeight = scalableContainerRef.current.scrollHeight;
+                heightSizerRef.current.style.height = `${containerHeight * newScale}px`;
+            }
+        }, 100);
+        
+    }, []);
+
+    useEffect(() => {
+        updateLayout();
+        window.addEventListener('resize', updateLayout);
+        return () => window.removeEventListener('resize', updateLayout);
+    }, [updateLayout]);
+    
+    // Re-calculate layout when employees list changes, as this affects content height
+    useEffect(() => {
+        updateLayout();
+    }, [employees, updateLayout]);
     
     useEffect(() => {
         if (isDarkMode) {
@@ -60,26 +90,6 @@ const App: React.FC = () => {
             localStorage.setItem('theme', 'light');
         }
     }, [isDarkMode]);
-
-    useEffect(() => {
-        const calculateModalScale = () => {
-            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-            
-            if (isTouchDevice) {
-                // The previous scale factor (4.5) was still a bit too large,
-                // causing the modal to be clipped vertically on some phone screens.
-                // This further reduced factor provides a better fit, ensuring the entire
-                // modal is visible while remaining large and legible.
-                setModalScale(3.8);
-            } else {
-                setModalScale(1); // Default scale for desktop
-            }
-        };
-
-        calculateModalScale();
-        window.addEventListener('resize', calculateModalScale);
-        return () => window.removeEventListener('resize', calculateModalScale);
-    }, []);
 
     const handleToggleDarkMode = () => setIsDarkMode(prev => !prev);
 
@@ -166,131 +176,6 @@ const App: React.FC = () => {
             unsubscribeRegistrations();
         };
     }, [showNotification, loading]);
-
-    const setScale = useCallback((newScale: number, scrollX?: number, scrollY?: number) => {
-        const viewport = viewportRef.current;
-        const scalableContainer = scalableContainerRef.current;
-        if (!viewport || !scalableContainer) return;
-
-        const finalScale = Math.max(0.1, Math.min(newScale, 2.0));
-        scaleStateRef.current.currentScale = finalScale;
-
-        // Dynamically set minWidth and minHeight to ensure the container always fills the viewport,
-        // effectively expanding it when zoomed out.
-        scalableContainer.style.minWidth = `${viewport.clientWidth / finalScale}px`;
-        scalableContainer.style.minHeight = `${viewport.clientHeight / finalScale}px`;
-
-        scalableContainer.style.transform = `scale(${finalScale})`;
-        if (scrollX !== undefined) viewport.scrollLeft = scrollX;
-        if (scrollY !== undefined) viewport.scrollTop = scrollY;
-    }, []);
-
-    const initializeScale = useCallback(() => {
-        const viewport = viewportRef.current;
-        const scalableContainer = scalableContainerRef.current;
-        if (!viewport || !scalableContainer) return;
-
-        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-        if (isTouchDevice) {
-            const fitScale = viewport.clientWidth / scalableContainer.offsetWidth;
-            setScale(fitScale, 0, 0);
-        } else {
-            setScale(1.0, 0, 0);
-        }
-    }, [setScale]);
-
-
-    useEffect(() => {
-        const viewport = viewportRef.current;
-        const scalableContainer = scalableContainerRef.current;
-
-        if (!viewport || !scalableContainer) return;
-
-        let initialDistance = 0;
-        let initialScale = 1;
-        let scrollStart = { x: 0, y: 0 };
-        let touchCenter = { x: 0, y: 0 };
-        
-        const handleTouchStart = (e: TouchEvent) => {
-            if (e.touches.length === 2) {
-                e.preventDefault();
-                initialDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-                initialScale = scaleStateRef.current.currentScale;
-                scrollStart = { x: viewport.scrollLeft, y: viewport.scrollTop };
-                touchCenter = {
-                    x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
-                    y: (e.touches[0].clientY + e.touches[1].clientY) / 2
-                };
-            }
-        };
-
-        const handleTouchMove = (e: TouchEvent) => {
-            if (e.touches.length === 2) {
-                e.preventDefault();
-                const currentDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-                const scaleRatio = currentDistance / initialDistance;
-                const newScale = initialScale * scaleRatio;
-                
-                const originX = touchCenter.x - viewport.getBoundingClientRect().left;
-                const originY = touchCenter.y - viewport.getBoundingClientRect().top;
-
-                const contentOriginX = (scrollStart.x + originX) / initialScale;
-                const contentOriginY = (scrollStart.y + originY) / initialScale;
-
-                const newScrollX = (contentOriginX * newScale) - originX;
-                const newScrollY = (contentOriginY * newScale) - originY;
-                
-                setScale(newScale, newScrollX, newScrollY);
-            }
-        };
-
-        const handleWheel = (e: WheelEvent) => {
-            if (e.ctrlKey || e.metaKey) {
-                e.preventDefault();
-                const zoomIntensity = 0.002;
-                const delta = -e.deltaY * zoomIntensity;
-                const newScale = scaleStateRef.current.currentScale + delta * scaleStateRef.current.currentScale;
-
-                const originX = e.clientX - viewport.getBoundingClientRect().left;
-                const originY = e.clientY - viewport.getBoundingClientRect().top;
-
-                const contentOriginX = (viewport.scrollLeft + originX) / scaleStateRef.current.currentScale;
-                const contentOriginY = (viewport.scrollTop + originY) / scaleStateRef.current.currentScale;
-
-                const newScrollX = (contentOriginX * newScale) - originX;
-                const newScrollY = (contentOriginY * newScale) - originY;
-
-                setScale(newScale, newScrollX, newScrollY);
-            }
-        };
-
-        let lastWidth = window.innerWidth;
-        const handleResize = () => {
-            if (window.innerWidth !== lastWidth) {
-                lastWidth = window.innerWidth;
-                // Re-applying the scale will trigger a recalculation of minWidth/minHeight
-                // based on the new viewport dimensions.
-                setScale(scaleStateRef.current.currentScale);
-            }
-        };
-
-        window.addEventListener('load', initializeScale);
-        window.addEventListener('resize', handleResize);
-        viewport.addEventListener('wheel', handleWheel, { passive: false });
-        viewport.addEventListener('touchstart', handleTouchStart, { passive: false });
-        viewport.addEventListener('touchmove', handleTouchMove, { passive: false });
-
-        return () => {
-            window.removeEventListener('load', initializeScale);
-            window.removeEventListener('resize', handleResize);
-            if (viewport) {
-              viewport.removeEventListener('wheel', handleWheel);
-              viewport.removeEventListener('touchstart', handleTouchStart);
-              viewport.removeEventListener('touchmove', handleTouchMove);
-            }
-        };
-
-    }, [initializeScale, setScale]);
 
     const handleStatusChange = async (id: string, type: StatusType) => {
         if (!db) {
@@ -570,54 +455,67 @@ const App: React.FC = () => {
     const rightColumn = mainTeam.slice(columnSize);
 
     return (
-        <div className="bg-light-bg-secondary dark:bg-dark-bg min-h-screen text-light-text dark:text-dark-text transition-colors">
-            <div ref={viewportRef} className="viewport fixed inset-0">
-                <div ref={scalableContainerRef} className="scalable-container w-[2448px] p-8">
-                    <Header
-                        stats={stats}
-                        loading={loading}
-                        onAdminClick={() => setActiveModal(ModalType.AdminLogin)}
-                        isDarkMode={isDarkMode}
-                        onToggleDarkMode={handleToggleDarkMode}
-                    />
-                    
-                    <div className="flex gap-8 w-[2384px]">
-                       <div className="w-[1536px] flex flex-col gap-8">
-                            <ManualRegisterSection 
-                                subject={mainSubject}
-                                matricula={mainMatricula}
-                                onSubjectChange={setMainSubject}
-                                onMatriculaChange={setMainMatricula}
-                                onRegister={() => handleManualRegister('7H-19H')} 
-                            />
-                            <div className="flex-grow flex gap-8">
-                                <div className="flex flex-col gap-6 w-[752px]">
-                                    {leftColumn.map(emp => <EmployeeCard key={emp.id} employee={emp} onStatusChange={handleStatusChange} onToggleSpecialTeam={handleToggleSpecialTeam} isTogglingSpecialTeam={togglingSpecialTeamId === emp.id} isAdmin={isAdmin} onDelete={handleDeleteUser} />)}
+        <>
+            <div className="viewport">
+                <div ref={heightSizerRef}>
+                    <div
+                        ref={scalableContainerRef}
+                        className="scalable-container"
+                        style={{ transform: `scale(${scale})` }}
+                    >
+                        <div className="bg-light-bg-secondary dark:bg-dark-bg text-light-text dark:text-dark-text transition-colors">
+                             <main className="p-8">
+                                <Header
+                                    stats={stats}
+                                    loading={loading}
+                                    onAdminClick={() => setActiveModal(ModalType.AdminLogin)}
+                                    isDarkMode={isDarkMode}
+                                    onToggleDarkMode={handleToggleDarkMode}
+                                />
+                                
+                                <div className="flex gap-8">
+                                   <div className="w-[1536px] flex flex-col gap-8">
+                                        <ManualRegisterSection 
+                                            subject={mainSubject}
+                                            matricula={mainMatricula}
+                                            onSubjectChange={setMainSubject}
+                                            onMatriculaChange={setMainMatricula}
+                                            onRegister={() => handleManualRegister('7H-19H')} 
+                                        />
+                                        <div className="grid grid-cols-2 gap-8">
+                                            <div className="flex flex-col gap-6">
+                                                {leftColumn.map(emp => <EmployeeCard key={emp.id} employee={emp} onStatusChange={handleStatusChange} onToggleSpecialTeam={handleToggleSpecialTeam} isTogglingSpecialTeam={togglingSpecialTeamId === emp.id} isAdmin={isAdmin} onDelete={handleDeleteUser} />)}
+                                            </div>
+                                            <div className="flex flex-col gap-6">
+                                                {rightColumn.map(emp => <EmployeeCard key={emp.id} employee={emp} onStatusChange={handleStatusChange} onToggleSpecialTeam={handleToggleSpecialTeam} isTogglingSpecialTeam={togglingSpecialTeamId === emp.id} isAdmin={isAdmin} onDelete={handleDeleteUser} />)}
+                                            </div>
+                                        </div>
+                                   </div>
+                                   <div className="w-[800px]">
+                                    <SpecialTeamPanel 
+                                        specialTeam={specialTeam} 
+                                        onStatusChange={handleStatusChange}
+                                        onToggleSpecialTeam={handleToggleSpecialTeam}
+                                        togglingSpecialTeamId={togglingSpecialTeamId}
+                                        isAdmin={isAdmin}
+                                        onDeleteUser={handleDeleteUser}
+                                        subject={specialSubject}
+                                        matricula={specialMatricula}
+                                        onSubjectChange={setSpecialSubject}
+                                        onMatriculaChange={setSpecialMatricula}
+                                        onRegister={() => handleManualRegister('6H')}
+                                    />
+                                   </div>
                                 </div>
-                                <div className="flex flex-col gap-6 w-[752px]">
-                                    {rightColumn.map(emp => <EmployeeCard key={emp.id} employee={emp} onStatusChange={handleStatusChange} onToggleSpecialTeam={handleToggleSpecialTeam} isTogglingSpecialTeam={togglingSpecialTeamId === emp.id} isAdmin={isAdmin} onDelete={handleDeleteUser} />)}
-                                </div>
-                            </div>
-                       </div>
-                        <SpecialTeamPanel 
-                            specialTeam={specialTeam} 
-                            onStatusChange={handleStatusChange}
-                            onToggleSpecialTeam={handleToggleSpecialTeam}
-                            togglingSpecialTeamId={togglingSpecialTeamId}
-                            isAdmin={isAdmin}
-                            onDeleteUser={handleDeleteUser}
-                            // Props for controlled inputs
-                            subject={specialSubject}
-                            matricula={specialMatricula}
-                            onSubjectChange={setSpecialSubject}
-                            onMatriculaChange={setSpecialMatricula}
-                            onRegister={() => handleManualRegister('6H')}
-                        />
+                            </main>
+                            <Footer />
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <AdminLoginModal isOpen={activeModal === ModalType.AdminLogin} onClose={() => setActiveModal(ModalType.None)} onLogin={handleAdminLogin} scale={modalScale} />
+            {/* Modals, Notifications, and Zoom are kept outside the scaled container to maintain readability and correct positioning */}
+            <AdminLoginModal isOpen={activeModal === ModalType.AdminLogin} onClose={() => setActiveModal(ModalType.None)} onLogin={handleAdminLogin} />
             <AdminOptionsModal 
                 isOpen={activeModal === ModalType.AdminOptions} 
                 onClose={() => setActiveModal(ModalType.None)} 
@@ -625,20 +523,18 @@ const App: React.FC = () => {
                 onReorganize={handleReorganize} 
                 onAddUser={() => setActiveModal(ModalType.AddUser)}
                 onSendReport={() => setActiveModal(ModalType.Report)}
-                scale={modalScale}
             />
-            <AddUserModal isOpen={activeModal === ModalType.AddUser} onClose={() => setActiveModal(ModalType.None)} onAdd={handleAddUser} scale={modalScale} />
+            <AddUserModal isOpen={activeModal === ModalType.AddUser} onClose={() => setActiveModal(ModalType.None)} onAdd={handleAddUser} />
             <ReportModal 
                 isOpen={activeModal === ModalType.Report}
                 onClose={() => setActiveModal(ModalType.None)}
                 employees={employees}
                 showNotification={showNotification}
-                scale={modalScale}
             />
-            <div className="fixed top-5 right-5 z-[100] space-y-3">
+            <div className="fixed top-5 right-5 left-5 sm:left-auto z-[100] space-y-3 flex flex-col items-center sm:items-end">
                 {notifications.map(n => <Notification key={n.id} notification={n} onDismiss={dismissNotification} />)}
             </div>
-        </div>
+        </>
     );
 };
 
@@ -663,7 +559,7 @@ const ManualRegisterSection: React.FC<ManualRegisterSectionProps> = ({
 
     return (
         <div className="bg-light-card dark:bg-dark-card rounded-3xl p-8 shadow-lg flex items-center gap-6">
-            <div className="relative flex-1 max-w-md">
+            <div className="relative flex-1">
                 <SubjectIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input 
                     type="text" 
@@ -673,7 +569,7 @@ const ManualRegisterSection: React.FC<ManualRegisterSectionProps> = ({
                     className="w-full pl-12 pr-4 py-4 bg-light-bg dark:bg-dark-bg border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"
                 />
             </div>
-            <div className="relative flex-1 max-w-md">
+            <div className="relative flex-1">
                 <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input 
                     type="text" 
@@ -685,14 +581,14 @@ const ManualRegisterSection: React.FC<ManualRegisterSectionProps> = ({
                     pattern="[0-9]*"
                 />
             </div>
-            <button onClick={onRegister} className="px-9 py-4 font-bold text-white bg-gradient-to-r from-primary to-primary-dark rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+            <button onClick={onRegister} className="w-auto px-9 py-4 font-bold text-white bg-gradient-to-r from-primary to-primary-dark rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
                 REGISTRAR
             </button>
         </div>
     );
 };
 
-const AdminLoginModal: React.FC<{isOpen: boolean, onClose: () => void, onLogin: (email: string) => void, scale?: number}> = ({isOpen, onClose, onLogin, scale}) => {
+const AdminLoginModal: React.FC<{isOpen: boolean, onClose: () => void, onLogin: (email: string) => void}> = ({isOpen, onClose, onLogin}) => {
     const [email, setEmail] = useState('');
 
     const handleSubmit = () => {
@@ -701,7 +597,7 @@ const AdminLoginModal: React.FC<{isOpen: boolean, onClose: () => void, onLogin: 
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Acesso Administrativo" scale={scale}>
+        <Modal isOpen={isOpen} onClose={onClose} title="Acesso Administrativo">
             <div className="space-y-4">
                 <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
                     Insira o e-mail de administrador para continuar.
@@ -728,10 +624,9 @@ const AdminOptionsModal: React.FC<{
     onClear: () => void, 
     onReorganize: () => void, 
     onAddUser: () => void, 
-    onSendReport: () => void,
-    scale?: number
-}> = ({isOpen, onClose, onClear, onReorganize, onAddUser, onSendReport, scale}) => (
-    <Modal isOpen={isOpen} onClose={onClose} title="Opções Administrativas" scale={scale}>
+    onSendReport: () => void
+}> = ({isOpen, onClose, onClear, onReorganize, onAddUser, onSendReport}) => (
+    <Modal isOpen={isOpen} onClose={onClose} title="Opções Administrativas">
         <div className="space-y-4">
             <button onClick={onClear} className="w-full py-4 font-bold text-white bg-orange rounded-lg hover:bg-orange-600 transition">LIMPAR STATUS DIÁRIO</button>
             <button onClick={onSendReport} className="w-full py-4 font-bold text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition">GERAR RELATÓRIO</button>
@@ -741,7 +636,7 @@ const AdminOptionsModal: React.FC<{
     </Modal>
 );
 
-const AddUserModal: React.FC<{isOpen: boolean, onClose: () => void, onAdd: (name: string, matricula: string) => void, scale?: number}> = ({isOpen, onClose, onAdd, scale}) => {
+const AddUserModal: React.FC<{isOpen: boolean, onClose: () => void, onAdd: (name: string, matricula: string) => void}> = ({isOpen, onClose, onAdd}) => {
     const [name, setName] = useState('');
     const [matricula, setMatricula] = useState('');
     
@@ -758,7 +653,7 @@ const AddUserModal: React.FC<{isOpen: boolean, onClose: () => void, onAdd: (name
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Adicionar Novo Usuário" scale={scale}>
+        <Modal isOpen={isOpen} onClose={onClose} title="Adicionar Novo Usuário">
             <div className="space-y-4">
                 <div className="relative">
                     <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -787,8 +682,7 @@ const ReportModal: React.FC<{
     onClose: () => void;
     employees: Employee[];
     showNotification: (message: string, type?: 'success' | 'error') => void;
-    scale?: number;
-}> = ({ isOpen, onClose, employees, showNotification, scale }) => {
+}> = ({ isOpen, onClose, employees, showNotification }) => {
     const [manualRegistrations, setManualRegistrations] = useState<ManualRegistration[]>([]);
     
     useEffect(() => {
@@ -915,7 +809,7 @@ ${specialTeamNames}`;
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Relatório de Status" scale={scale}>
+        <Modal isOpen={isOpen} onClose={onClose} title="Relatório de Status">
             <div className="text-left bg-light-bg dark:bg-dark-bg-secondary p-4 rounded-lg max-h-96 overflow-y-auto">
                 <pre className="whitespace-pre-wrap text-sm font-mono text-light-text dark:text-dark-text">{reportText}</pre>
             </div>

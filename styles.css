@@ -1,24 +1,32 @@
+/* === VIEWPORT SCALING STYLES === */
+html, body, #root {
+    height: 100%;
+    overflow: hidden; /* Prevent default body scrolling */
+    background-color: #f5f7fa; /* Match light theme background */
+}
 
-/* === GENERAL STYLES === */
-body {
-    overflow: hidden; /* Prevent the main page from scrolling */
+.dark, .dark body {
+    background-color: #1A202C; /* Match dark theme background */
 }
 
 .viewport {
-    overflow: auto; /* Allow this container to have scrollbars */
-    cursor: grab;
-}
-
-.viewport:active {
-    cursor: grabbing;
+  width: 100vw;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .scalable-container {
-    transform-origin: 0 0; /* Anchor scaling to the top-left corner */
-    will-change: transform; /* Hint to the browser for performance optimization */
-    transition: transform 0.05s ease-out; /* Add a slight smoothness to scaling */
+  /* This is the fixed design width that will be scaled down */
+  width: 2400px; 
+  transform-origin: top left;
+  transition: transform 0.2s ease-out;
 }
 
+/* === GENERAL STYLES === */
+body {
+    overflow-x: hidden; /* Prevent horizontal scroll on smaller screens */
+}
 
 /* === BB-8 TOGGLE STYLES === */
 .bb8-toggle {
