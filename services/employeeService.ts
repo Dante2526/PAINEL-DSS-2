@@ -1,4 +1,5 @@
-import { Timestamp } from 'firebase/firestore';
+// FIX: Switched to scoped Firebase package for Timestamp import to match project configuration.
+import { Timestamp } from '@firebase/firestore';
 
 // Helper function to format Firestore Timestamp or string
 export const formatTimestamp = (time: Timestamp | string | null): string => {

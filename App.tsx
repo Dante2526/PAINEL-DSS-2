@@ -8,6 +8,7 @@ import { SubjectIcon, UserIcon } from './components/icons';
 import { Employee, StatusType, ModalType, ManualRegistration } from './types';
 import type { NotificationData } from './components/Notification';
 import { db, auth, isConfigured } from './firebase';
+// FIX: Switched to scoped Firebase packages for imports to match project configuration and resolve module errors.
 import { 
     collection, 
     query, 
@@ -22,8 +23,9 @@ import {
     where,
     getDocs,
     deleteDoc
-} from 'firebase/firestore';
-import { signInAnonymously } from 'firebase/auth';
+} from '@firebase/firestore';
+// FIX: Switched to scoped Firebase packages for imports to match project configuration and resolve module errors.
+import { signInAnonymously } from '@firebase/auth';
 import './styles.css';
 import { formatTimestamp } from './services/employeeService';
 
