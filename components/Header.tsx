@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import DarkModeToggle from './DarkModeToggle';
 import { AdminIcon } from './icons';
@@ -28,19 +29,15 @@ const Header: React.FC<HeaderProps> = ({ stats, loading, onAdminClick, isDarkMod
         <header className="bg-light-card dark:bg-dark-card rounded-3xl p-6 md:p-10 mb-8 shadow-lg flex justify-between items-center w-[2384px] transition-colors">
             <div className="flex items-center gap-4">
                 {loading ? (
-                    <div className="w-8 h-8 border-4 border-primary-light border-t-primary rounded-full animate-spin"></div>
+                    <div className="w-10 h-10 border-4 border-primary-light border-t-primary rounded-full animate-spin"></div>
                 ) : (
-                    <div className="w-8 h-8 text-primary">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                      </svg>
+                    <div className="text-4xl text-primary">
+                      🛡️
                     </div>
                 )}
                 <div>
-                    <div className="flex items-center gap-4">
-                        <h1 className="text-3xl font-bold text-light-text dark:text-dark-text">🛡️ Painel de Acompanhamento DSS</h1>
-                    </div>
-                    <p className="text-light-text-secondary dark:text-dark-text-secondary">Diálogo Diário de Segurança - Monitoramento em tempo real</p>
+                    <h1 className="text-3xl font-bold text-light-text dark:text-dark-text">Painel de Acompanhamento DSS</h1>
+                    <p className="text-light-text-secondary dark:text-dark-text-secondary">Diálogo de Saúde e Segurança - Monitoramento em tempo real</p>
                 </div>
             </div>
             <div className="flex flex-col items-end gap-5">
