@@ -8,18 +8,13 @@ on:
 jobs:
   enviar-relatorio-job:
     runs-on: ubuntu-latest
-    # A correção do checkout com defeito acontece aqui:
-    # Nós dizemos ao job para rodar DENTRO da pasta duplicada
-    defaults:
-      run:
-        working-directory: ./PAINEL-DSS-2
+    # NENHUMA pasta 'defaults' ou 'working-directory' aqui
 
     steps:
-      - name: Checkout código (com defeito)
+      - name: Checkout código
         uses: actions/checkout@v4
-        # O checkout baixa para PAINEL-DSS-2, então o path fica duplicado
-        # Mas o 'defaults' acima conserta isso para todos os passos abaixo
 
+      # Lógica de verificação (manual vs agendado)
       - name: Verificar se é dia de trabalho OU teste manual
         id: verificar-dia
         env:
