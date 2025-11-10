@@ -635,7 +635,10 @@ const App: React.FC = () => {
                 showNotification={showNotification}
                 scale={modalScale}
             />
-            <div className="fixed top-5 right-5 z-[100] space-y-3">
+            <div 
+                className="fixed top-5 right-5 z-[100] space-y-3"
+                style={{ transform: `scale(${modalScale})`, transformOrigin: 'top right' }}
+            >
                 {notifications.map(n => <Notification key={n.id} notification={n} onDismiss={dismissNotification} />)}
             </div>
         </div>
