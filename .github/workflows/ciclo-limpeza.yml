@@ -8,13 +8,10 @@ on:
 jobs:
   limpar-dados-firebase:
     runs-on: ubuntu-latest
-    # A correção do checkout com defeito acontece aqui:
-    defaults:
-      run:
-        working-directory: ./PAINEL-DSS-2
+    # NENHUMA pasta 'defaults' ou 'working-directory' aqui
 
     steps:
-      - name: Checkout código (com defeito)
+      - name: Checkout código
         uses: actions/checkout@v4
 
       - name: Verificar se é dia de trabalho OU teste manual
