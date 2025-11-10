@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Employee, StatusType } from '../types';
 import { ShiftIcon, AbsentIcon, TrashIcon } from './icons';
@@ -87,13 +86,13 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onStatusChange, o
 
     return (
         <div className="w-full bg-light-card dark:bg-dark-card rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-            <div className={`p-6 flex flex-row items-center gap-4 text-white ${getHeaderClass()}`}>
-                <div className="w-14 h-14 bg-white/25 rounded-full flex items-center justify-center text-2xl mr-5 flex-shrink-0">👤</div>
+            <div className={`p-6 flex items-center text-white ${getHeaderClass()}`}>
+                <div className="w-14 h-14 bg-white/25 rounded-full flex items-center justify-center text-2xl mr-5">👤</div>
                 <div className="flex-grow">
                     <div className="text-xl font-bold">{employee.name}</div>
                     <div className="text-sm opacity-90">Matrícula: {employee.matricula}</div>
                 </div>
-                <div className="flex gap-2.5 justify-end">
+                <div className="flex gap-2.5">
                     <button
                         onClick={handleToggleSpecialTeamClick}
                         disabled={isTogglingSpecialTeam}

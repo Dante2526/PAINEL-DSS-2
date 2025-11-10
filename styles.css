@@ -1,7 +1,24 @@
+
 /* === GENERAL STYLES === */
 body {
-    /* A propriedade overflow-x: hidden foi removida para permitir a rolagem horizontal em telas menores, acomodando o layout de largura fixa. */
+    overflow: hidden; /* Prevent the main page from scrolling */
 }
+
+.viewport {
+    overflow: auto; /* Allow this container to have scrollbars */
+    cursor: grab;
+}
+
+.viewport:active {
+    cursor: grabbing;
+}
+
+.scalable-container {
+    transform-origin: 0 0; /* Anchor scaling to the top-left corner */
+    will-change: transform; /* Hint to the browser for performance optimization */
+    transition: transform 0.05s ease-out; /* Add a slight smoothness to scaling */
+}
+
 
 /* === BB-8 TOGGLE STYLES === */
 .bb8-toggle {

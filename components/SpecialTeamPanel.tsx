@@ -36,7 +36,7 @@ const SpecialTeamPanel: React.FC<SpecialTeamPanelProps> = ({
     };
 
     return (
-        <div className="w-full bg-light-card dark:bg-dark-card rounded-3xl p-8 shadow-lg h-fit">
+        <div className="w-[800px] flex-shrink-0 bg-light-card dark:bg-dark-card rounded-3xl p-8 shadow-lg h-fit">
             <h2 className="text-2xl font-bold text-center text-light-text dark:text-dark-text pb-4 mb-6 border-b-2 border-gray-200 dark:border-gray-700">TURNO 6H</h2>
             
             <div className="space-y-4 mb-6 pb-6 border-b-2 border-gray-200 dark:border-gray-700">

@@ -6,18 +6,25 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   children: ReactNode;
+  scale?: number;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, scale = 1 }) => {
   if (!isOpen) return null;
+
+  const modalStyle = { 
+    transform: `scale(${scale})`, 
+    animation: 'fade-in-scale 0.3s forwards ease-out' 
+  };
 
   return (
     <div 
-      className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 transition-opacity duration-300 animate-fade-in"
+      className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 transition-opacity duration-300"
       onClick={onClose}
     >
       <div 
-        className="bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 w-11/12 max-w-md text-center relative animate-scale-in"
+        className="bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center"
+        style={modalStyle}
         onClick={(e) => e.stopPropagation()}
       >
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-3xl z-10">&times;</button>
@@ -25,16 +32,10 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
         {children}
       </div>
       <style>{`
-        @keyframes fade-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
+        @keyframes fade-in-scale {
+          from { opacity: 0; transform: scale(${scale * 0.95}); }
+          to { opacity: 1; transform: scale(${scale}); }
         }
-        @keyframes scale-in {
-          from { opacity: 0; transform: scale(0.95); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        .animate-fade-in { animation: fade-in 0.2s forwards ease-out; }
-        .animate-scale-in { animation: scale-in 0.2s forwards ease-out; }
       `}</style>
     </div>
   );
