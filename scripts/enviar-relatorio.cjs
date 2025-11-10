@@ -10,6 +10,9 @@ const EMAIL_TO = process.env.EMAIL_TO;
 
 // --- CORREÇÃO AQUI ---
 // Inicializa o app PADRÃO (default). Não precisa de nome.
+// O script de limpeza (limpar-firebase.cjs) também inicializa o app padrão,
+// mas como eles rodam em workflows SEPARADOS (1h e 10h), eles nunca vão
+// entrar em conflito.
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
