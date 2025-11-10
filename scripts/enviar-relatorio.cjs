@@ -44,18 +44,15 @@ async function gerarRelatorio() {
     empSnapshot.forEach(doc => {
       const emp = doc.data();
 
-      // --- LÓGICA CORRETA PARA O FLUXO DAS 10H ---
-      // 1. O funcionário está "Mal"?
+      // Lógica de separação (baseada no fluxo das 10h)
       if (emp.mal === true) {
         if (emp.turno === "6H") cat_6H_EstouMal.push(emp);
         else cat_7H_EstouMal.push(emp);
       
-      // 2. O funcionário está "Bem" E "ASS.DSS"?
       } else if (emp.assDss === true && emp.bem === true) {
         if (emp.turno === "6H") cat_6H_EstouBem.push(emp);
         else cat_7H_EstouBem.push(emp);
       
-      // 3. Se não for nenhum dos acima, ele não preencheu.
       } else {
         if (emp.turno === "6H") cat_6H_Ausentes.push(emp);
         else cat_7H_Ausentes.push(emp);
@@ -81,9 +78,6 @@ async function gerarRelatorio() {
   }
 
   // --- 3. MONTAR O CORPO DO E-MAIL ---
-  // Usamos <pre> para fonte monoespaçada
-  // E <br> (em vez de \n) para FORÇAR a quebra de linha
-  
   let htmlBody = `<pre>`;
   
   const totalPresentes = cat_7H_EstouBem.length + cat_7H_EstouMal.length + cat_6H_EstouBem.length + cat_6H_EstouMal.length;
@@ -101,19 +95,22 @@ async function gerarRelatorio() {
   htmlBody += `STATUS: "ASS.DSS + ESTOU BEM"<br>`;
   htmlBody += `--------------------------------------------------<br>`;
   if (cat_7H_EstouBem.length === 0) htmlBody += `Nenhum<br>`;
-  cat_7H_EstouBem.forEach(emp => { htmlBody += `${emp.name} (Matrícula: ${emp.matricula})<br>`; });
+  // --- CORREÇÃO AQUI: .replace() ---
+  cat_7H_EstouBem.forEach(emp => { htmlBody += `${emp.name.replace(/\n/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
   htmlBody += `<br>`;
   
   htmlBody += `STATUS "ESTOU MAL"<br>`;
   htmlBody += `--------------------------------------------------<br>`;
   if (cat_7H_EstouMal.length === 0) htmlBody += `Nenhum<br>`;
-  cat_7H_EstouMal.forEach(emp => { htmlBody += `${emp.name} (Matrícula: ${emp.matricula})<br>`; });
+  // --- CORREÇÃO AQUI: .replace() ---
+  cat_7H_EstouMal.forEach(emp => { htmlBody += `${emp.name.replace(/\n/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
   htmlBody += `<br>`;
 
-  htmlBody += `PENDENTES / AUSENTES<br>`; // Nome atualizado
+  htmlBody += `PENDENTES / AUSENTES<br>`;
   htmlBody += `--------------------------------------------------<br>`;
   if (cat_7H_Ausentes.length === 0) htmlBody += `Nenhum<br>`;
-  cat_7H_Ausentes.forEach(emp => { htmlBody += `${emp.name} (Matrícula: ${emp.matricula})<br>`; });
+  // --- CORREÇÃO AQUI: .replace() ---
+  cat_7H_Ausentes.forEach(emp => { htmlBody += `${emp.name.replace(/\n/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
   htmlBody += `<br><br>`;
 
   // --- EQUIPE TURNO 6H ---
@@ -122,19 +119,22 @@ async function gerarRelatorio() {
   htmlBody += `STATUS: "ASS.DSS + ESTOU BEM"<br>`;
   htmlBody += `--------------------------------------------------<br>`;
   if (cat_6H_EstouBem.length === 0) htmlBody += `Nenhum<br>`;
-  cat_6H_EstouBem.forEach(emp => { htmlBody += `${emp.name} (Matrícula: ${emp.matricula})<br>`; });
+  // --- CORREÇÃO AQUI: .replace() ---
+  cat_6H_EstouBem.forEach(emp => { htmlBody += `${emp.name.replace(/\n/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
   htmlBody += `<br>`;
   
   htmlBody += `STATUS "ESTOU MAL"<br>`;
   htmlBody += `--------------------------------------------------<br>`;
   if (cat_6H_EstouMal.length === 0) htmlBody += `Nenhum<br>`;
-  cat_6H_EstouMal.forEach(emp => { htmlBody += `${emp.name} (Matrícula: ${emp.matricula})<br>`; });
+  // --- CORREÇÃO AQUI: .replace() ---
+  cat_6H_EstouMal.forEach(emp => { htmlBody += `${emp.name.replace(/\n/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
   htmlBody += `<br>`;
 
-  htmlBody += `PENDENTES / AUSENTES<br>`; // Nome atualizado
+  htmlBody += `PENDENTES / AUSENTES<br>`;
   htmlBody += `--------------------------------------------------<br>`;
   if (cat_6H_Ausentes.length === 0) htmlBody += `Nenhum<br>`;
-  cat_6H_Ausentes.forEach(emp => { htmlBody += `${emp.name} (Matrícula: ${emp.matricula})<br>`; });
+  // --- CORREÇÃO AQUI: .replace() ---
+  cat_6H_Ausentes.forEach(emp => { htmlBody += `${emp.name.replace(/\n/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
   htmlBody += `<br><br>`;
   
   // --- REGISTROS DE ASSUNTO DSS (SEPARADOS) ---
@@ -144,8 +144,9 @@ async function gerarRelatorio() {
   if (registros7H.length === 0) {
     htmlBody += `Nenhum registro de assunto encontrado para 7H-19H.<br>`;
   } else {
+    // Adicionando a limpeza para o assunto também (por segurança)
     registros7H.forEach(reg => {
-      htmlBody += `Assunto: ${reg.assunto} (Matrícula: ${reg.matricula})<br>`;
+      htmlBody += `Assunto: ${reg.assunto.replace(/\n/g, ' ')} (Matrícula: ${reg.matricula})<br>`;
     });
   }
   htmlBody += `<br>`;
@@ -155,8 +156,9 @@ async function gerarRelatorio() {
   if (registros6H.length === 0) {
     htmlBody += `Nenhum registro de assunto encontrado para 6H.<br>`;
   } else {
+    // Adicionando a limpeza para o assunto também (por segurança)
     registros6H.forEach(reg => {
-      htmlBody += `Assunto: ${reg.assunto} (Matrícula: ${reg.matricula})<br>`;
+      htmlBody += `Assunto: ${reg.assunto.replace(/\n/g, ' ')} (Matrícula: ${reg.matricula})<br>`;
     });
   }
 
