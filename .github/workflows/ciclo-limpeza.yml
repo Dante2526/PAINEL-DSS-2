@@ -10,22 +10,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout código
+      - name: Checkout código (com defeito)
         uses: actions/checkout@v4
 
-      # --- PASSO DE VERIFICAÇÃO ATUALIZADO ---
+      # --- AQUI ESTÁ A CORREÇÃO (A "VOLTA") ---
+      - name: Mover para a pasta do código (Correção)
+        # Entra na pasta duplicada que o checkout criou
+        run: cd $GITHUB_WORKSPACE/PAINEL-DSS-2
+        # Define esta pasta como o local de trabalho para os próximos passos
+        working-directory: ./PAINEL-DSS-2
+
+      # Este passo agora roda DENTRO da pasta correta
       - name: Verificar se é dia de trabalho OU teste manual
         id: verificar-dia
         env:
-          # Pega o nome do evento (schedule ou workflow_dispatch)
           GITHUB_EVENT_NAME: ${{ github.event_name }}
         run: |
-          # 1. VERIFICA SE É MANUAL
+          # (O resto do script de verificação...)
           if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
-            echo "É um TESTE MANUAL. A limpeza VAI rodar (ignorando o ciclo 2x2)."
+            echo "É um TESTE MANUAL. A limpeza VAI rodar."
             echo "should_run=true" >> $GITHUB_OUTPUT
-          
-          # 2. SE NÃO FOR MANUAL, É AGENDADO. CHECAR O CICLO.
           else
             echo "É uma execução AGENDADA. Verificando o ciclo 2x2..."
             ANCHOR_DATE="2025-11-07"
@@ -33,24 +37,30 @@ jobs:
             CURRENT_SECONDS=$(date +%s)
             DIFF_DAYS=$(((CURRENT_SECONDS - ANCHOR_SECONDS) / 86400))
             CYCLE_DAY=$((DIFF_DAYS % 4))
-            
             if [[ $CYCLE_DAY -eq 0 || $CYCLE_DAY -eq 1 ]]; then
-              echo "Hoje é um dia de TRABALHO (Dia $CYCLE_DAY do ciclo). A limpeza VAI rodar."
+              echo "Hoje é dia de TRABALHO. A limpeza VAI rodar."
               echo "should_run=true" >> $GITHUB_OUTPUT
             else
-              echo "Hoje é um dia de FOLGA (Dia $CYCLE_DAY do ciclo). A limpeza NÃO vai rodar."
+              echo "Hoje é dia de FOLGA. A limpeza NÃO vai rodar."
               echo "should_run=false" >> $GITHUB_OUTPUT
             fi
           fi
+        # IMPORTANTE: Diz a este passo para rodar na pasta correta
+        working-directory: ./PAINEL-DSS-2
 
       # Este passo SÓ RODA se a verificação (manual ou agendada) passar
       - name: Instalar dependências
         if: steps.verificar-dia.outputs.should_run == 'true'
         run: npm install
+        # IMPORTANTE: Diz a este passo para rodar na pasta correta
+        working-directory: ./PAINEL-DSS-2
 
       # Este passo SÓ RODA se a verificação (manual ou agendada) passar
       - name: Rodar script de limpeza
         if: steps.verificar-dia.outputs.should_run == 'true'
+        # O caminho agora é mais simples (só "scripts/...")
         run: node scripts/limpar-firebase.cjs 
         env:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        # IMPORTANTE: Diz a este passo para rodar na pasta correta
+        working-directory: ./PAINEL-DSS-2
