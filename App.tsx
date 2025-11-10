@@ -122,7 +122,7 @@ const App: React.FC = () => {
                             mal: data.mal,
                             absent: data.absent,
                             time: data.time ? formatTimestamp(data.time as Timestamp) : null,
-                            inSpecialTeam: data.inSpecialTeam,
+                            turno: data.turno || '7H',
                         };
                     });
                     setEmployees(employeesData);
@@ -378,8 +378,11 @@ const App: React.FC = () => {
 
         try {
             const docRef = doc(db, 'employees', id);
-            await updateDoc(docRef, { inSpecialTeam: !employee.inSpecialTeam });
-            showNotification(`${employee.name} ${!employee.inSpecialTeam ? 'adicionado à' : 'removido da'} turma.`, 'success');
+            const newTurno = employee.turno === '6H' ? '7H' : '6H';
+            await updateDoc(docRef, { 
+                turno: newTurno
+            });
+            showNotification(`${employee.name} foi movido para o turno ${newTurno}.`, 'success');
         } catch (error) {
             console.error("Failed to toggle special team status:", error);
             const message = error instanceof Error ? error.message : 'Ocorreu um erro desconhecido.';
@@ -480,7 +483,7 @@ const App: React.FC = () => {
                 mal: false,
                 absent: false,
                 time: null,
-                inSpecialTeam: false
+                turno: '7H'
             });
             setActiveModal(ModalType.None);
             showNotification(`Usuário ${name} adicionado com sucesso!`, 'success');
@@ -562,8 +565,8 @@ const App: React.FC = () => {
         total: employees.length,
     }), [employees]);
     
-    const mainTeam = useMemo(() => employees.filter(e => !e.inSpecialTeam), [employees]);
-    const specialTeam = useMemo(() => employees.filter(e => e.inSpecialTeam), [employees]);
+    const mainTeam = useMemo(() => employees.filter(e => e.turno !== '6H'), [employees]);
+    const specialTeam = useMemo(() => employees.filter(e => e.turno === '6H'), [employees]);
 
     const columnSize = Math.ceil(mainTeam.length / 2);
     const leftColumn = mainTeam.slice(0, columnSize);
@@ -828,7 +831,7 @@ const ReportModal: React.FC<{
         const bemNames = getNames(e => e.bem);
         const malNames = getNames(e => e.mal);
         const absentNames = getNames(e => e.absent);
-        const specialTeamNames = getNames(e => e.inSpecialTeam);
+        const specialTeamNames = getNames(e => e.turno === '6H');
 
         const employeeReport = `RELATÓRIO DE STATUS - ${today}
 ==================================================

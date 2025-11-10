@@ -7,7 +7,7 @@ export interface Employee {
   mal: boolean;
   absent: boolean;
   time: string | null;
-  inSpecialTeam: boolean;
+  turno: string;
 }
 
 export interface ManualRegistration {

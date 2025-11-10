@@ -96,7 +96,7 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onStatusChange, o
                     <button
                         onClick={handleToggleSpecialTeamClick}
                         disabled={isTogglingSpecialTeam}
-                        className={`turno-button ${employee.inSpecialTeam ? 'active' : ''} ${isTogglingSpecialTeam ? 'loading' : ''}`}
+                        className={`turno-button ${employee.turno === '6H' ? 'active' : ''} ${isTogglingSpecialTeam ? 'loading' : ''}`}
                     >
                         <div className="default-state">
                             <ShiftIcon className="w-5 h-5" />
