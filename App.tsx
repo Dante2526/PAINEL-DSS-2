@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Header from './components/Header';
 import EmployeeCard from './components/EmployeeCard';
 import SpecialTeamPanel from './components/SpecialTeamPanel';
 import Modal from './components/Modal';
 import Notification from './components/Notification';
-import Footer from './components/Footer';
 import { SubjectIcon, UserIcon } from './components/icons';
 import { Employee, StatusType, ModalType, ManualRegistration } from './types';
 import type { NotificationData } from './components/Notification';
@@ -28,8 +27,6 @@ import { signInAnonymously } from 'firebase/auth';
 import './styles.css';
 import { formatTimestamp } from './services/employeeService';
 
-const DESIGN_WIDTH = 2400; // The fixed width of the design
-
 const App: React.FC = () => {
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [loading, setLoading] = useState(true);
@@ -49,37 +46,6 @@ const App: React.FC = () => {
         if (savedTheme) return savedTheme === 'dark';
         return window.matchMedia('(prefers-color-scheme: dark)').matches;
     });
-
-    // Scaling state and refs
-    const [scale, setScale] = useState(1);
-    const scalableContainerRef = useRef<HTMLDivElement>(null);
-    const heightSizerRef = useRef<HTMLDivElement>(null);
-
-    const updateLayout = useCallback(() => {
-        const newScale = window.innerWidth / DESIGN_WIDTH;
-        setScale(newScale);
-
-        // Update the height of the sizer element to ensure correct scrolling behavior
-        // Use a timeout to wait for the DOM to render and calculate correct scrollHeight
-        setTimeout(() => {
-            if (scalableContainerRef.current && heightSizerRef.current) {
-                const containerHeight = scalableContainerRef.current.scrollHeight;
-                heightSizerRef.current.style.height = `${containerHeight * newScale}px`;
-            }
-        }, 100);
-        
-    }, []);
-
-    useEffect(() => {
-        updateLayout();
-        window.addEventListener('resize', updateLayout);
-        return () => window.removeEventListener('resize', updateLayout);
-    }, [updateLayout]);
-    
-    // Re-calculate layout when employees list changes, as this affects content height
-    useEffect(() => {
-        updateLayout();
-    }, [employees, updateLayout]);
     
     useEffect(() => {
         if (isDarkMode) {
@@ -455,66 +421,52 @@ const App: React.FC = () => {
     const rightColumn = mainTeam.slice(columnSize);
 
     return (
-        <>
-            <div className="viewport">
-                <div ref={heightSizerRef}>
-                    <div
-                        ref={scalableContainerRef}
-                        className="scalable-container"
-                        style={{ transform: `scale(${scale})` }}
-                    >
-                        <div className="bg-light-bg-secondary dark:bg-dark-bg text-light-text dark:text-dark-text transition-colors">
-                             <main className="p-8">
-                                <Header
-                                    stats={stats}
-                                    loading={loading}
-                                    onAdminClick={() => setActiveModal(ModalType.AdminLogin)}
-                                    isDarkMode={isDarkMode}
-                                    onToggleDarkMode={handleToggleDarkMode}
-                                />
-                                
-                                <div className="flex gap-8">
-                                   <div className="w-[1536px] flex flex-col gap-8">
-                                        <ManualRegisterSection 
-                                            subject={mainSubject}
-                                            matricula={mainMatricula}
-                                            onSubjectChange={setMainSubject}
-                                            onMatriculaChange={setMainMatricula}
-                                            onRegister={() => handleManualRegister('7H-19H')} 
-                                        />
-                                        <div className="grid grid-cols-2 gap-8">
-                                            <div className="flex flex-col gap-6">
-                                                {leftColumn.map(emp => <EmployeeCard key={emp.id} employee={emp} onStatusChange={handleStatusChange} onToggleSpecialTeam={handleToggleSpecialTeam} isTogglingSpecialTeam={togglingSpecialTeamId === emp.id} isAdmin={isAdmin} onDelete={handleDeleteUser} />)}
-                                            </div>
-                                            <div className="flex flex-col gap-6">
-                                                {rightColumn.map(emp => <EmployeeCard key={emp.id} employee={emp} onStatusChange={handleStatusChange} onToggleSpecialTeam={handleToggleSpecialTeam} isTogglingSpecialTeam={togglingSpecialTeamId === emp.id} isAdmin={isAdmin} onDelete={handleDeleteUser} />)}
-                                            </div>
-                                        </div>
-                                   </div>
-                                   <div className="w-[800px]">
-                                    <SpecialTeamPanel 
-                                        specialTeam={specialTeam} 
-                                        onStatusChange={handleStatusChange}
-                                        onToggleSpecialTeam={handleToggleSpecialTeam}
-                                        togglingSpecialTeamId={togglingSpecialTeamId}
-                                        isAdmin={isAdmin}
-                                        onDeleteUser={handleDeleteUser}
-                                        subject={specialSubject}
-                                        matricula={specialMatricula}
-                                        onSubjectChange={setSpecialSubject}
-                                        onMatriculaChange={setSpecialMatricula}
-                                        onRegister={() => handleManualRegister('6H')}
-                                    />
-                                   </div>
-                                </div>
-                            </main>
-                            <Footer />
+        <div className="bg-light-bg-secondary dark:bg-dark-bg min-h-screen text-light-text dark:text-dark-text transition-colors">
+            <main className="container mx-auto p-4 sm:p-6 lg:p-8">
+                <Header
+                    stats={stats}
+                    loading={loading}
+                    onAdminClick={() => setActiveModal(ModalType.AdminLogin)}
+                    isDarkMode={isDarkMode}
+                    onToggleDarkMode={handleToggleDarkMode}
+                />
+                
+                <div className="flex flex-col lg:flex-row gap-8">
+                   <div className="w-full lg:w-2/3 flex flex-col gap-8">
+                        <ManualRegisterSection 
+                            subject={mainSubject}
+                            matricula={mainMatricula}
+                            onSubjectChange={setMainSubject}
+                            onMatriculaChange={setMainMatricula}
+                            onRegister={() => handleManualRegister('7H-19H')} 
+                        />
+                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                            <div className="flex flex-col gap-6">
+                                {leftColumn.map(emp => <EmployeeCard key={emp.id} employee={emp} onStatusChange={handleStatusChange} onToggleSpecialTeam={handleToggleSpecialTeam} isTogglingSpecialTeam={togglingSpecialTeamId === emp.id} isAdmin={isAdmin} onDelete={handleDeleteUser} />)}
+                            </div>
+                            <div className="flex flex-col gap-6">
+                                {rightColumn.map(emp => <EmployeeCard key={emp.id} employee={emp} onStatusChange={handleStatusChange} onToggleSpecialTeam={handleToggleSpecialTeam} isTogglingSpecialTeam={togglingSpecialTeamId === emp.id} isAdmin={isAdmin} onDelete={handleDeleteUser} />)}
+                            </div>
                         </div>
-                    </div>
+                   </div>
+                   <div className="w-full lg:w-1/3">
+                    <SpecialTeamPanel 
+                        specialTeam={specialTeam} 
+                        onStatusChange={handleStatusChange}
+                        onToggleSpecialTeam={handleToggleSpecialTeam}
+                        togglingSpecialTeamId={togglingSpecialTeamId}
+                        isAdmin={isAdmin}
+                        onDeleteUser={handleDeleteUser}
+                        subject={specialSubject}
+                        matricula={specialMatricula}
+                        onSubjectChange={setSpecialSubject}
+                        onMatriculaChange={setSpecialMatricula}
+                        onRegister={() => handleManualRegister('6H')}
+                    />
+                   </div>
                 </div>
-            </div>
+            </main>
             
-            {/* Modals, Notifications, and Zoom are kept outside the scaled container to maintain readability and correct positioning */}
             <AdminLoginModal isOpen={activeModal === ModalType.AdminLogin} onClose={() => setActiveModal(ModalType.None)} onLogin={handleAdminLogin} />
             <AdminOptionsModal 
                 isOpen={activeModal === ModalType.AdminOptions} 
@@ -534,7 +486,7 @@ const App: React.FC = () => {
             <div className="fixed top-5 right-5 left-5 sm:left-auto z-[100] space-y-3 flex flex-col items-center sm:items-end">
                 {notifications.map(n => <Notification key={n.id} notification={n} onDismiss={dismissNotification} />)}
             </div>
-        </>
+        </div>
     );
 };
 
@@ -558,8 +510,8 @@ const ManualRegisterSection: React.FC<ManualRegisterSectionProps> = ({
     };
 
     return (
-        <div className="bg-light-card dark:bg-dark-card rounded-3xl p-8 shadow-lg flex items-center gap-6">
-            <div className="relative flex-1">
+        <div className="bg-light-card dark:bg-dark-card rounded-3xl p-8 shadow-lg flex flex-col md:flex-row items-stretch md:items-center gap-6">
+            <div className="relative w-full md:flex-1">
                 <SubjectIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input 
                     type="text" 
@@ -569,7 +521,7 @@ const ManualRegisterSection: React.FC<ManualRegisterSectionProps> = ({
                     className="w-full pl-12 pr-4 py-4 bg-light-bg dark:bg-dark-bg border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"
                 />
             </div>
-            <div className="relative flex-1">
+            <div className="relative w-full md:flex-1">
                 <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input 
                     type="text" 
@@ -581,7 +533,7 @@ const ManualRegisterSection: React.FC<ManualRegisterSectionProps> = ({
                     pattern="[0-9]*"
                 />
             </div>
-            <button onClick={onRegister} className="w-auto px-9 py-4 font-bold text-white bg-gradient-to-r from-primary to-primary-dark rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+            <button onClick={onRegister} className="w-full md:w-auto px-9 py-4 font-bold text-white bg-gradient-to-r from-primary to-primary-dark rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
                 REGISTRAR
             </button>
         </div>
