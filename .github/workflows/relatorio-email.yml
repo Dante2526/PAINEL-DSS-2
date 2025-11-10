@@ -8,29 +8,23 @@ on:
 jobs:
   enviar-relatorio-job:
     runs-on: ubuntu-latest
+    # A correção do checkout com defeito acontece aqui:
+    # Nós dizemos ao job para rodar DENTRO da pasta duplicada
+    defaults:
+      run:
+        working-directory: ./PAINEL-DSS-2
 
     steps:
       - name: Checkout código (com defeito)
         uses: actions/checkout@v4
+        # O checkout baixa para PAINEL-DSS-2, então o path fica duplicado
+        # Mas o 'defaults' acima conserta isso para todos os passos abaixo
 
-      # --- AQUI ESTÁ A CORREÇÃO (O "DEDO-DURO" DA PASTA) ---
-      - name: Mostrar onde os arquivos estão (Debug)
-        run: ls -R
-
-      # --- AQUI ESTÁ A CORREÇÃO (A "VOLTA") ---
-      - name: Mover para a pasta do código (Correção)
-        # Entra na pasta duplicada que o checkout criou
-        run: cd $GITHUB_WORKSPACE/PAINEL-DSS-2
-        # Define esta pasta como o local de trabalho para os próximos passos
-        working-directory: ./PAINEL-DSS-2
-
-      # Este passo agora roda DENTRO da pasta correta
       - name: Verificar se é dia de trabalho OU teste manual
         id: verificar-dia
         env:
           GITHUB_EVENT_NAME: ${{ github.event_name }}
         run: |
-          # (O resto do script de verificação...)
           if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
             echo "É um TESTE MANUAL. O relatório VAI ser enviado."
             echo "should_run=true" >> $GITHUB_OUTPUT
@@ -49,25 +43,16 @@ jobs:
               echo "should_run=false" >> $GITHUB_OUTPUT
             fi
           fi
-        # IMPORTANTE: Diz a este passo para rodar na pasta correta
-        working-directory: ./PAINEL-DSS-2
 
-      # Este passo SÓ RODA se a verificação (manual ou agendada) passar
       - name: Instalar dependências
         if: steps.verificar-dia.outputs.should_run == 'true'
         run: npm install
-        # IMPORTANTE: Diz a este passo para rodar na pasta correta
-        working-directory: ./PAINEL-DSS-2
 
-      # Este passo SÓ RODA se a verificação (manual ou agendada) passar
       - name: Rodar script de envio de e-mail
         if: steps.verificar-dia.outputs.should_run == 'true'
-        # O caminho agora é mais simples (só "scripts/...")
         run: node scripts/enviar-relatorio.cjs 
         env:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
           EMAIL_USER: ${{ secrets.EMAIL_USER }}
           EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
           EMAIL_TO: ${{ secrets.EMAIL_TO }}
-        # IMPORTANTE: Diz a este passo para rodar na pasta correta
-        working-directory: ./PAINEL-DSS-2
