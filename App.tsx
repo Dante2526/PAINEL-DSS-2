@@ -165,7 +165,7 @@ const App: React.FC = () => {
             unsubscribeEmployees();
             unsubscribeRegistrations();
         };
-    }, [showNotification, loading]);
+    }, [showNotification]);
 
     const setScale = useCallback((newScale: number, scrollX?: number, scrollY?: number) => {
         const viewport = viewportRef.current;

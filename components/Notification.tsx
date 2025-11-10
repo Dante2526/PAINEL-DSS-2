@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 
 export interface NotificationData {
@@ -25,7 +24,7 @@ const Notification: React.FC<NotificationProps> = ({ notification, onDismiss }) 
     return () => clearTimeout(timer);
   }, [notification, onDismiss]);
 
-  const baseClasses = 'font-semibold text-white px-6 py-4 rounded-xl shadow-lg transition-all duration-500 ease-[cubic-bezier(0.68,-0.55,0.27,1.55)]';
+  const baseClasses = 'font-semibold text-white px-6 py-4 rounded-xl shadow-lg transition-all duration-500 ease-[cubic-bezier(0.68,-0.55,0.27,1.55)] max-w-xs text-center';
   const typeClasses = notification.type === 'success' ? 'bg-success' : 'bg-danger';
   const visibilityClasses = visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full';
 
