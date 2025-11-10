@@ -96,21 +96,21 @@ async function gerarRelatorio() {
   htmlBody += `--------------------------------------------------<br>`;
   if (cat_7H_EstouBem.length === 0) htmlBody += `Nenhum<br>`;
   // --- CORREÇÃO AQUI: Regex mais forte ---
-  cat_7H_EstouBem.forEach(emp => { htmlBody += `${emp.name.replace(/\r\n|\r|\n/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
+  cat_7H_EstouBem.forEach(emp => { htmlBody += `${emp.name.replace(/\s+/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
   htmlBody += `<br>`;
   
   htmlBody += `STATUS "ESTOU MAL"<br>`;
   htmlBody += `--------------------------------------------------<br>`;
   if (cat_7H_EstouMal.length === 0) htmlBody += `Nenhum<br>`;
   // --- CORREÇÃO AQUI: Regex mais forte ---
-  cat_7H_EstouMal.forEach(emp => { htmlBody += `${emp.name.replace(/\r\n|\r|\n/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
+  cat_7H_EstouMal.forEach(emp => { htmlBody += `${emp.name.replace(/\s+/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
   htmlBody += `<br>`;
 
   htmlBody += `PENDENTES / AUSENTES<br>`;
   htmlBody += `--------------------------------------------------<br>`;
   if (cat_7H_Ausentes.length === 0) htmlBody += `Nenhum<br>`;
   // --- CORREÇÃO AQUI: Regex mais forte ---
-  cat_7H_Ausentes.forEach(emp => { htmlBody += `${emp.name.replace(/\r\n|\r|\n/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
+  cat_7H_Ausentes.forEach(emp => { htmlBody += `${emp.name.replace(/\s+/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
   htmlBody += `<br><br>`;
 
   // --- EQUIPE TURNO 6H ---
@@ -120,21 +120,21 @@ async function gerarRelatorio() {
   htmlBody += `--------------------------------------------------<br>`;
   if (cat_6H_EstouBem.length === 0) htmlBody += `Nenhum<br>`;
   // --- CORREÇÃO AQUI: Regex mais forte ---
-  cat_6H_EstouBem.forEach(emp => { htmlBody += `${emp.name.replace(/\r\n|\r|\n/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
+  cat_6H_EstouBem.forEach(emp => { htmlBody += `${emp.name.replace(/\s+/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
   htmlBody += `<br>`;
   
   htmlBody += `STATUS "ESTOU MAL"<br>`;
   htmlBody += `--------------------------------------------------<br>`;
   if (cat_6H_EstouMal.length === 0) htmlBody += `Nenhum<br>`;
   // --- CORREÇÃO AQUI: Regex mais forte ---
-  cat_6H_EstouMal.forEach(emp => { htmlBody += `${emp.name.replace(/\r\n|\r|\n/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
+  cat_6H_EstouMal.forEach(emp => { htmlBody += `${emp.name.replace(/\s+/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
   htmlBody += `<br>`;
 
   htmlBody += `PENDENTES / AUSENTES<br>`;
   htmlBody += `--------------------------------------------------<br>`;
   if (cat_6H_Ausentes.length === 0) htmlBody += `Nenhum<br>`;
   // --- CORREÇÃO AQUI: Regex mais forte ---
-  cat_6H_Ausentes.forEach(emp => { htmlBody += `${emp.name.replace(/\r\n|\r|\n/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
+  cat_6H_Ausentes.forEach(emp => { htmlBody += `${emp.name.replace(/\s+/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
   htmlBody += `<br><br>`;
   
   // --- REGISTROS DE ASSUNTO DSS (SEPARADOS) ---
@@ -146,7 +146,7 @@ async function gerarRelatorio() {
   } else {
     // Adicionando a limpeza para o assunto também (por segurança)
     registros7H.forEach(reg => {
-      htmlBody += `Assunto: ${reg.assunto.replace(/\r\n|\r|\n/g, ' ')} (Matrícula: ${reg.matricula})<br>`;
+      htmlBody += `Assunto: ${reg.assunto.replace(/\s+/g, ' ')} (Matrícula: ${reg.matricula})<br>`;
     });
   }
   htmlBody += `<br>`;
@@ -158,7 +158,7 @@ async function gerarRelatorio() {
   } else {
     // Adicionando a limpeza para o assunto também (por segurança)
     registros6H.forEach(reg => {
-      htmlBody += `Assunto: ${reg.assunto.replace(/\r\n|\r|\n/g, ' ')} (Matrícula: ${reg.matricula})<br>`;
+      htmlBody += `Assunto: ${reg.assunto.replace(/\s+/g, ' ')} (Matrícula: ${reg.matricula})<br>`;
     });
   }
 
