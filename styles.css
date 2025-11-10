@@ -1,6 +1,6 @@
 /* === GENERAL STYLES === */
 body {
-    overflow-x: hidden; /* Prevent horizontal scroll on smaller screens */
+    /* A propriedade overflow-x: hidden foi removida para permitir a rolagem horizontal em telas menores, acomodando o layout de largura fixa. */
 }
 
 /* === BB-8 TOGGLE STYLES === */
