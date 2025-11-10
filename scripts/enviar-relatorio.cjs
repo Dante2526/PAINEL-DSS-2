@@ -3,18 +3,18 @@ const admin = require('firebase-admin');
 const nodemailer = require('nodemailer');
 
 // --- 1. CONFIGURAÇÕES ---
-// Pega os secrets que você criou no GitHub
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
 const EMAIL_USER = process.env.EMAIL_USER;
 const EMAIL_PASS = process.env.EMAIL_PASS;
 const EMAIL_TO = process.env.EMAIL_TO;
 
-// Inicializa o Firebase (só pode uma vez)
-// Usamos um nome único para esta app, já que temos 2 scripts
+// --- CORREÇÃO AQUI ---
+// Inicializa o app PADRÃO (default). Não precisa de nome.
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
-}, 'relatorioApp'); // <-- Nome único
+});
 
+// Agora este comando vai achar o app padrão
 const db = admin.firestore();
 
 // Configura o "Carteiro"
@@ -22,7 +22,7 @@ const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: EMAIL_USER,
-    pass: EMAIL_PASS, // A senha de app de 16 letras
+    pass: EMAIL_PASS,
   },
 });
 
@@ -48,13 +48,12 @@ async function gerarRelatorio() {
       const emp = doc.data();
       funcionarios.push(emp);
 
-      // Lendo o campo 'turno' (minúsculo) da coleção 'employees'
+      // Lendo o campo 'turno' (minúsculo)
       if (emp.turno === "6H") { 
         if (emp.mal === true) cat_6H_EstouMal.push(emp);
         else if (emp.assDss === true && emp.bem === true) cat_6H_EstouBem.push(emp);
         else cat_6H_Ausentes.push(emp);
       } else {
-        // Todos os outros (incluindo "7H")
         if (emp.mal === true) cat_7H_EstouMal.push(emp);
         else if (emp.assDss === true && emp.bem === true) cat_7H_EstouBem.push(emp);
         else cat_7H_Ausentes.push(emp);
@@ -72,11 +71,10 @@ async function gerarRelatorio() {
     
     regSnapshot.forEach(doc => {
       const reg = doc.data();
-      // Lendo 'reg.TURNO' (MAIÚSCULO) da coleção 'registrosDSS'
+      // Lendo 'reg.TURNO' (MAIÚSCULO)
       if (reg.TURNO === "6H") {
         registros6H.push(reg);
       } else {
-        // Se for "7H-19H" ou qualquer outra coisa
         registros7H.push(reg);
       }
     });
@@ -85,7 +83,7 @@ async function gerarRelatorio() {
   }
 
   // --- 3. MONTAR O CORPO DO E-MAIL ---
-  let htmlBody = `<pre>`; // Usamos <pre> para manter a formatação de texto
+  let htmlBody = `<pre>`;
   
   const totalPresentes = cat_7H_EstouBem.length + cat_7H_EstouMal.length + cat_6H_EstouBem.length + cat_6H_EstouMal.length;
   const totalAusentes = cat_7H_Ausentes.length + cat_6H_Ausentes.length;
@@ -166,7 +164,7 @@ async function enviarEmail(htmlRelatorio) {
   console.log(`Enviando e-mail para ${EMAIL_TO}...`);
   
   const dataDeHoje = new Date().toLocaleDateString('pt-BR', {
-    timeZone: 'America/Sao_Paulo', // Garante o fuso horário de Brasília
+    timeZone: 'America/Sao_Paulo',
     day: '2-digit', month: '2-digit', year: 'numeric'
   });
   const novoAssunto = `Relatório DSS - TURMA B (${dataDeHoje})`;
