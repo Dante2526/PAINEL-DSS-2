@@ -1,12 +1,9 @@
 name: Enviar Relatório por E-mail (Agendado 2x2)
 
 on:
-  # 1. Botão manual (para testar)
   workflow_dispatch: 
-
-  # 2. O agendamento (13:00 UTC = 10:00 da manhã em Brasília)
   schedule:
-    - cron: '0 13 * * *'
+    - cron: '0 13 * * *' # 10h da manhã BRT
 
 jobs:
   enviar-relatorio-job:
@@ -16,40 +13,46 @@ jobs:
       - name: Checkout código
         uses: actions/checkout@v4
 
-      # Exatamente a mesma lógica de verificação 2x2
-      - name: Verificar se é dia de trabalho (Ciclo 2x2)
-        id: verificar-dia 
+      # --- PASSO DE VERIFICAÇÃO ATUALIZADO ---
+      - name: Verificar se é dia de trabalho OU teste manual
+        id: verificar-dia
+        env:
+          # Pega o nome do evento (schedule ou workflow_dispatch)
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
         run: |
-          # Data base: 7 de Novembro de 2025 (Dia que sabemos que é TRABALHO)
-          ANCHOR_DATE="2025-11-07"
-          
-          ANCHOR_SECONDS=$(date -d "$ANCHOR_DATE" +%s)
-          CURRENT_SECONDS=$(date +%s)
-          
-          DIFF_DAYS=$(((CURRENT_SECONDS - ANCHOR_SECONDS) / 86400))
-          # Corrigido para % (um sinal de porcentagem)
-          CYCLE_DAY=$((DIFF_DAYS % 4))
-          
-          if [[ $CYCLE_DAY -eq 0 || $CYCLE_DAY -eq 1 ]]; then
-            echo "Hoje é um dia de TRABALHO (Dia $CYCLE_DAY do ciclo). O relatório VAI ser enviado."
+          # 1. VERIFICA SE É MANUAL
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            echo "É um TESTE MANUAL. O relatório VAI ser enviado (ignorando o ciclo 2x2)."
             echo "should_run=true" >> $GITHUB_OUTPUT
+          
+          # 2. SE NÃO FOR MANUAL, É AGENDADO. CHECAR O CICLO.
           else
-            echo "Hoje é um dia de FOLGA (Dia $CYCLE_DAY do ciclo). O relatório NÃO vai ser enviado."
-            echo "should_run=false" >> $GITHUB_OUTPUT
+            echo "É uma execução AGENDADA. Verificando o ciclo 2x2..."
+            ANCHOR_DATE="2025-11-07"
+            ANCHOR_SECONDS=$(date -d "$ANCHOR_DATE" +%s)
+            CURRENT_SECONDS=$(date +%s)
+            DIFF_DAYS=$(((CURRENT_SECONDS - ANCHOR_SECONDS) / 86400))
+            CYCLE_DAY=$((DIFF_DAYS % 4))
+            
+            if [[ $CYCLE_DAY -eq 0 || $CYCLE_DAY -eq 1 ]]; then
+              echo "Hoje é um dia de TRABALHO (Dia $CYCLE_DAY do ciclo). O relatório VAI ser enviado."
+              echo "should_run=true" >> $GITHUB_OUTPUT
+            else
+              echo "Hoje é um dia de FOLGA (Dia $CYCLE_DAY do ciclo). O relatório NÃO vai ser enviado."
+              echo "should_run=false" >> $GITHUB_OUTPUT
+            fi
           fi
 
-      # Este passo SÓ RODA se for dia de trabalho
+      # Este passo SÓ RODA se a verificação (manual ou agendada) passar
       - name: Instalar dependências
         if: steps.verificar-dia.outputs.should_run == 'true'
         run: npm install
 
-      # Este passo SÓ RODA se for dia de trabalho
+      # Este passo SÓ RODA se a verificação (manual ou agendada) passar
       - name: Rodar script de envio de e-mail
         if: steps.verificar-dia.outputs.should_run == 'true'
-        # --- ATENÇÃO AQUI: Estamos a chamar o novo script ---
         run: node scripts/enviar-relatorio.cjs 
         env:
-          # Precisa de TODOS os secrets: Firebase e E-mail
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
           EMAIL_USER: ${{ secrets.EMAIL_USER }}
           EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
