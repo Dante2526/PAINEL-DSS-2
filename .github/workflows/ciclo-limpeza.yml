@@ -8,25 +8,20 @@ on:
 jobs:
   limpar-dados-firebase:
     runs-on: ubuntu-latest
+    # A correção do checkout com defeito acontece aqui:
+    defaults:
+      run:
+        working-directory: ./PAINEL-DSS-2
 
     steps:
       - name: Checkout código (com defeito)
         uses: actions/checkout@v4
 
-      # --- AQUI ESTÁ A CORREÇÃO (A "VOLTA") ---
-      - name: Mover para a pasta do código (Correção)
-        # Entra na pasta duplicada que o checkout criou
-        run: cd $GITHUB_WORKSPACE/PAINEL-DSS-2
-        # Define esta pasta como o local de trabalho para os próximos passos
-        working-directory: ./PAINEL-DSS-2
-
-      # Este passo agora roda DENTRO da pasta correta
       - name: Verificar se é dia de trabalho OU teste manual
         id: verificar-dia
         env:
           GITHUB_EVENT_NAME: ${{ github.event_name }}
         run: |
-          # (O resto do script de verificação...)
           if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
             echo "É um TESTE MANUAL. A limpeza VAI rodar."
             echo "should_run=true" >> $GITHUB_OUTPUT
@@ -45,22 +40,13 @@ jobs:
               echo "should_run=false" >> $GITHUB_OUTPUT
             fi
           fi
-        # IMPORTANTE: Diz a este passo para rodar na pasta correta
-        working-directory: ./PAINEL-DSS-2
 
-      # Este passo SÓ RODA se a verificação (manual ou agendada) passar
       - name: Instalar dependências
         if: steps.verificar-dia.outputs.should_run == 'true'
         run: npm install
-        # IMPORTANTE: Diz a este passo para rodar na pasta correta
-        working-directory: ./PAINEL-DSS-2
 
-      # Este passo SÓ RODA se a verificação (manual ou agendada) passar
       - name: Rodar script de limpeza
         if: steps.verificar-dia.outputs.should_run == 'true'
-        # O caminho agora é mais simples (só "scripts/...")
         run: node scripts/limpar-firebase.cjs 
         env:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
-        # IMPORTANTE: Diz a este passo para rodar na pasta correta
-        working-directory: ./PAINEL-DSS-2
