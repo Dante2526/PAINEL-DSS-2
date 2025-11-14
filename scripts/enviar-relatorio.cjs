@@ -1,3 +1,4 @@
+// scripts/enviar-relatorio.cjs
 const admin = require('firebase-admin');
 const nodemailer = require('nodemailer');
 
@@ -7,7 +8,6 @@ const EMAIL_USER = process.env.EMAIL_USER;
 const EMAIL_PASS = process.env.EMAIL_PASS;
 const EMAIL_TO = process.env.EMAIL_TO;
 
-// Inicializa o app PADRÃO
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
@@ -21,87 +21,58 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// --- FUNÇÃO AUXILIAR DE LIMPEZA (A "ARMA SECRETA") ---
+// --- FUNÇÃO DE LIMPEZA DE TEXTO ---
+// Limpa quebras de linha, espaços duplos e caracteres invisíveis
 function limparTexto(texto) {
-  if (!texto) return ""; // Se estiver vazio, retorna vazio
-  
-  // 1. Força converter para string (caso venha como objeto)
-  let str = String(texto);
-  
-  // 2. Substitui TODAS as quebras de linha (\r, \n) por um espaço simples
-  str = str.replace(/(\r\n|\n|\r)/gm, " ");
-  
-  // 3. Remove espaços duplos (ex: "Ana  Paula" vira "Ana Paula")
-  str = str.replace(/\s+/g, " ");
-  
-  return str.trim();
+  if (!texto) return '';
+  return texto.replace(/\s+/g, ' ').trim();
 }
 
-// --- 2. FUNÇÃO DE LER E PREPARAR OS DADOS ---
+// --- 2. FUNÇÃO DE LER OS DADOS (O Relatório) ---
 async function gerarRelatorio() {
   console.log("Iniciando geração do relatório...");
 
+  // Arrays para funcionários
   const cat_7H_EstouBem = [], cat_7H_EstouMal = [], cat_7H_Ausentes = [];
   const cat_6H_EstouBem = [], cat_6H_EstouMal = [], cat_6H_Ausentes = [];
   
+  // Arrays para os registros DSS
   const registros7H = [];
   const registros6H = [];
   
   let totalFuncionarios = 0;
 
-  // A) Ler dados dos 'employees' e LIMPAR NA FONTE
+  // A) Ler dados dos 'employees'
   try {
     const empRef = db.collection('employees');
     const empSnapshot = await empRef.get();
     totalFuncionarios = empSnapshot.size;
     
     empSnapshot.forEach(doc => {
-      const dados = doc.data();
-      
-      // --- AQUI ESTÁ A MÁGICA: Limpamos tudo AGORA ---
-      const emp = {
-        ...dados,
-        name: limparTexto(dados.name),
-        matricula: limparTexto(dados.matricula),
-        turno: limparTexto(dados.turno)
-      };
-
-      // Lógica de separação
+      const emp = doc.data();
       if (emp.mal === true) {
         if (emp.turno === "6H") cat_6H_EstouMal.push(emp);
         else cat_7H_EstouMal.push(emp);
-      
       } else if (emp.assDss === true && emp.bem === true) {
         if (emp.turno === "6H") cat_6H_EstouBem.push(emp);
         else cat_7H_EstouBem.push(emp);
-      
       } else {
-        // Se não está Mal e não está Bem+DSS, é Pendente/Ausente
         if (emp.turno === "6H") cat_6H_Ausentes.push(emp);
         else cat_7H_Ausentes.push(emp);
       }
     });
   } catch (error) {
     console.error("Erro ao ler 'employees':", error);
-    return "<h1>Erro ao ler o banco de dados.</h1>";
+    return "<h1>Erro ao ler o banco de dados 'employees'.</h1>";
   }
 
-  // B) Ler dados dos 'registrosDSS' e LIMPAR NA FONTE
+  // B) Ler dados dos 'registrosDSS'
   try {
     const regRef = db.collection('registrosDSS');
     const regSnapshot = await regRef.get();
     
     regSnapshot.forEach(doc => {
-      const dados = doc.data();
-      
-      // --- Limpeza imediata ---
-      const reg = {
-        ...dados,
-        assunto: limparTexto(dados.assunto),
-        matricula: limparTexto(dados.matricula),
-        TURNO: limparTexto(dados.TURNO)
-      };
-
+      const reg = doc.data();
       if (reg.TURNO === "6H") registros6H.push(reg);
       else registros7H.push(reg);
     });
@@ -110,86 +81,102 @@ async function gerarRelatorio() {
   }
 
   // --- 3. MONTAR O CORPO DO E-MAIL ---
-  // Usamos <pre> com estilo para garantir quebras de linha só onde queremos
-  let htmlBody = `<pre style="font-family: monospace; font-size: 14px; white-space: pre-wrap;">`;
+  // ABANDONAMOS O <pre>. Agora usamos HTML semântico.
+  let htmlBody = `<div style="font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6;">`;
   
   const totalPresentes = cat_7H_EstouBem.length + cat_7H_EstouMal.length + cat_6H_EstouBem.length + cat_6H_EstouMal.length;
   const totalAusentes = cat_7H_Ausentes.length + cat_6H_Ausentes.length;
   
-  htmlBody += `RESUMO GERAL<br>`;
-  htmlBody += `--------------------------------------------------<br>`;
-  htmlBody += `- Total de Funcionários: ${totalFuncionarios}<br>`;
-  htmlBody += `- Presentes (DSS + Bem/Mal): ${totalPresentes}<br>`;
-  htmlBody += `- Pendentes / Ausentes: ${totalAusentes}<br><br>`;
+  htmlBody += `<h2>RESUMO GERAL</h2>`;
+  htmlBody += `<hr>`;
+  htmlBody += `<ul>`;
+  htmlBody += `<li><strong>Total de Funcionários:</strong> ${totalFuncionarios}</li>`;
+  htmlBody += `<li><strong>Presentes (DSS + Bem/Mal):</strong> ${totalPresentes}</li>`;
+  htmlBody += `<li><strong>Pendentes / Ausentes:</strong> ${totalAusentes}</li>`;
+  htmlBody += `</ul>`;
 
   // --- EQUIPE TURNO 7H ---
-  htmlBody += `EQUIPE TURNO 7H-19H<br>`; 
-  htmlBody += `--------------------------------------------------<br><br>`;
+  htmlBody += `<h2>EQUIPE TURNO 7H-19H</h2>`; 
+  htmlBody += `<hr>`;
   
-  htmlBody += `STATUS: "ASS.DSS + ESTOU BEM"<br>`;
-  htmlBody += `--------------------------------------------------<br>`;
-  if (cat_7H_EstouBem.length === 0) htmlBody += `Nenhum<br>`;
-  cat_7H_EstouBem.forEach(emp => { htmlBody += `${emp.name} (Matrícula: ${emp.matricula})<br>`; });
-  htmlBody += `<br>`;
+  htmlBody += `<h3>STATUS: "ASS.DSS + ESTOU BEM"</h3>`;
+  if (cat_7H_EstouBem.length === 0) htmlBody += `Nenhum`;
+  else {
+    htmlBody += `<ul>`;
+    cat_7H_EstouBem.forEach(emp => { htmlBody += `<li>${limparTexto(emp.name)} (Matrícula: ${emp.matricula})</li>`; });
+    htmlBody += `</ul>`;
+  }
   
-  htmlBody += `STATUS "ESTOU MAL"<br>`;
-  htmlBody += `--------------------------------------------------<br>`;
-  if (cat_7H_EstouMal.length === 0) htmlBody += `Nenhum<br>`;
-  cat_7H_EstouMal.forEach(emp => { htmlBody += `${emp.name} (Matrícula: ${emp.matricula})<br>`; });
-  htmlBody += `<br>`;
+  htmlBody += `<h3>STATUS "ESTOU MAL"</h3>`;
+  if (cat_7H_EstouMal.length === 0) htmlBody += `Nenhum`;
+  else {
+    htmlBody += `<ul>`;
+    cat_7H_EstouMal.forEach(emp => { htmlBody += `<li>${limparTexto(emp.name)} (Matrícula: ${emp.matricula})</li>`; });
+    htmlBody += `</ul>`;
+  }
 
-  htmlBody += `PENDENTES / AUSENTES<br>`;
-  htmlBody += `--------------------------------------------------<br>`;
-  if (cat_7H_Ausentes.length === 0) htmlBody += `Nenhum<br>`;
-  cat_7H_Ausentes.forEach(emp => { htmlBody += `${emp.name} (Matrícula: ${emp.matricula})<br>`; });
-  htmlBody += `<br><br>`;
+  htmlBody += `<h3>PENDENTES / AUSENTES</h3>`;
+  if (cat_7H_Ausentes.length === 0) htmlBody += `Nenhum`;
+  else {
+    htmlBody += `<ul>`;
+    cat_7H_Ausentes.forEach(emp => { htmlBody += `<li>${limparTexto(emp.name)} (Matrícula: ${emp.matricula})</li>`; });
+    htmlBody += `</ul>`;
+  }
 
   // --- EQUIPE TURNO 6H ---
-  htmlBody += `EQUIPE TURNO 6H<br>`;
-  htmlBody += `--------------------------------------------------<br><br>`;
+  htmlBody += `<br><h2>EQUIPE TURNO 6H</h2>`;
+  htmlBody += `<hr>`;
   
-  htmlBody += `STATUS: "ASS.DSS + ESTOU BEM"<br>`;
-  htmlBody += `--------------------------------------------------<br>`;
-  if (cat_6H_EstouBem.length === 0) htmlBody += `Nenhum<br>`;
-  cat_6H_EstouBem.forEach(emp => { htmlBody += `${emp.name} (Matrícula: ${emp.matricula})<br>`; });
-  htmlBody += `<br>`;
+  htmlBody += `<h3>STATUS: "ASS.DSS + ESTOU BEM"</h3>`;
+  if (cat_6H_EstouBem.length === 0) htmlBody += `Nenhum`;
+  else {
+    htmlBody += `<ul>`;
+    cat_6H_EstouBem.forEach(emp => { htmlBody += `<li>${limparTexto(emp.name)} (Matrícula: ${emp.matricula})</li>`; });
+    htmlBody += `</ul>`;
+  }
   
-  htmlBody += `STATUS "ESTOU MAL"<br>`;
-  htmlBody += `--------------------------------------------------<br>`;
-  if (cat_6H_EstouMal.length === 0) htmlBody += `Nenhum<br>`;
-  cat_6H_EstouMal.forEach(emp => { htmlBody += `${emp.name} (Matrícula: ${emp.matricula})<br>`; });
-  htmlBody += `<br>`;
+  htmlBody += `<h3>STATUS "ESTOU MAL"</h3>`;
+  if (cat_6H_EstouMal.length === 0) htmlBody += `Nenhum`;
+  else {
+    htmlBody += `<ul>`;
+    cat_6H_EstouMal.forEach(emp => { htmlBody += `<li>${limparTexto(emp.name)} (Matrícula: ${emp.matricula})</li>`; });
+    htmlBody += `</ul>`;
+  }
 
-  htmlBody += `PENDENTES / AUSENTES<br>`;
-  htmlBody += `--------------------------------------------------<br>`;
-  if (cat_6H_Ausentes.length === 0) htmlBody += `Nenhum<br>`;
-  cat_6H_Ausentes.forEach(emp => { htmlBody += `${emp.name} (Matrícula: ${emp.matricula})<br>`; });
-  htmlBody += `<br><br>`;
+  htmlBody += `<h3>PENDENTES / AUSENTES</h3>`;
+  if (cat_6H_Ausentes.length === 0) htmlBody += `Nenhum`;
+  else {
+    htmlBody += `<ul>`;
+    cat_6H_Ausentes.forEach(emp => { htmlBody += `<li>${limparTexto(emp.name)} (Matrícula: ${emp.matricula})</li>`; });
+    htmlBody += `</ul>`;
+  }
   
-  // --- REGISTROS DE ASSUNTO DSS ---
-  
-  htmlBody += `REGISTROS DSS (TURNO 7H-19H)<br>`;
-  htmlBody += `--------------------------------------------------<br>`;
+  // --- REGISTROS DE ASSUNTO DSS (SEPARADOS) ---
+  htmlBody += `<br><h2>REGISTROS DSS (TURNO 7H-19H)</h2>`;
+  htmlBody += `<hr>`;
   if (registros7H.length === 0) {
-    htmlBody += `Nenhum registro de assunto encontrado para 7H-19H.<br>`;
+    htmlBody += `Nenhum registro de assunto encontrado para 7H-19H.`;
   } else {
+    htmlBody += `<ul>`;
     registros7H.forEach(reg => {
-      htmlBody += `Assunto: ${reg.assunto} (Matrícula: ${reg.matricula})<br>`;
+      htmlBody += `<li><strong>Assunto:</strong> ${limparTexto(reg.assunto)} (Matrícula: ${reg.matricula})</li>`;
     });
+    htmlBody += `</ul>`;
   }
-  htmlBody += `<br>`;
 
-  htmlBody += `REGISTROS DSS (TURNO 6H)<br>`;
-  htmlBody += `--------------------------------------------------<br>`;
+  htmlBody += `<br><h2>REGISTROS DSS (TURNO 6H)</h2>`;
+  htmlBody += `<hr>`;
   if (registros6H.length === 0) {
-    htmlBody += `Nenhum registro de assunto encontrado para 6H.<br>`;
+    htmlBody += `Nenhum registro de assunto encontrado para 6H.`;
   } else {
+    htmlBody += `<ul>`;
     registros6H.forEach(reg => {
-      htmlBody += `Assunto: ${reg.assunto} (Matrícula: ${reg.matricula})<br>`;
+      htmlBody += `<li><strong>Assunto:</strong> ${limparTexto(reg.assunto)} (Matrícula: ${reg.matricula})</li>`;
     });
+    htmlBody += `</ul>`;
   }
 
-  htmlBody += `</pre>`;
+  htmlBody += `</div>`; // Fecha o <div> principal
   return htmlBody;
 }
 
@@ -207,7 +194,7 @@ async function enviarEmail(htmlRelatorio) {
     from: EMAIL_USER,
     to: EMAIL_TO,
     subject: novoAssunto, 
-    html: htmlRelatorio, 
+    html: htmlRelatorio, // O novo corpo de e-mail em HTML
   };
 
   try {
@@ -219,6 +206,7 @@ async function enviarEmail(htmlRelatorio) {
   }
 }
 
+// --- 5. FUNÇÃO PRINCIPAL (Ler e Enviar) ---
 async function main() {
   console.log("Iniciando script de relatório (10h)...");
   try {
