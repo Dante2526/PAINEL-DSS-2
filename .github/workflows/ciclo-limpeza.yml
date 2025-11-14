@@ -8,18 +8,13 @@ on:
 jobs:
   limpar-dados-firebase:
     runs-on: ubuntu-latest
-    
-    # --- ESTA É A CORREÇÃO PARA O CAMINHO DUPLICADO ---
-    # Define o diretório de trabalho padrão para a pasta onde o código realmente está
-    defaults:
-      run:
-        working-directory: ./PAINEL-DSS-2
+    # REMOVEMOS a secção 'defaults:' daqui
 
     steps:
-      - name: Checkout código (com defeito)
+      - name: Checkout código (Correção)
         uses: actions/checkout@v4
-        # Este checkout baixa o código para ./PAINEL-DSS-2, então
-        # todos os passos seguintes vão rodar dentro dessa pasta.
+        with:
+          path: . # <-- ESTA É A CORREÇÃO para o caminho duplicado
 
       - name: Verificar se é dia de trabalho OU teste manual
         id: verificar-dia
