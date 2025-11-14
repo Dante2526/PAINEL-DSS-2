@@ -1,4 +1,3 @@
-// scripts/enviar-relatorio.cjs
 const admin = require('firebase-admin');
 const nodemailer = require('nodemailer');
 
@@ -8,14 +7,12 @@ const EMAIL_USER = process.env.EMAIL_USER;
 const EMAIL_PASS = process.env.EMAIL_PASS;
 const EMAIL_TO = process.env.EMAIL_TO;
 
-// Inicializa o app PADRÃO (default).
+// Inicializa o app PADRÃO
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
-
 const db = admin.firestore();
 
-// Configura o "Carteiro"
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -24,30 +21,52 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// --- 2. FUNÇÃO DE LER OS DADOS (O Relatório) ---
+// --- FUNÇÃO AUXILIAR DE LIMPEZA (A "ARMA SECRETA") ---
+function limparTexto(texto) {
+  if (!texto) return ""; // Se estiver vazio, retorna vazio
+  
+  // 1. Força converter para string (caso venha como objeto)
+  let str = String(texto);
+  
+  // 2. Substitui TODAS as quebras de linha (\r, \n) por um espaço simples
+  str = str.replace(/(\r\n|\n|\r)/gm, " ");
+  
+  // 3. Remove espaços duplos (ex: "Ana  Paula" vira "Ana Paula")
+  str = str.replace(/\s+/g, " ");
+  
+  return str.trim();
+}
+
+// --- 2. FUNÇÃO DE LER E PREPARAR OS DADOS ---
 async function gerarRelatorio() {
   console.log("Iniciando geração do relatório...");
 
-  // Arrays para funcionários
   const cat_7H_EstouBem = [], cat_7H_EstouMal = [], cat_7H_Ausentes = [];
   const cat_6H_EstouBem = [], cat_6H_EstouMal = [], cat_6H_Ausentes = [];
   
-  // Arrays para os registros DSS
   const registros7H = [];
   const registros6H = [];
   
   let totalFuncionarios = 0;
 
-  // A) Ler dados dos 'employees'
+  // A) Ler dados dos 'employees' e LIMPAR NA FONTE
   try {
     const empRef = db.collection('employees');
     const empSnapshot = await empRef.get();
     totalFuncionarios = empSnapshot.size;
     
     empSnapshot.forEach(doc => {
-      const emp = doc.data();
+      const dados = doc.data();
+      
+      // --- AQUI ESTÁ A MÁGICA: Limpamos tudo AGORA ---
+      const emp = {
+        ...dados,
+        name: limparTexto(dados.name),
+        matricula: limparTexto(dados.matricula),
+        turno: limparTexto(dados.turno)
+      };
 
-      // Lógica de separação (baseada no fluxo das 10h)
+      // Lógica de separação
       if (emp.mal === true) {
         if (emp.turno === "6H") cat_6H_EstouMal.push(emp);
         else cat_7H_EstouMal.push(emp);
@@ -57,22 +76,32 @@ async function gerarRelatorio() {
         else cat_7H_EstouBem.push(emp);
       
       } else {
+        // Se não está Mal e não está Bem+DSS, é Pendente/Ausente
         if (emp.turno === "6H") cat_6H_Ausentes.push(emp);
         else cat_7H_Ausentes.push(emp);
       }
     });
   } catch (error) {
     console.error("Erro ao ler 'employees':", error);
-    return "<h1>Erro ao ler o banco de dados 'employees'.</h1>";
+    return "<h1>Erro ao ler o banco de dados.</h1>";
   }
 
-  // B) Ler dados dos 'registrosDSS'
+  // B) Ler dados dos 'registrosDSS' e LIMPAR NA FONTE
   try {
     const regRef = db.collection('registrosDSS');
     const regSnapshot = await regRef.get();
     
     regSnapshot.forEach(doc => {
-      const reg = doc.data();
+      const dados = doc.data();
+      
+      // --- Limpeza imediata ---
+      const reg = {
+        ...dados,
+        assunto: limparTexto(dados.assunto),
+        matricula: limparTexto(dados.matricula),
+        TURNO: limparTexto(dados.TURNO)
+      };
+
       if (reg.TURNO === "6H") registros6H.push(reg);
       else registros7H.push(reg);
     });
@@ -81,8 +110,8 @@ async function gerarRelatorio() {
   }
 
   // --- 3. MONTAR O CORPO DO E-MAIL ---
-  // CORREÇÃO: Usamos <br> para quebras de linha e <pre> para a formatação
-  let htmlBody = `<pre style="font-family: monospace, courier; font-size: 14px;">`;
+  // Usamos <pre> com estilo para garantir quebras de linha só onde queremos
+  let htmlBody = `<pre style="font-family: monospace; font-size: 14px; white-space: pre-wrap;">`;
   
   const totalPresentes = cat_7H_EstouBem.length + cat_7H_EstouMal.length + cat_6H_EstouBem.length + cat_6H_EstouMal.length;
   const totalAusentes = cat_7H_Ausentes.length + cat_6H_Ausentes.length;
@@ -96,47 +125,48 @@ async function gerarRelatorio() {
   // --- EQUIPE TURNO 7H ---
   htmlBody += `EQUIPE TURNO 7H-19H<br>`; 
   htmlBody += `--------------------------------------------------<br><br>`;
+  
   htmlBody += `STATUS: "ASS.DSS + ESTOU BEM"<br>`;
   htmlBody += `--------------------------------------------------<br>`;
   if (cat_7H_EstouBem.length === 0) htmlBody += `Nenhum<br>`;
-  // CORREÇÃO: (emp.name || '') para evitar erro, e .replace() para limpar quebras
-  cat_7H_EstouBem.forEach(emp => { htmlBody += `${(emp.name || '').replace(/\s+/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
+  cat_7H_EstouBem.forEach(emp => { htmlBody += `${emp.name} (Matrícula: ${emp.matricula})<br>`; });
   htmlBody += `<br>`;
   
   htmlBody += `STATUS "ESTOU MAL"<br>`;
   htmlBody += `--------------------------------------------------<br>`;
   if (cat_7H_EstouMal.length === 0) htmlBody += `Nenhum<br>`;
-  cat_7H_EstouMal.forEach(emp => { htmlBody += `${(emp.name || '').replace(/\s+/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
+  cat_7H_EstouMal.forEach(emp => { htmlBody += `${emp.name} (Matrícula: ${emp.matricula})<br>`; });
   htmlBody += `<br>`;
 
   htmlBody += `PENDENTES / AUSENTES<br>`;
   htmlBody += `--------------------------------------------------<br>`;
   if (cat_7H_Ausentes.length === 0) htmlBody += `Nenhum<br>`;
-  cat_7H_Ausentes.forEach(emp => { htmlBody += `${(emp.name || '').replace(/\s+/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
+  cat_7H_Ausentes.forEach(emp => { htmlBody += `${emp.name} (Matrícula: ${emp.matricula})<br>`; });
   htmlBody += `<br><br>`;
 
   // --- EQUIPE TURNO 6H ---
   htmlBody += `EQUIPE TURNO 6H<br>`;
   htmlBody += `--------------------------------------------------<br><br>`;
+  
   htmlBody += `STATUS: "ASS.DSS + ESTOU BEM"<br>`;
   htmlBody += `--------------------------------------------------<br>`;
   if (cat_6H_EstouBem.length === 0) htmlBody += `Nenhum<br>`;
-  cat_6H_EstouBem.forEach(emp => { htmlBody += `${(emp.name || '').replace(/\s+/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
+  cat_6H_EstouBem.forEach(emp => { htmlBody += `${emp.name} (Matrícula: ${emp.matricula})<br>`; });
   htmlBody += `<br>`;
   
   htmlBody += `STATUS "ESTOU MAL"<br>`;
   htmlBody += `--------------------------------------------------<br>`;
   if (cat_6H_EstouMal.length === 0) htmlBody += `Nenhum<br>`;
-  cat_6H_EstouMal.forEach(emp => { htmlBody += `${(emp.name || '').replace(/\s+/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
+  cat_6H_EstouMal.forEach(emp => { htmlBody += `${emp.name} (Matrícula: ${emp.matricula})<br>`; });
   htmlBody += `<br>`;
 
   htmlBody += `PENDENTES / AUSENTES<br>`;
   htmlBody += `--------------------------------------------------<br>`;
   if (cat_6H_Ausentes.length === 0) htmlBody += `Nenhum<br>`;
-  cat_6H_Ausentes.forEach(emp => { htmlBody += `${(emp.name || '').replace(/\s+/g, ' ')} (Matrícula: ${emp.matricula})<br>`; });
+  cat_6H_Ausentes.forEach(emp => { htmlBody += `${emp.name} (Matrícula: ${emp.matricula})<br>`; });
   htmlBody += `<br><br>`;
   
-  // --- REGISTROS DE ASSUNTO DSS (SEPARADOS) ---
+  // --- REGISTROS DE ASSUNTO DSS ---
   
   htmlBody += `REGISTROS DSS (TURNO 7H-19H)<br>`;
   htmlBody += `--------------------------------------------------<br>`;
@@ -144,7 +174,7 @@ async function gerarRelatorio() {
     htmlBody += `Nenhum registro de assunto encontrado para 7H-19H.<br>`;
   } else {
     registros7H.forEach(reg => {
-      htmlBody += `Assunto: ${(reg.assunto || '').replace(/\s+/g, ' ')} (Matrícula: ${reg.matricula})<br>`;
+      htmlBody += `Assunto: ${reg.assunto} (Matrícula: ${reg.matricula})<br>`;
     });
   }
   htmlBody += `<br>`;
@@ -155,7 +185,7 @@ async function gerarRelatorio() {
     htmlBody += `Nenhum registro de assunto encontrado para 6H.<br>`;
   } else {
     registros6H.forEach(reg => {
-      htmlBody += `Assunto: ${(reg.assunto || '').replace(/\s+/g, ' ')} (Matrícula: ${reg.matricula})<br>`;
+      htmlBody += `Assunto: ${reg.assunto} (Matrícula: ${reg.matricula})<br>`;
     });
   }
 
@@ -189,7 +219,6 @@ async function enviarEmail(htmlRelatorio) {
   }
 }
 
-// --- 5. FUNÇÃO PRINCIPAL (Ler e Enviar) ---
 async function main() {
   console.log("Iniciando script de relatório (10h)...");
   try {
