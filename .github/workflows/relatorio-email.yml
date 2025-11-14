@@ -8,15 +8,13 @@ on:
 jobs:
   enviar-relatorio-job:
     runs-on: ubuntu-latest
-    
-    # --- ESTA É A CORREÇÃO PARA O CAMINHO DUPLICADO ---
-    defaults:
-      run:
-        working-directory: ./PAINEL-DSS-2
+    # REMOVEMOS a secção 'defaults:' daqui
 
     steps:
-      - name: Checkout código (com defeito)
+      - name: Checkout código (Correção)
         uses: actions/checkout@v4
+        with:
+          path: . # <-- ESTA É A CORREÇÃO para o caminho duplicado
 
       - name: Verificar se é dia de trabalho OU teste manual
         id: verificar-dia
