@@ -8,13 +8,16 @@ on:
 jobs:
   enviar-relatorio-job:
     runs-on: ubuntu-latest
-    # NENHUMA pasta 'defaults' ou 'working-directory' aqui
+    
+    # --- ESTA É A CORREÇÃO PARA O CAMINHO DUPLICADO ---
+    defaults:
+      run:
+        working-directory: ./PAINEL-DSS-2
 
     steps:
-      - name: Checkout código
+      - name: Checkout código (com defeito)
         uses: actions/checkout@v4
 
-      # Lógica de verificação (manual vs agendado)
       - name: Verificar se é dia de trabalho OU teste manual
         id: verificar-dia
         env:
