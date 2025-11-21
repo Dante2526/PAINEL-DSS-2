@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Header from './components/Header';
 import EmployeeCard from './components/EmployeeCard';
@@ -26,8 +27,15 @@ import {
 } from '@firebase/firestore';
 // FIX: Switched to scoped Firebase packages for imports to match project configuration and resolve module errors.
 import { signInAnonymously } from '@firebase/auth';
+import emailjs from '@emailjs/browser';
 import './styles.css';
 import { formatTimestamp } from './services/employeeService';
+
+// --- CONFIGURAÇÃO EMAILJS ---
+const EMAILJS_SERVICE_ID = "service_adjw0cj";
+const EMAILJS_TEMPLATE_ID = "template_owo0dmm";
+const EMAILJS_PUBLIC_KEY = "Ef-7IoF9U9NQ_iV8X";
+// ----------------------------
 
 const App: React.FC = () => {
     const [employees, setEmployees] = useState<Employee[]>([]);
@@ -92,6 +100,32 @@ const App: React.FC = () => {
 
     const dismissNotification = (id: number) => {
         setNotifications(prev => prev.filter(n => n.id !== id));
+    };
+
+    // Função para enviar alerta por e-mail
+    const sendAlertEmail = async (name: string, matricula: string) => {
+        try {
+            // Parâmetros que serão enviados para o template do EmailJS
+            const templateParams = {
+                employee_name: name,
+                matricula: matricula,
+                status: 'ESTOU MAL',
+                time: new Date().toLocaleString('pt-BR'),
+                message: `O colaborador ${name} (Mat: ${matricula}) reportou que não está se sentindo bem durante o DSS.`
+            };
+
+            await emailjs.send(
+                EMAILJS_SERVICE_ID,
+                EMAILJS_TEMPLATE_ID,
+                templateParams,
+                EMAILJS_PUBLIC_KEY
+            );
+            
+            showNotification('Alerta enviado por e-mail ao setor responsável.', 'success');
+        } catch (error) {
+            console.error("Erro ao enviar e-mail via EmailJS:", error);
+            // Não mostramos erro visual para o usuário final para não gerar pânico, apenas logamos
+        }
     };
 
     useEffect(() => {
@@ -336,6 +370,8 @@ const App: React.FC = () => {
                 updatedData.mal = isChecking;
                 if (isChecking) {
                     updatedData.bem = false;
+                    // TRIGGER EMAIL ALERT HERE
+                    sendAlertEmail(employee.name, employee.matricula);
                 }
             }
         }
@@ -943,3 +979,4 @@ ${specialTeamNames}`;
 };
 
 export default App;
+    
