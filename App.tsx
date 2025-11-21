@@ -103,15 +103,21 @@ const App: React.FC = () => {
     };
 
     // Função para enviar alerta por e-mail
-    const sendAlertEmail = async (name: string, matricula: string) => {
+    const sendAlertEmail = async (name: string, matricula: string, turno: string) => {
         try {
+            const currentTime = new Date().toLocaleString('pt-BR');
             // Parâmetros que serão enviados para o template do EmailJS
+            // Enviamos variações de chaves (name/nome, time/horario) para garantir compatibilidade com o template
             const templateParams = {
+                name: name,
+                nome: name, 
                 employee_name: name,
                 matricula: matricula,
+                turno: turno,
                 status: 'ESTOU MAL',
-                time: new Date().toLocaleString('pt-BR'),
-                message: `O colaborador ${name} (Mat: ${matricula}) reportou que não está se sentindo bem durante o DSS.`
+                time: currentTime,
+                horario: currentTime,
+                message: `O colaborador ${name} (Mat: ${matricula}, Turno: ${turno}) reportou que não está se sentindo bem durante o DSS.`
             };
 
             await emailjs.send(
@@ -371,7 +377,7 @@ const App: React.FC = () => {
                 if (isChecking) {
                     updatedData.bem = false;
                     // TRIGGER EMAIL ALERT HERE
-                    sendAlertEmail(employee.name, employee.matricula);
+                    sendAlertEmail(employee.name, employee.matricula, employee.turno);
                 }
             }
         }
@@ -979,4 +985,3 @@ ${specialTeamNames}`;
 };
 
 export default App;
-    
