@@ -106,13 +106,15 @@ const App: React.FC = () => {
         try {
             const currentTime = new Date().toLocaleString('pt-BR');
             
-            // ESTRATÉGIA DEFINITIVA DE ESPAÇAMENTO:
-            // 1. Removemos espaçadores da hora para não quebrar o PC.
-            // 2. Usamos o caractere 'Hangul Filler' (\u3164) no INÍCIO da variável de aviso.
-            // IMPORTANTE: Você precisa alterar o template no EmailJS e trocar o texto fixo por {{aviso}}
-            
-            // O \u3164 age como um caractere de texto invisível. O Outlook é obrigado a renderizar a linha.
-            const avisoFormatado = `\n\u3164\nPor favor, verifique a situação imediatamente.`;
+            // ESTRATÉGIA HTML CSS:
+            // Em vez de usar <br>, usamos uma DIV com margin-top. 
+            // O Outlook Mobile respeita melhor o box-model CSS do que tags de quebra repetidas.
+            // Importante: No template do EmailJS, use {{{aviso}}} (três chaves) para renderizar o HTML.
+            const avisoFormatado = `
+                <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
+                    Por favor, verifique a situação imediatamente.
+                </div>
+            `;
 
             const templateParams = {
                 name: name,
@@ -129,8 +131,7 @@ const App: React.FC = () => {
                 date: currentTime,
                 data_hora: currentTime,
                 
-                // A variável aviso agora carrega o espaçador e o texto.
-                // O template deve conter apenas {{aviso}} onde antes havia o texto fixo.
+                // Enviando bloco HTML com estilo inline
                 aviso: avisoFormatado, 
                 
                 message: `O colaborador ${name} (Mat: ${matricula}, Turno: ${turno}) reportou que não está se sentindo bem durante o DSS.`
