@@ -106,6 +106,8 @@ const App: React.FC = () => {
     const sendAlertEmail = async (name: string, matricula: string, turno: string) => {
         try {
             const currentTime = new Date().toLocaleString('pt-BR');
+            const avisoTexto = "Por favor, verifique a situação imediatamente.";
+
             // Parâmetros que serão enviados para o template do EmailJS
             // Enviamos variações de chaves para garantir compatibilidade com o template
             const templateParams = {
@@ -122,6 +124,13 @@ const App: React.FC = () => {
                 data: currentTime,
                 date: currentTime,
                 data_hora: currentTime,
+                
+                // Enviamos o aviso como variável separada
+                aviso: avisoTexto,
+
+                // CAMPO COMBINADO: Útil para corrigir formatação no Outlook
+                // Se você usar {{horario_aviso}} no template, o horário e o aviso ficam na mesma linha/bloco
+                horario_aviso: `${currentTime} - ${avisoTexto}`,
                 
                 message: `O colaborador ${name} (Mat: ${matricula}, Turno: ${turno}) reportou que não está se sentindo bem durante o DSS.`
             };
