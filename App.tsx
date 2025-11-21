@@ -106,35 +106,65 @@ const App: React.FC = () => {
         try {
             const currentTime = new Date().toLocaleString('pt-BR');
             
-            // ESTRATÉGIA HTML CSS:
-            // Em vez de usar <br>, usamos uma DIV com margin-top. 
-            // O Outlook Mobile respeita melhor o box-model CSS do que tags de quebra repetidas.
-            // Importante: No template do EmailJS, use {{{aviso}}} (três chaves) para renderizar o HTML.
-            const avisoFormatado = `
-                <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
-                    Por favor, verifique a situação imediatamente.
+            // HTML EMAIL BUILDER
+            // Usamos divs com altura definida para forçar espaçamento no Outlook/Mobile
+            // em vez de depender apenas de margin/padding ou br.
+            const emailContent = `
+                <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333333; background-color: #ffffff; max-width: 600px; margin: 0 auto;">
+                    
+                    <h2 style="color: #d32f2f; margin: 0; padding-bottom: 10px; border-bottom: 2px solid #d32f2f;">
+                        ⚠️ Alerta de Saúde e Segurança!
+                    </h2>
+                    
+                    <!-- Espaçador -->
+                    <div style="height: 20px; line-height: 20px; font-size: 20px;">&nbsp;</div>
+
+                    <p style="font-size: 18px; margin: 0; line-height: 1.5;">
+                        O colaborador <strong>${name}</strong> informou que não está se sentindo bem.
+                    </p>
+
+                    <!-- ESPAÇO SOLICITADO ENTRE O TEXTO E OS DETALHES -->
+                    <div style="height: 30px; line-height: 30px; font-size: 30px;">&nbsp;</div>
+                    
+                    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e9ecef;">
+                        <h3 style="margin-top: 0; margin-bottom: 15px; color: #495057; font-size: 16px; text-transform: uppercase;">Detalhes do Registro:</h3>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="padding: 5px 0; font-weight: bold; color: #555; width: 100px;">Nome:</td>
+                                <td style="padding: 5px 0;">${name}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 5px 0; font-weight: bold; color: #555;">Matrícula:</td>
+                                <td style="padding: 5px 0;">${matricula}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 5px 0; font-weight: bold; color: #555;">Turno:</td>
+                                <td style="padding: 5px 0;">${turno}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 5px 0; font-weight: bold; color: #555;">Horário:</td>
+                                <td style="padding: 5px 0;">${currentTime}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <!-- Espaçador -->
+                    <div style="height: 30px; line-height: 30px; font-size: 30px;">&nbsp;</div>
+
+                    <div style="padding: 15px; background-color: #fee2e2; color: #991b1b; font-weight: bold; text-align: center; border-radius: 6px; font-size: 16px;">
+                        Por favor, verifique a situação imediatamente.
+                    </div>
+
+                    <div style="height: 20px; line-height: 20px; font-size: 20px;">&nbsp;</div>
+                    <p style="font-size: 12px; color: #888; text-align: center; margin: 0;">
+                        Este é um e-mail automático do sistema DSS.
+                    </p>
                 </div>
             `;
 
             const templateParams = {
-                name: name,
-                nome: name, 
-                employee_name: name,
-                matricula: matricula,
-                turno: turno,
-                status: 'ESTOU MAL',
-                
-                time: currentTime,
-                horario: currentTime,
-                hora: currentTime,
-                data: currentTime,
-                date: currentTime,
-                data_hora: currentTime,
-                
-                // Enviando bloco HTML com estilo inline
-                aviso: avisoFormatado, 
-                
-                message: `O colaborador ${name} (Mat: ${matricula}, Turno: ${turno}) reportou que não está se sentindo bem durante o DSS.`
+                // O Template do EmailJS deve conter APENAS: {{{html_content}}}
+                html_content: emailContent,
             };
 
             await emailjs.send(
