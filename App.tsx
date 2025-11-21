@@ -108,14 +108,14 @@ const App: React.FC = () => {
             const currentTime = new Date().toLocaleString('pt-BR');
             const avisoTexto = "Por favor, verifique a situação imediatamente.";
             
-            // FIX: Using a VISUAL separator line. 
-            // Mobile email clients (Outlook/Samsung Internet) are extremely aggressive at removing 
-            // "empty" vertical space (even with invisible characters). 
-            // A visual line (underscores) forces the rendering engine to display the separation.
-            const spacer = "\n__________________________________________________\n\n"; 
+            // FIX: Hangul Filler (U+3164)
+            // Esta é a única solução garantida para Outlook/Mobile.
+            // O caractere \u3164 é invisível, mas o sistema o trata como uma LETRA.
+            // Isso força o renderizador a desenhar a linha e o espaço, impedindo o colapso.
+            const spacer = "\n\u3164\n"; 
             
             const avisoComEspaco = `${spacer}${avisoTexto}`;
-            const avisoHtml = `<br><hr><br>${avisoTexto}`; // Fallback for HTML templates
+            const avisoHtml = `<br><br>${avisoTexto}`; 
 
             const templateParams = {
                 name: name,
@@ -125,15 +125,15 @@ const App: React.FC = () => {
                 turno: turno,
                 status: 'ESTOU MAL',
                 
-                // Appending newline to time variables
-                time: currentTime + "\n",
-                horario: currentTime + "\n",
-                hora: currentTime + "\n",
-                data: currentTime + "\n",
-                date: currentTime + "\n",
-                data_hora: currentTime + "\n",
+                // Time variables cleaned up (no trailing \n) so spacer handles layout
+                time: currentTime,
+                horario: currentTime,
+                hora: currentTime,
+                data: currentTime,
+                date: currentTime,
+                data_hora: currentTime,
                 
-                // Envia o aviso com a linha separadora
+                // Envia o aviso com o Hangul Filler para forçar a linha em branco
                 aviso: avisoComEspaco, 
                 aviso_html: avisoHtml,
 
