@@ -107,7 +107,7 @@ const App: React.FC = () => {
         try {
             const currentTime = new Date().toLocaleString('pt-BR');
             // Parâmetros que serão enviados para o template do EmailJS
-            // Enviamos variações de chaves (name/nome, time/horario) para garantir compatibilidade com o template
+            // Enviamos variações de chaves para garantir compatibilidade com o template
             const templateParams = {
                 name: name,
                 nome: name, 
@@ -115,8 +115,14 @@ const App: React.FC = () => {
                 matricula: matricula,
                 turno: turno,
                 status: 'ESTOU MAL',
+                // Variações de tempo para garantir que o template pegue o valor correto
                 time: currentTime,
                 horario: currentTime,
+                hora: currentTime,
+                data: currentTime,
+                date: currentTime,
+                data_hora: currentTime,
+                
                 message: `O colaborador ${name} (Mat: ${matricula}, Turno: ${turno}) reportou que não está se sentindo bem durante o DSS.`
             };
 
