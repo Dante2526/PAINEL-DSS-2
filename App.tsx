@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Header from './components/Header';
 import EmployeeCard from './components/EmployeeCard';
@@ -107,12 +106,13 @@ const App: React.FC = () => {
         try {
             const currentTime = new Date().toLocaleString('pt-BR');
             
-            // HANGUL FILLER (U+3164)
-            // Como o texto "Por favor..." é fixo no template, precisamos anexar o espaço
-            // ao final da variável que vem ANTES dele (a hora).
-            // Isso força o Outlook Mobile a renderizar o espaço entre a hora e o texto fixo.
-            const spacer = "\n\n\u3164\n\n"; 
-            const timeWithSpacer = `${currentTime}${spacer}`;
+            // ESTRATÉGIA DEFINITIVA DE ESPAÇAMENTO:
+            // 1. Removemos espaçadores da hora para não quebrar o PC.
+            // 2. Usamos o caractere 'Hangul Filler' (\u3164) no INÍCIO da variável de aviso.
+            // IMPORTANTE: Você precisa alterar o template no EmailJS e trocar o texto fixo por {{aviso}}
+            
+            // O \u3164 age como um caractere de texto invisível. O Outlook é obrigado a renderizar a linha.
+            const avisoFormatado = `\n\u3164\nPor favor, verifique a situação imediatamente.`;
 
             const templateParams = {
                 name: name,
@@ -122,18 +122,16 @@ const App: React.FC = () => {
                 turno: turno,
                 status: 'ESTOU MAL',
                 
-                // Anexamos o espaçador diretamente na hora.
-                // Assim, o template renderiza: "Horário: 15:00 [ESPAÇO INVISÍVEL]"
-                // E o texto fixo "Por favor..." vem depois do espaço.
-                time: timeWithSpacer,
-                horario: timeWithSpacer,
-                hora: timeWithSpacer,
-                data: timeWithSpacer,
-                date: timeWithSpacer,
-                data_hora: timeWithSpacer,
+                time: currentTime,
+                horario: currentTime,
+                hora: currentTime,
+                data: currentTime,
+                date: currentTime,
+                data_hora: currentTime,
                 
-                // Variável opcional, caso decida usar {{aviso}} no futuro
-                aviso: "Por favor, verifique a situação imediatamente.", 
+                // A variável aviso agora carrega o espaçador e o texto.
+                // O template deve conter apenas {{aviso}} onde antes havia o texto fixo.
+                aviso: avisoFormatado, 
                 
                 message: `O colaborador ${name} (Mat: ${matricula}, Turno: ${turno}) reportou que não está se sentindo bem durante o DSS.`
             };
