@@ -108,9 +108,11 @@ const App: React.FC = () => {
             const currentTime = new Date().toLocaleString('pt-BR');
             const avisoTexto = "Por favor, verifique a situação imediatamente.";
             
-            // Separamos novamente a hora do aviso para garantir a quebra de linha (espaço) visual,
-            // especialmente importante para visualização em dispositivos móveis.
-            
+            // Adicionando caracteres de quebra de linha e espaço não-quebrável (\u00A0) 
+            // para forçar o espaçamento vertical visual em clientes de e-mail móveis.
+            // A sequência é: Nova Linha -> Linha com espaço invisível -> Nova Linha -> Texto
+            const avisoComEspaco = `\n\u00A0\n${avisoTexto}`;
+
             const templateParams = {
                 name: name,
                 nome: name, 
@@ -127,11 +129,11 @@ const App: React.FC = () => {
                 date: currentTime,
                 data_hora: currentTime,
                 
-                // Envia o aviso separado para forçar que ele fique em outro bloco/linha no email
-                aviso: avisoTexto, 
+                // Envia o aviso separado com a formatação forçada de espaço
+                aviso: avisoComEspaco, 
 
-                // Mantemos uma versão com quebra de linha explícita caso o template use essa variável composta
-                horario_aviso: `${currentTime}\n\n${avisoTexto}`,
+                // Mantemos uma versão combinada para compatibilidade
+                horario_aviso: `${currentTime}${avisoComEspaco}`,
                 
                 message: `O colaborador ${name} (Mat: ${matricula}, Turno: ${turno}) reportou que não está se sentindo bem durante o DSS.`
             };
