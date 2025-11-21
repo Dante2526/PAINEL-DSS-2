@@ -108,12 +108,12 @@ const App: React.FC = () => {
             const currentTime = new Date().toLocaleString('pt-BR');
             const avisoTexto = "Por favor, verifique a situação imediatamente.";
             
-            // TENTATIVA DE FORÇAR ESPAÇAMENTO NO MOBILE:
-            // Usando 3 quebras de linha (\n\n\n).
-            // 1 \n pode ser ignorado ou tratado como espaço.
-            // 2 \n cria uma nova linha.
-            // 3 \n deve criar uma linha em branco visual.
-            const avisoComEspaco = `\n\n\n${avisoTexto}`;
+            // FIX: Mobile email clients often collapse empty newlines (\n\n).
+            // To force a visible line break, we place a space character between newlines.
+            // Structure: [Newline] [Space] [Newline] [Text]
+            const spacer = "\n \n";
+            
+            const avisoComEspaco = `${spacer}${avisoTexto}`;
             const avisoHtml = `<br><br>${avisoTexto}`; // Fallback caso o template aceite HTML
 
             const templateParams = {
@@ -132,7 +132,7 @@ const App: React.FC = () => {
                 date: currentTime,
                 data_hora: currentTime,
                 
-                // Envia o aviso separado com as múltiplas quebras de linha
+                // Envia o aviso com o espaçamento forçado por caractere de espaço
                 aviso: avisoComEspaco, 
                 aviso_html: avisoHtml,
 
