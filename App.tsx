@@ -165,6 +165,8 @@ const App: React.FC = () => {
             const templateParams = {
                 // O Template do EmailJS deve conter APENAS: {{{html_content}}}
                 html_content: emailContent,
+                // Assunto personalizado com maiúsculas controladas
+                subject: `ALERTA URGENTE TURNO ${turno}: ${name} marcou "ESTOU MAL"`,
             };
 
             await emailjs.send(
