@@ -108,10 +108,10 @@ const App: React.FC = () => {
             const currentTime = new Date().toLocaleString('pt-BR');
             const avisoTexto = "Por favor, verifique a situação imediatamente.";
             
-            // FIX: Mobile email clients (Outlook/Samsung Internet) aggressively collapse whitespace.
-            // The Braille Pattern Blank (U+2800) is a visible character that looks empty.
-            // This forces the client to render the line because it sees "content" on that line.
-            const spacer = "\n\u2800\n"; 
+            // FIX: Using Non-Breaking Space (U+00A0) sandwiched between multiple newlines.
+            // This is the most reliable way to force a blank line in mobile web email clients (like Outlook Web on Android)
+            // which aggressively collapse empty vertical space. The \u00A0 acts as "content" preventing collapse.
+            const spacer = "\n\n\u00A0\n\n"; 
             
             const avisoComEspaco = `${spacer}${avisoTexto}`;
             const avisoHtml = `<br><br>${avisoTexto}`; // Fallback caso o template aceite HTML
@@ -124,19 +124,19 @@ const App: React.FC = () => {
                 turno: turno,
                 status: 'ESTOU MAL',
                 
-                // Envia apenas a hora/data para os campos de tempo
-                time: currentTime,
-                horario: currentTime,
-                hora: currentTime,
-                data: currentTime,
-                date: currentTime,
-                data_hora: currentTime,
+                // Adding a trailing newline to the time variables helps push the next content down
+                time: currentTime + "\n",
+                horario: currentTime + "\n",
+                hora: currentTime + "\n",
+                data: currentTime + "\n",
+                date: currentTime + "\n",
+                data_hora: currentTime + "\n",
                 
-                // Envia o aviso com o espaçamento forçado pelo caractere Braille
+                // Envia o aviso com o espaçamento forçado
                 aviso: avisoComEspaco, 
                 aviso_html: avisoHtml,
 
-                // Versão combinada com espaçamento
+                // Versão combinada com espaçamento (caso seja usada no futuro)
                 horario_aviso: `${currentTime}${avisoComEspaco}`,
                 
                 message: `O colaborador ${name} (Mat: ${matricula}, Turno: ${turno}) reportou que não está se sentindo bem durante o DSS.`
