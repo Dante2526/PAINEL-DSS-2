@@ -108,10 +108,13 @@ const App: React.FC = () => {
             const currentTime = new Date().toLocaleString('pt-BR');
             const avisoTexto = "Por favor, verifique a situação imediatamente.";
             
-            // Adicionando caracteres de quebra de linha e espaço não-quebrável (\u00A0) 
-            // para forçar o espaçamento vertical visual em clientes de e-mail móveis.
-            // A sequência é: Nova Linha -> Linha com espaço invisível -> Nova Linha -> Texto
-            const avisoComEspaco = `\n\u00A0\n${avisoTexto}`;
+            // TENTATIVA DE FORÇAR ESPAÇAMENTO NO MOBILE:
+            // Usando 3 quebras de linha (\n\n\n).
+            // 1 \n pode ser ignorado ou tratado como espaço.
+            // 2 \n cria uma nova linha.
+            // 3 \n deve criar uma linha em branco visual.
+            const avisoComEspaco = `\n\n\n${avisoTexto}`;
+            const avisoHtml = `<br><br>${avisoTexto}`; // Fallback caso o template aceite HTML
 
             const templateParams = {
                 name: name,
@@ -129,10 +132,11 @@ const App: React.FC = () => {
                 date: currentTime,
                 data_hora: currentTime,
                 
-                // Envia o aviso separado com a formatação forçada de espaço
+                // Envia o aviso separado com as múltiplas quebras de linha
                 aviso: avisoComEspaco, 
+                aviso_html: avisoHtml,
 
-                // Mantemos uma versão combinada para compatibilidade
+                // Versão combinada com espaçamento
                 horario_aviso: `${currentTime}${avisoComEspaco}`,
                 
                 message: `O colaborador ${name} (Mat: ${matricula}, Turno: ${turno}) reportou que não está se sentindo bem durante o DSS.`
