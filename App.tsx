@@ -106,16 +106,13 @@ const App: React.FC = () => {
     const sendAlertEmail = async (name: string, matricula: string, turno: string) => {
         try {
             const currentTime = new Date().toLocaleString('pt-BR');
-            const avisoTexto = "Por favor, verifique a situação imediatamente.";
             
-            // FIX: Hangul Filler (U+3164)
-            // Esta é a única solução garantida para Outlook/Mobile.
-            // O caractere \u3164 é invisível, mas o sistema o trata como uma LETRA.
-            // Isso força o renderizador a desenhar a linha e o espaço, impedindo o colapso.
-            const spacer = "\n\u3164\n"; 
-            
-            const avisoComEspaco = `${spacer}${avisoTexto}`;
-            const avisoHtml = `<br><br>${avisoTexto}`; 
+            // HANGUL FILLER (U+3164)
+            // Como o texto "Por favor..." é fixo no template, precisamos anexar o espaço
+            // ao final da variável que vem ANTES dele (a hora).
+            // Isso força o Outlook Mobile a renderizar o espaço entre a hora e o texto fixo.
+            const spacer = "\n\n\u3164\n\n"; 
+            const timeWithSpacer = `${currentTime}${spacer}`;
 
             const templateParams = {
                 name: name,
@@ -125,20 +122,18 @@ const App: React.FC = () => {
                 turno: turno,
                 status: 'ESTOU MAL',
                 
-                // Time variables cleaned up (no trailing \n) so spacer handles layout
-                time: currentTime,
-                horario: currentTime,
-                hora: currentTime,
-                data: currentTime,
-                date: currentTime,
-                data_hora: currentTime,
+                // Anexamos o espaçador diretamente na hora.
+                // Assim, o template renderiza: "Horário: 15:00 [ESPAÇO INVISÍVEL]"
+                // E o texto fixo "Por favor..." vem depois do espaço.
+                time: timeWithSpacer,
+                horario: timeWithSpacer,
+                hora: timeWithSpacer,
+                data: timeWithSpacer,
+                date: timeWithSpacer,
+                data_hora: timeWithSpacer,
                 
-                // Envia o aviso com o Hangul Filler para forçar a linha em branco
-                aviso: avisoComEspaco, 
-                aviso_html: avisoHtml,
-
-                // Versão combinada
-                horario_aviso: `${currentTime}${avisoComEspaco}`,
+                // Variável opcional, caso decida usar {{aviso}} no futuro
+                aviso: "Por favor, verifique a situação imediatamente.", 
                 
                 message: `O colaborador ${name} (Mat: ${matricula}, Turno: ${turno}) reportou que não está se sentindo bem durante o DSS.`
             };
