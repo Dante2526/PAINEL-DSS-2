@@ -108,10 +108,10 @@ const App: React.FC = () => {
             const currentTime = new Date().toLocaleString('pt-BR');
             const avisoTexto = "Por favor, verifique a situação imediatamente.";
             
-            // FIX: Mobile email clients often collapse empty newlines (\n\n).
-            // To force a visible line break, we place a space character between newlines.
-            // Structure: [Newline] [Space] [Newline] [Text]
-            const spacer = "\n \n";
+            // FIX: Mobile email clients (Outlook/Samsung Internet) aggressively collapse whitespace.
+            // The Braille Pattern Blank (U+2800) is a visible character that looks empty.
+            // This forces the client to render the line because it sees "content" on that line.
+            const spacer = "\n\u2800\n"; 
             
             const avisoComEspaco = `${spacer}${avisoTexto}`;
             const avisoHtml = `<br><br>${avisoTexto}`; // Fallback caso o template aceite HTML
@@ -132,7 +132,7 @@ const App: React.FC = () => {
                 date: currentTime,
                 data_hora: currentTime,
                 
-                // Envia o aviso com o espaçamento forçado por caractere de espaço
+                // Envia o aviso com o espaçamento forçado pelo caractere Braille
                 aviso: avisoComEspaco, 
                 aviso_html: avisoHtml,
 
