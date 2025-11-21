@@ -107,9 +107,10 @@ const App: React.FC = () => {
         try {
             const currentTime = new Date().toLocaleString('pt-BR');
             const avisoTexto = "Por favor, verifique a situação imediatamente.";
-
-            // Parâmetros que serão enviados para o template do EmailJS
-            // Enviamos variações de chaves para garantir compatibilidade com o template
+            
+            // Separamos novamente a hora do aviso para garantir a quebra de linha (espaço) visual,
+            // especialmente importante para visualização em dispositivos móveis.
+            
             const templateParams = {
                 name: name,
                 nome: name, 
@@ -117,7 +118,8 @@ const App: React.FC = () => {
                 matricula: matricula,
                 turno: turno,
                 status: 'ESTOU MAL',
-                // Variações de tempo para garantir que o template pegue o valor correto
+                
+                // Envia apenas a hora/data para os campos de tempo
                 time: currentTime,
                 horario: currentTime,
                 hora: currentTime,
@@ -125,12 +127,11 @@ const App: React.FC = () => {
                 date: currentTime,
                 data_hora: currentTime,
                 
-                // Enviamos o aviso como variável separada
-                aviso: avisoTexto,
+                // Envia o aviso separado para forçar que ele fique em outro bloco/linha no email
+                aviso: avisoTexto, 
 
-                // CAMPO COMBINADO: Útil para corrigir formatação no Outlook
-                // Se você usar {{horario_aviso}} no template, o horário e o aviso ficam na mesma linha/bloco
-                horario_aviso: `${currentTime} - ${avisoTexto}`,
+                // Mantemos uma versão com quebra de linha explícita caso o template use essa variável composta
+                horario_aviso: `${currentTime}\n\n${avisoTexto}`,
                 
                 message: `O colaborador ${name} (Mat: ${matricula}, Turno: ${turno}) reportou que não está se sentindo bem durante o DSS.`
             };
