@@ -1001,6 +1001,7 @@ const ReportModal: React.FC<{
         }
     }, [isOpen, showNotification]);
 
+    // Logic for plain text clipboard/email
     const reportText = useMemo(() => {
         if (!employees.length && !manualRegistrations.length) return "Nenhum dado para exibir.";
 
@@ -1055,6 +1056,36 @@ ${specialTeamNames}`;
         return `${employeeReport}\n\n==================================================\n\nREGISTROS MANUAIS\n--------------------------------------------------\n${manualRegistrationsText}`;
     }, [employees, manualRegistrations]);
 
+    // Logic for Visual HTML Report
+    const categorizeEmployees = (team: Employee[]) => {
+        const mal = team.filter(e => e.mal);
+        const ok = team.filter(e => !e.mal && e.bem && e.assDss);
+        // Pendentes: Quem não está mal, e não completou o processo (ausente ou esqueceu de marcar algo)
+        const pending = team.filter(e => !e.mal && !(e.bem && e.assDss));
+        return { mal, ok, pending };
+    };
+
+    const mainTeam = employees.filter(e => e.turno !== '6H');
+    const specialTeam = employees.filter(e => e.turno === '6H');
+
+    const mainCat = categorizeEmployees(mainTeam);
+    const specialCat = categorizeEmployees(specialTeam);
+
+    const renderEmployeeList = (list: Employee[], emptyText: string = 'Ninguém') => (
+        <ul className="list-none space-y-1 pl-1">
+            {list.map(e => (
+                <li key={e.id} className="text-light-text dark:text-dark-text text-sm flex items-center gap-2">
+                   {e.mal ? <span className="text-red-500 font-bold">⚠</span> : 
+                    (e.bem && e.assDss) ? <span className="text-green-500 font-bold">✓</span> : 
+                    <span className="text-gray-400">•</span>}
+                   <span className={e.mal ? "font-bold" : ""}>{e.name}</span>
+                   {e.absent && <span className="text-xs text-gray-400">(Ausente)</span>}
+                </li>
+            ))}
+            {list.length === 0 && <li className="text-gray-400 text-xs italic ml-4">{emptyText}</li>}
+        </ul>
+    );
+
     const handleCopyReport = () => {
         navigator.clipboard.writeText(reportText).then(() => {
             showNotification('Relatório copiado para a área de transferência!', 'success');
@@ -1091,7 +1122,6 @@ ${specialTeamNames}`;
         const subject = `Relatório de Status DSS - ${today}`;
         const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(reportText)}`;
         
-        // Mailto links have character limits that vary by client/browser (often around 2000).
         if (mailtoLink.length > 2000) {
             navigator.clipboard.writeText(reportText).then(() => {
                 showNotification('Relatório muito longo para e-mail! Copiado para a área de transferência.', 'success');
@@ -1106,9 +1136,68 @@ ${specialTeamNames}`;
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Relatório de Status" scale={scale}>
-            <div className="text-left bg-light-bg dark:bg-dark-bg-secondary p-4 rounded-lg max-h-96 overflow-y-auto">
-                <pre className="whitespace-pre-wrap text-sm font-mono text-light-text dark:text-dark-text">{reportText}</pre>
+            <div className="text-left bg-light-bg dark:bg-dark-bg-secondary p-6 rounded-lg max-h-[60vh] overflow-y-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Column 7H-19H */}
+                    <div>
+                        <h2 className="text-xl font-bold text-primary mb-4 border-b-2 border-primary pb-2">TURNO 7H-19H</h2>
+                        
+                        <div className="mb-6">
+                            <h3 className="bg-success text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">STATUS: 100% OK ({mainCat.ok.length})</h3>
+                            {renderEmployeeList(mainCat.ok)}
+                        </div>
+
+                        <div className="mb-6">
+                            <h3 className="bg-danger text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">STATUS: ESTOU MAL ({mainCat.mal.length})</h3>
+                            {renderEmployeeList(mainCat.mal)}
+                        </div>
+
+                        <div className="mb-6">
+                            <h3 className="bg-neutral text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">PENDENTES / AUSENTES ({mainCat.pending.length})</h3>
+                            {renderEmployeeList(mainCat.pending)}
+                        </div>
+                    </div>
+
+                    {/* Column 6H */}
+                     <div>
+                        <h2 className="text-xl font-bold text-orange mb-4 border-b-2 border-orange pb-2">TURNO 6H</h2>
+                        
+                        <div className="mb-6">
+                            <h3 className="bg-success text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">STATUS: 100% OK ({specialCat.ok.length})</h3>
+                            {renderEmployeeList(specialCat.ok)}
+                        </div>
+
+                        <div className="mb-6">
+                            <h3 className="bg-danger text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">STATUS: ESTOU MAL ({specialCat.mal.length})</h3>
+                            {renderEmployeeList(specialCat.mal)}
+                        </div>
+
+                        <div className="mb-6">
+                            <h3 className="bg-neutral text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">PENDENTES / AUSENTES ({specialCat.pending.length})</h3>
+                            {renderEmployeeList(specialCat.pending)}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Manual Registrations Section */}
+                {manualRegistrations.length > 0 && (
+                    <div className="mt-8 pt-6 border-t-2 border-gray-200 dark:border-gray-700">
+                        <h2 className="text-lg font-bold text-light-text dark:text-dark-text mb-4">REGISTROS MANUAIS</h2>
+                        <ul className="list-disc pl-5 space-y-2">
+                             {manualRegistrations.map(reg => {
+                                 const employee = employees.find(e => e.matricula === reg.matricula);
+                                 const name = employee ? employee.name : 'Desconhecido';
+                                 return (
+                                     <li key={reg.id} className="text-sm text-light-text dark:text-dark-text">
+                                         <span className="font-bold">{reg.matricula}</span> ({name}) - {reg.assunto} <span className="text-xs bg-gray-200 dark:bg-gray-600 px-1 rounded">{reg.TURNO}</span>
+                                     </li>
+                                 )
+                             })}
+                        </ul>
+                    </div>
+                )}
             </div>
+
             <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <button onClick={handleCopyReport} className="w-full py-4 font-bold text-white bg-primary rounded-lg hover:bg-primary-dark transition">
                     COPIAR
