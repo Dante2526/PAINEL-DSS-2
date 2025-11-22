@@ -106,44 +106,44 @@ const App: React.FC = () => {
         try {
             const currentTime = new Date().toLocaleString('pt-BR');
             
-            // HTML EMAIL BUILDER
-            // Usamos divs com altura definida para forçar espaçamento no Outlook/Mobile
-            // em vez de depender apenas de margin/padding ou br.
+            // HTML EMAIL BUILDER - DARK MODE THEME
             const emailContent = `
-                <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333333; background-color: #ffffff; max-width: 600px; margin: 0 auto;">
+                <div style="font-family: Arial, sans-serif; font-size: 16px; color: #eeeeee; background-color: #222222; max-width: 600px; margin: 0 auto; border: 1px solid #444444; border-radius: 8px;">
                     
-                    <h2 style="color: #d32f2f; margin: 0; padding-bottom: 10px; border-bottom: 2px solid #d32f2f;">
-                        ⚠️ Alerta de Saúde e Segurança!
-                    </h2>
-                    
-                    <!-- Espaçador -->
-                    <div style="height: 20px; line-height: 20px; font-size: 20px;">&nbsp;</div>
+                    <div style="padding: 20px 20px 10px 20px;">
+                        <h2 style="color: #ff5252; margin: 0; padding-bottom: 10px; border-bottom: 2px solid #ff5252;">
+                            ⚠️ Alerta de Saúde e Segurança!
+                        </h2>
+                        
+                        <!-- Espaçador -->
+                        <div style="height: 20px; line-height: 20px; font-size: 20px;">&nbsp;</div>
 
-                    <p style="font-size: 18px; margin: 0; line-height: 1.5;">
-                        O colaborador <strong>${name}</strong> informou que não está se sentindo bem.
-                    </p>
+                        <p style="font-size: 18px; margin: 0; line-height: 1.5; color: #ffffff;">
+                            O colaborador <strong>${name}</strong> informou que não está se sentindo bem.
+                        </p>
+                    </div>
 
                     <!-- ESPAÇO SOLICITADO ENTRE O TEXTO E OS DETALHES -->
-                    <div style="height: 30px; line-height: 30px; font-size: 30px;">&nbsp;</div>
+                    <div style="height: 20px; line-height: 20px; font-size: 20px;">&nbsp;</div>
                     
-                    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e9ecef;">
-                        <h3 style="margin-top: 0; margin-bottom: 15px; color: #495057; font-size: 16px; text-transform: uppercase;">Detalhes do Registro:</h3>
+                    <div style="margin: 0 20px; background-color: #333333; padding: 20px; border-radius: 8px; border: 1px solid #444444;">
+                        <h3 style="margin-top: 0; margin-bottom: 15px; color: #b0b0b0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Detalhes do Registro:</h3>
                         <table style="width: 100%; border-collapse: collapse;">
                             <tr>
-                                <td style="padding: 5px 0; font-weight: bold; color: #555; width: 100px;">Nome:</td>
-                                <td style="padding: 5px 0;">${name}</td>
+                                <td style="padding: 8px 0; font-weight: bold; color: #aaaaaa; width: 100px; border-bottom: 1px solid #444444;">Nome:</td>
+                                <td style="padding: 8px 0; color: #ffffff; border-bottom: 1px solid #444444;">${name}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 5px 0; font-weight: bold; color: #555;">Matrícula:</td>
-                                <td style="padding: 5px 0;">${matricula}</td>
+                                <td style="padding: 8px 0; font-weight: bold; color: #aaaaaa; border-bottom: 1px solid #444444;">Matrícula:</td>
+                                <td style="padding: 8px 0; color: #ffffff; border-bottom: 1px solid #444444;">${matricula}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 5px 0; font-weight: bold; color: #555;">Turno:</td>
-                                <td style="padding: 5px 0;">${turno}</td>
+                                <td style="padding: 8px 0; font-weight: bold; color: #aaaaaa; border-bottom: 1px solid #444444;">Turno:</td>
+                                <td style="padding: 8px 0; color: #ffffff; border-bottom: 1px solid #444444;">${turno}</td>
                             </tr>
                             <tr>
-                                <td style="padding: 5px 0; font-weight: bold; color: #555;">Horário:</td>
-                                <td style="padding: 5px 0;">${currentTime}</td>
+                                <td style="padding: 8px 0; font-weight: bold; color: #aaaaaa;">Horário:</td>
+                                <td style="padding: 8px 0; color: #ffffff;">${currentTime}</td>
                             </tr>
                         </table>
                     </div>
@@ -151,21 +151,19 @@ const App: React.FC = () => {
                     <!-- Espaçador -->
                     <div style="height: 30px; line-height: 30px; font-size: 30px;">&nbsp;</div>
 
-                    <div style="padding: 15px; background-color: #fee2e2; color: #991b1b; font-weight: bold; text-align: center; border-radius: 6px; font-size: 16px;">
+                    <div style="margin: 0 20px 20px 20px; padding: 15px; background-color: #450a0a; color: #fca5a5; font-weight: bold; text-align: center; border-radius: 6px; font-size: 16px; border: 1px solid #7f1d1d;">
                         Por favor, verifique a situação imediatamente.
                     </div>
 
-                    <div style="height: 20px; line-height: 20px; font-size: 20px;">&nbsp;</div>
-                    <p style="font-size: 12px; color: #888; text-align: center; margin: 0;">
+                    <div style="height: 10px; line-height: 10px; font-size: 10px;">&nbsp;</div>
+                    <p style="font-size: 12px; color: #666666; text-align: center; margin: 0; padding-bottom: 20px;">
                         Este é um e-mail automático do sistema DSS.
                     </p>
                 </div>
             `;
 
             const templateParams = {
-                // O Template do EmailJS deve conter APENAS: {{{html_content}}}
                 html_content: emailContent,
-                // Assunto personalizado com TURMA B fixo e "ESTOU MAL" em maiúsculo
                 subject: `ALERTA URGENTE TURMA B: "ESTOU MAL"`,
             };
 
@@ -179,7 +177,6 @@ const App: React.FC = () => {
             showNotification('Alerta enviado por e-mail ao setor responsável.', 'success');
         } catch (error) {
             console.error("Erro ao enviar e-mail via EmailJS:", error);
-            // Não mostramos erro visual para o usuário final para não gerar pânico, apenas logamos
         }
     };
 
