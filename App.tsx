@@ -208,7 +208,7 @@ const App: React.FC = () => {
                                     <td>
                                         <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                             <tr>
-                                                <td align="center" style="background-color: #fca5a5; border-radius: 8px; padding: 16px; border: 1px solid #f87171;">
+                                                <td align="center" style="background-color: #ff5252; border-radius: 8px; padding: 16px; border: 1px solid #ff5252;">
                                                     <span style="color: #000000; font-weight: bold; font-size: 16px;">
                                                         Por favor, verifique a situação imediatamente.
                                                     </span>
@@ -221,7 +221,7 @@ const App: React.FC = () => {
                                 <!-- Footer Note -->
                                 <tr>
                                     <td align="center" style="padding-top: 30px;">
-                                        <p style="margin: 0; font-size: 12px; color: #666666;">
+                                        <p style="margin: 0; font-size: 12px; color: #000000;">
                                             Este é um e-mail automático do sistema DSS.
                                         </p>
                                     </td>
