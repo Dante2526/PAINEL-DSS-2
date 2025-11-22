@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Header from './components/Header';
 import EmployeeCard from './components/EmployeeCard';
@@ -107,105 +106,66 @@ const App: React.FC = () => {
         try {
             const currentTime = new Date().toLocaleString('pt-BR');
             
-            // HTML EMAIL BUILDER - TABLE LAYOUT (RESPONSIVE + NATIVE DARK MODE SUPPORT)
-            // Utilizando tabelas para evitar estouro de largura e permitir que o Outlook inverta as cores naturalmente.
+            // HTML EMAIL BUILDER
+            // Usamos divs com altura definida para forçar espaçamento no Outlook/Mobile
+            // em vez de depender apenas de margin/padding ou br.
             const emailContent = `
-            <!DOCTYPE html>
-            <html lang="pt-BR">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Alerta DSS</title>
-            </head>
-            <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f3f4f6;">
-                <!-- Tabela Principal (Fundo) -->
-                <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f3f4f6;">
-                    <tr>
-                        <td align="center" style="padding: 20px 10px;">
-                            
-                            <!-- Cartão Central -->
-                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                                
-                                <!-- Cabeçalho -->
-                                <tr>
-                                    <td style="padding: 25px 25px 10px 25px; border-bottom: 2px solid #dc2626;">
-                                        <h2 style="margin: 0; color: #dc2626; font-size: 22px;">
-                                            ⚠️ Alerta de Saúde e Segurança!
-                                        </h2>
-                                    </td>
-                                </tr>
-                                
-                                <!-- Corpo da Mensagem -->
-                                <tr>
-                                    <td style="padding: 20px 25px;">
-                                        <p style="margin: 0; color: #374151; font-size: 18px; line-height: 1.6;">
-                                            O colaborador <strong style="color: #111827;">${name}</strong> informou que não está se sentindo bem.
-                                        </p>
-                                    </td>
-                                </tr>
-                                
-                                <!-- Caixa de Detalhes -->
-                                <tr>
-                                    <td style="padding: 0 25px 20px 25px;">
-                                        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="15" style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px;">
-                                            <tr>
-                                                <td style="padding: 0;">
-                                                    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
-                                                        <tr>
-                                                            <td style="padding: 10px 15px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-weight: bold; font-size: 14px; width: 30%;">NOME:</td>
-                                                            <td style="padding: 10px 15px; border-bottom: 1px solid #e5e7eb; color: #111827; font-size: 15px;">${name}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td style="padding: 10px 15px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-weight: bold; font-size: 14px;">MATRÍCULA:</td>
-                                                            <td style="padding: 10px 15px; border-bottom: 1px solid #e5e7eb; color: #111827; font-size: 15px;">${matricula}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td style="padding: 10px 15px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-weight: bold; font-size: 14px;">TURNO:</td>
-                                                            <td style="padding: 10px 15px; border-bottom: 1px solid #e5e7eb; color: #111827; font-size: 15px;">${turno}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td style="padding: 10px 15px; color: #6b7280; font-weight: bold; font-size: 14px;">HORÁRIO:</td>
-                                                            <td style="padding: 10px 15px; color: #111827; font-size: 15px;">${currentTime}</td>
-                                                        </tr>
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                                
-                                <!-- Alerta de Rodapé -->
-                                <tr>
-                                    <td style="padding: 0 25px 25px 25px;">
-                                        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="15" style="background-color: #fee2e2; border: 1px solid #fecaca; border-radius: 6px;">
-                                            <tr>
-                                                <td align="center" style="color: #991b1b; font-weight: bold; font-size: 16px;">
-                                                    Por favor, verifique a situação imediatamente.
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                                
-                                <!-- Footer Sistema -->
-                                <tr>
-                                    <td align="center" style="padding: 15px; background-color: #f3f4f6; border-top: 1px solid #e5e7eb;">
-                                        <p style="margin: 0; color: #9ca3af; font-size: 12px;">
-                                            Este é um e-mail automático do sistema DSS.
-                                        </p>
-                                    </td>
-                                </tr>
-                                
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-            </body>
-            </html>
+                <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333333; background-color: #ffffff; max-width: 600px; margin: 0 auto;">
+                    
+                    <h2 style="color: #d32f2f; margin: 0; padding-bottom: 10px; border-bottom: 2px solid #d32f2f;">
+                        ⚠️ Alerta de Saúde e Segurança!
+                    </h2>
+                    
+                    <!-- Espaçador -->
+                    <div style="height: 20px; line-height: 20px; font-size: 20px;">&nbsp;</div>
+
+                    <p style="font-size: 18px; margin: 0; line-height: 1.5;">
+                        O colaborador <strong>${name}</strong> informou que não está se sentindo bem.
+                    </p>
+
+                    <!-- ESPAÇO SOLICITADO ENTRE O TEXTO E OS DETALHES -->
+                    <div style="height: 30px; line-height: 30px; font-size: 30px;">&nbsp;</div>
+                    
+                    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e9ecef;">
+                        <h3 style="margin-top: 0; margin-bottom: 15px; color: #495057; font-size: 16px; text-transform: uppercase;">Detalhes do Registro:</h3>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="padding: 5px 0; font-weight: bold; color: #555; width: 100px;">Nome:</td>
+                                <td style="padding: 5px 0;">${name}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 5px 0; font-weight: bold; color: #555;">Matrícula:</td>
+                                <td style="padding: 5px 0;">${matricula}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 5px 0; font-weight: bold; color: #555;">Turno:</td>
+                                <td style="padding: 5px 0;">${turno}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 5px 0; font-weight: bold; color: #555;">Horário:</td>
+                                <td style="padding: 5px 0;">${currentTime}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <!-- Espaçador -->
+                    <div style="height: 30px; line-height: 30px; font-size: 30px;">&nbsp;</div>
+
+                    <div style="padding: 15px; background-color: #fee2e2; color: #991b1b; font-weight: bold; text-align: center; border-radius: 6px; font-size: 16px;">
+                        Por favor, verifique a situação imediatamente.
+                    </div>
+
+                    <div style="height: 20px; line-height: 20px; font-size: 20px;">&nbsp;</div>
+                    <p style="font-size: 12px; color: #888; text-align: center; margin: 0;">
+                        Este é um e-mail automático do sistema DSS.
+                    </p>
+                </div>
             `;
 
             const templateParams = {
+                // O Template do EmailJS deve conter APENAS: {{{html_content}}}
                 html_content: emailContent,
+                // Assunto personalizado com TURMA B fixo e "ESTOU MAL" em maiúsculo
                 subject: `ALERTA URGENTE TURMA B: "ESTOU MAL"`,
             };
 
@@ -219,6 +179,7 @@ const App: React.FC = () => {
             showNotification('Alerta enviado por e-mail ao setor responsável.', 'success');
         } catch (error) {
             console.error("Erro ao enviar e-mail via EmailJS:", error);
+            // Não mostramos erro visual para o usuário final para não gerar pânico, apenas logamos
         }
     };
 
