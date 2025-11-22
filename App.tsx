@@ -1003,45 +1003,62 @@ const ReportModal: React.FC<{
 
     // Logic for plain text clipboard/email
     const reportText = useMemo(() => {
-        if (!employees.length && !manualRegistrations.length) return "Nenhum dado para exibir.";
-
         const today = new Date().toLocaleDateString('pt-BR', { dateStyle: 'full' });
         const total = employees.length;
         const absentCount = employees.filter(e => e.absent).length;
         const present = total - absentCount;
 
-        const getNames = (filter: (e: Employee) => boolean) => 
-            employees.filter(filter).map(e => `- ${e.name}`).join('\n') || 'Nenhum';
+        const categorizeEmployees = (team: Employee[]) => {
+            const mal = team.filter(e => e.mal);
+            const ok = team.filter(e => !e.mal && e.bem && e.assDss);
+            const pending = team.filter(e => !e.mal && !(e.bem && e.assDss));
+            return { mal, ok, pending };
+        };
 
-        const bemNames = getNames(e => e.bem);
-        const malNames = getNames(e => e.mal);
-        const absentNames = getNames(e => e.absent);
-        const specialTeamNames = getNames(e => e.turno === '6H');
+        const mainTeam = employees.filter(e => e.turno !== '6H');
+        const specialTeam = employees.filter(e => e.turno === '6H');
+
+        const mainCat = categorizeEmployees(mainTeam);
+        const specialCat = categorizeEmployees(specialTeam);
+
+        const formatList = (list: Employee[], emptyLabel = "Nenhum") => {
+            if (list.length === 0) return `   ( ${emptyLabel} )`;
+            return list.map(e => `   - ${e.name}`).join('\n');
+        };
 
         const employeeReport = `RELATÓRIO DE STATUS - ${today}
 ==================================================
 
 RESUMO GERAL
---------------------------------------------------
 - Total de Funcionários: ${total}
 - Presentes: ${present}
 - Ausentes: ${absentCount}
 
-STATUS "ESTOU BEM"
---------------------------------------------------
-${bemNames}
+==================================================
+TURNO 7H-19H
+==================================================
 
-STATUS "ESTOU MAL"
---------------------------------------------------
-${malNames}
+[ STATUS: 100% OK ]
+${formatList(mainCat.ok)}
 
-AUSENTES
---------------------------------------------------
-${absentNames}
+[ STATUS: ESTOU MAL ]
+${formatList(mainCat.mal)}
 
-EQUIPE TURNO 6H
---------------------------------------------------
-${specialTeamNames}`;
+[ PENDENTES / AUSENTES ]
+${formatList(mainCat.pending)}
+
+==================================================
+TURNO 6H
+==================================================
+
+[ STATUS: 100% OK ]
+${formatList(specialCat.ok)}
+
+[ STATUS: ESTOU MAL ]
+${formatList(specialCat.mal)}
+
+[ PENDENTES / AUSENTES ]
+${formatList(specialCat.pending)}`;
 
         let manualRegistrationsText = 'Nenhum registro manual adicionado.';
         if (manualRegistrations.length > 0) {
@@ -1053,7 +1070,7 @@ ${specialTeamNames}`;
               }).join('\n');
         }
 
-        return `${employeeReport}\n\n==================================================\n\nREGISTROS MANUAIS\n--------------------------------------------------\n${manualRegistrationsText}`;
+        return `${employeeReport}\n\n==================================================\nREGISTROS MANUAIS\n--------------------------------------------------\n${manualRegistrationsText}`;
     }, [employees, manualRegistrations]);
 
     // Logic for Visual HTML Report
