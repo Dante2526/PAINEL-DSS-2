@@ -1003,14 +1003,12 @@ const ReportModal: React.FC<{
 
     // Logic for plain text clipboard/email
     const reportText = useMemo(() => {
-        const today = new Date().toLocaleDateString('pt-BR', { dateStyle: 'full' });
         const total = employees.length;
-        const absentCount = employees.filter(e => e.absent).length;
-        const present = total - absentCount;
-
+        
         const categorizeEmployees = (team: Employee[]) => {
             const mal = team.filter(e => e.mal);
             const ok = team.filter(e => !e.mal && e.bem && e.assDss);
+            // Pendentes covers everyone else (including explicit absent)
             const pending = team.filter(e => !e.mal && !(e.bem && e.assDss));
             return { mal, ok, pending };
         };
@@ -1020,44 +1018,46 @@ const ReportModal: React.FC<{
 
         const mainCat = categorizeEmployees(mainTeam);
         const specialCat = categorizeEmployees(specialTeam);
+        
+        const totalOk = mainCat.ok.length + specialCat.ok.length;
+        const totalMal = mainCat.mal.length + specialCat.mal.length;
+        const presentCount = totalOk + totalMal;
+        const pendingAbsentCount = total - presentCount;
 
+        // Format helper
         const formatList = (list: Employee[], emptyLabel = "Nenhum") => {
-            if (list.length === 0) return `   ( ${emptyLabel} )`;
-            return list.map(e => `   - ${e.name} (${e.matricula})`).join('\n');
+            if (list.length === 0) return emptyLabel;
+            // Sort by name for better readability? The list is likely already sorted by the main query listener, but good to ensure.
+            // Assuming employees are sorted in state.
+            return list.map(e => `• ${e.name} (Matrícula: ${e.matricula})`).join('\n');
         };
 
-        const employeeReport = `RELATÓRIO - ${today}
-==================================================
+        const employeeReport = `RESUMO GERAL
+--------------------------------------------------
+• Total de Funcionários: ${total}
+• Presentes (DSS + Bem/Mal): ${presentCount}
+• Pendentes / Ausentes: ${pendingAbsentCount}
 
-RESUMO GERAL
-- Total de Funcionários: ${total}
-- Presentes: ${present}
-- Ausentes: ${absentCount}
-
-==================================================
-TURNO 7H
-==================================================
-
-[ ASS.DSS + ESTOU BEM ]
+EQUIPE TURNO 7H
+--------------------------------------------------
+STATUS: "ASS.DSS + ESTOU BEM"
 ${formatList(mainCat.ok)}
 
-[ ESTOU MAL ]
+STATUS: "ESTOU MAL"
 ${formatList(mainCat.mal)}
 
-[ PENDENTES / AUSENTES ]
+STATUS: "PENDENTES / AUSENTES"
 ${formatList(mainCat.pending)}
 
-==================================================
-TURNO 6H
-==================================================
-
-[ ASS.DSS + ESTOU BEM ]
+EQUIPE TURNO 6H
+--------------------------------------------------
+STATUS: "ASS.DSS + ESTOU BEM"
 ${formatList(specialCat.ok)}
 
-[ ESTOU MAL ]
+STATUS: "ESTOU MAL"
 ${formatList(specialCat.mal)}
 
-[ PENDENTES / AUSENTES ]
+STATUS: "PENDENTES / AUSENTES"
 ${formatList(specialCat.pending)}`;
 
         return employeeReport;
