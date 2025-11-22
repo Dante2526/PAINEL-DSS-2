@@ -707,6 +707,8 @@ const App: React.FC = () => {
         }
         try {
             const batch = writeBatch(db);
+            
+            // 1. Limpar status dos funcionários
             const employeesSnapshot = await getDocs(collection(db, 'employees'));
             employeesSnapshot.forEach((doc) => {
                 batch.update(doc.ref, {
@@ -717,9 +719,16 @@ const App: React.FC = () => {
                     time: null,
                 });
             });
+
+            // 2. Limpar registros manuais (Assunto DSS e Matrícula)
+            const registrationsSnapshot = await getDocs(collection(db, 'registrosDSS'));
+            registrationsSnapshot.forEach((doc) => {
+                batch.delete(doc.ref);
+            });
+
             await batch.commit();
             setActiveModal(ModalType.None);
-            showNotification('Dados de status diário foram limpos!', 'success');
+            showNotification('Dados de status diário e registros manuais foram limpos!', 'success');
         } catch(error) {
             console.error("Error clearing data:", error);
             const message = error instanceof Error ? error.message : 'Ocorreu um erro desconhecido.';
