@@ -107,7 +107,7 @@ const App: React.FC = () => {
         try {
             const currentTime = new Date().toLocaleString('pt-BR');
             
-            // HTML EMAIL BUILDER - SIDE-BY-SIDE LAYOUT WITH BLACK TEXT
+            // HTML EMAIL BUILDER - CLEAN CARD LAYOUT (NO BORDERS, BLACK TEXT)
             const emailContent = `
             <!DOCTYPE html>
             <html lang="pt-BR">
@@ -150,50 +150,51 @@ const App: React.FC = () => {
                                     </td>
                                 </tr>
 
-                                <!-- Details Card (Table with Borders) -->
+                                <!-- Details Card (Clean Layout) -->
                                 <tr>
                                     <td style="padding-bottom: 30px;">
-                                        <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
-                                            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-collapse: collapse;">
-                                                <!-- Header Row -->
-                                                <tr>
-                                                    <td colspan="2" style="padding: 15px 20px; border-bottom: 1px solid #e5e7eb; background-color: #f3f4f6;">
-                                                        <span style="font-size: 13px; font-weight: bold; color: #000000; text-transform: uppercase; letter-spacing: 0.5px;">DETALHES DO REGISTRO:</span>
-                                                    </td>
-                                                </tr>
+                                        <div style="background-color: #f8f9fa; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+                                            
+                                            <!-- Card Header -->
+                                            <p style="margin: 0 0 16px 0; font-size: 12px; font-weight: bold; color: #374151; text-transform: uppercase; letter-spacing: 1px;">
+                                                DETALHES DO REGISTRO:
+                                            </p>
+
+                                            <!-- Data Table (No Borders) -->
+                                            <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                 <!-- Nome -->
                                                 <tr>
-                                                    <td style="padding: 12px 20px; border-bottom: 1px solid #e5e7eb; width: 30%; vertical-align: top;">
-                                                        <strong style="font-size: 15px; color: #000000;">Nome:</strong>
+                                                    <td style="padding-bottom: 8px; width: 100px; vertical-align: top;">
+                                                        <strong style="font-size: 15px; color: #374151;">Nome:</strong>
                                                     </td>
-                                                    <td style="padding: 12px 20px; border-bottom: 1px solid #e5e7eb; vertical-align: top;">
+                                                    <td style="padding-bottom: 8px; vertical-align: top;">
                                                         <span style="font-size: 15px; color: #000000;">${name}</span>
                                                     </td>
                                                 </tr>
                                                 <!-- Matrícula -->
                                                 <tr>
-                                                    <td style="padding: 12px 20px; border-bottom: 1px solid #e5e7eb; width: 30%; vertical-align: top;">
-                                                        <strong style="font-size: 15px; color: #000000;">Matrícula:</strong>
+                                                    <td style="padding-bottom: 8px; width: 100px; vertical-align: top;">
+                                                        <strong style="font-size: 15px; color: #374151;">Matrícula:</strong>
                                                     </td>
-                                                    <td style="padding: 12px 20px; border-bottom: 1px solid #e5e7eb; vertical-align: top;">
+                                                    <td style="padding-bottom: 8px; vertical-align: top;">
                                                         <span style="font-size: 15px; color: #000000;">${matricula}</span>
                                                     </td>
                                                 </tr>
                                                 <!-- Turno -->
                                                 <tr>
-                                                    <td style="padding: 12px 20px; border-bottom: 1px solid #e5e7eb; width: 30%; vertical-align: top;">
-                                                        <strong style="font-size: 15px; color: #000000;">Turno:</strong>
+                                                    <td style="padding-bottom: 8px; width: 100px; vertical-align: top;">
+                                                        <strong style="font-size: 15px; color: #374151;">Turno:</strong>
                                                     </td>
-                                                    <td style="padding: 12px 20px; border-bottom: 1px solid #e5e7eb; vertical-align: top;">
+                                                    <td style="padding-bottom: 8px; vertical-align: top;">
                                                         <span style="font-size: 15px; color: #000000;">${turno}</span>
                                                     </td>
                                                 </tr>
-                                                <!-- Horário (Sem borda no final) -->
+                                                <!-- Horário -->
                                                 <tr>
-                                                    <td style="padding: 12px 20px; width: 30%; vertical-align: top;">
-                                                        <strong style="font-size: 15px; color: #000000;">Horário:</strong>
+                                                    <td style="padding-bottom: 0; width: 100px; vertical-align: top;">
+                                                        <strong style="font-size: 15px; color: #374151;">Horário:</strong>
                                                     </td>
-                                                    <td style="padding: 12px 20px; vertical-align: top;">
+                                                    <td style="padding-bottom: 0; vertical-align: top;">
                                                         <span style="font-size: 15px; color: #000000;">${currentTime}</span>
                                                     </td>
                                                 </tr>
@@ -207,7 +208,7 @@ const App: React.FC = () => {
                                     <td>
                                         <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                             <tr>
-                                                <td align="center" style="background-color: #fee2e2; border-radius: 6px; padding: 15px; border: 1px solid #fecaca;">
+                                                <td align="center" style="background-color: #fee2e2; border-radius: 8px; padding: 16px; border: 1px solid #fecaca;">
                                                     <span style="color: #991b1b; font-weight: bold; font-size: 16px;">
                                                         Por favor, verifique a situação imediatamente.
                                                     </span>
