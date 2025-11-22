@@ -106,60 +106,127 @@ const App: React.FC = () => {
         try {
             const currentTime = new Date().toLocaleString('pt-BR');
             
-            // HTML EMAIL BUILDER
-            // Usamos divs com altura definida para forçar espaçamento no Outlook/Mobile
-            // em vez de depender apenas de margin/padding ou br.
+            // HTML EMAIL BUILDER - LIGHT MODE (Standard)
+            // Projetado para ser clean e permitir que o Outlook converta para Dark Mode nativamente se necessário.
+            // Usa border-collapse para garantir que as linhas divisórias fiquem nítidas.
             const emailContent = `
-                <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333333; background-color: #ffffff; max-width: 600px; margin: 0 auto;">
-                    
-                    <h2 style="color: #d32f2f; margin: 0; padding-bottom: 10px; border-bottom: 2px solid #d32f2f;">
-                        ⚠️ Alerta de Saúde e Segurança!
-                    </h2>
-                    
-                    <!-- Espaçador -->
-                    <div style="height: 20px; line-height: 20px; font-size: 20px;">&nbsp;</div>
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Alerta de Saúde</title>
+            </head>
+            <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #ffffff;">
+                
+                <!-- Main Wrapper -->
+                <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; width: 100%;">
+                    <tr>
+                        <td align="center" style="padding: 20px 0;">
+                            
+                            <!-- Container (Max Width 600px for Mobile) -->
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; width: 100%;">
+                                
+                                <!-- Header Alert -->
+                                <tr>
+                                    <td style="padding-bottom: 20px;">
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td style="border-left: 4px solid #dc2626; padding-left: 15px;">
+                                                    <h1 style="margin: 0; color: #dc2626; font-size: 24px; font-weight: bold; line-height: 1.2;">
+                                                        Alerta de Saúde e Segurança!
+                                                    </h1>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
 
-                    <p style="font-size: 18px; margin: 0; line-height: 1.5;">
-                        O colaborador <strong>${name}</strong> informou que não está se sentindo bem.
-                    </p>
+                                <!-- Main Message -->
+                                <tr>
+                                    <td style="padding-bottom: 30px;">
+                                        <p style="margin: 0; font-size: 18px; line-height: 1.5; color: #111827;">
+                                            O colaborador <strong>${name}</strong> informou que não está se sentindo bem.
+                                        </p>
+                                    </td>
+                                </tr>
 
-                    <!-- ESPAÇO SOLICITADO ENTRE O TEXTO E OS DETALHES -->
-                    <div style="height: 30px; line-height: 30px; font-size: 30px;">&nbsp;</div>
-                    
-                    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e9ecef;">
-                        <h3 style="margin-top: 0; margin-bottom: 15px; color: #495057; font-size: 16px; text-transform: uppercase;">Detalhes do Registro:</h3>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <tr>
-                                <td style="padding: 5px 0; font-weight: bold; color: #555; width: 100px;">Nome:</td>
-                                <td style="padding: 5px 0;">${name}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px 0; font-weight: bold; color: #555;">Matrícula:</td>
-                                <td style="padding: 5px 0;">${matricula}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px 0; font-weight: bold; color: #555;">Turno:</td>
-                                <td style="padding: 5px 0;">${turno}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px 0; font-weight: bold; color: #555;">Horário:</td>
-                                <td style="padding: 5px 0;">${currentTime}</td>
-                            </tr>
-                        </table>
-                    </div>
-                    
-                    <!-- Espaçador -->
-                    <div style="height: 30px; line-height: 30px; font-size: 30px;">&nbsp;</div>
+                                <!-- Details Card (Table with Borders) -->
+                                <tr>
+                                    <td style="padding-bottom: 30px;">
+                                        <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+                                            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-collapse: collapse;">
+                                                <!-- Header Row -->
+                                                <tr>
+                                                    <td style="padding: 15px 20px; border-bottom: 1px solid #e5e7eb; background-color: #f3f4f6;">
+                                                        <span style="font-size: 13px; font-weight: bold; color: #4b5563; text-transform: uppercase; letter-spacing: 0.5px;">DETALHES DO REGISTRO</span>
+                                                    </td>
+                                                </tr>
+                                                <!-- Nome -->
+                                                <tr>
+                                                    <td style="padding: 12px 20px; border-bottom: 1px solid #e5e7eb;">
+                                                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 2px;">Nome</div>
+                                                        <div style="font-size: 16px; font-weight: 600; color: #111827;">${name}</div>
+                                                    </td>
+                                                </tr>
+                                                <!-- Matrícula -->
+                                                <tr>
+                                                    <td style="padding: 12px 20px; border-bottom: 1px solid #e5e7eb;">
+                                                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 2px;">Matrícula</div>
+                                                        <div style="font-size: 16px; font-weight: 600; color: #111827;">${matricula}</div>
+                                                    </td>
+                                                </tr>
+                                                <!-- Turno -->
+                                                <tr>
+                                                    <td style="padding: 12px 20px; border-bottom: 1px solid #e5e7eb;">
+                                                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 2px;">Turno</div>
+                                                        <div style="font-size: 16px; font-weight: 600; color: #111827;">${turno}</div>
+                                                    </td>
+                                                </tr>
+                                                <!-- Horário (Sem borda no final) -->
+                                                <tr>
+                                                    <td style="padding: 12px 20px;">
+                                                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 2px;">Horário</div>
+                                                        <div style="font-size: 16px; font-weight: 600; color: #111827;">${currentTime}</div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </td>
+                                </tr>
 
-                    <div style="padding: 15px; background-color: #fee2e2; color: #991b1b; font-weight: bold; text-align: center; border-radius: 6px; font-size: 16px;">
-                        Por favor, verifique a situação imediatamente.
-                    </div>
+                                <!-- Footer Alert Box -->
+                                <tr>
+                                    <td>
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td align="center" style="background-color: #fee2e2; border-radius: 6px; padding: 15px; border: 1px solid #fecaca;">
+                                                    <span style="color: #991b1b; font-weight: bold; font-size: 16px;">
+                                                        Por favor, verifique a situação imediatamente.
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
 
-                    <div style="height: 20px; line-height: 20px; font-size: 20px;">&nbsp;</div>
-                    <p style="font-size: 12px; color: #888; text-align: center; margin: 0;">
-                        Este é um e-mail automático do sistema DSS.
-                    </p>
-                </div>
+                                <!-- Footer Note -->
+                                <tr>
+                                    <td align="center" style="padding-top: 30px;">
+                                        <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+                                            Este é um e-mail automático do sistema DSS.
+                                        </p>
+                                    </td>
+                                </tr>
+
+                            </table>
+                            <!-- End Container -->
+
+                        </td>
+                    </tr>
+                </table>
+            </body>
+            </html>
             `;
 
             const templateParams = {
