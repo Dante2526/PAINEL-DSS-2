@@ -1124,23 +1124,6 @@ ${formatList(specialCat.pending)}`;
         }
     };
 
-    const handleEmailReport = () => {
-        const today = new Date().toLocaleDateString('pt-BR');
-        const subject = `Relatório DSS - ${today}`;
-        const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(reportText)}`;
-        
-        if (mailtoLink.length > 2000) {
-            navigator.clipboard.writeText(reportText).then(() => {
-                showNotification('Relatório muito longo para e-mail! Copiado para a área de transferência.', 'success');
-            }).catch(err => {
-                console.error('Failed to copy report: ', err);
-                showNotification('Relatório muito longo e falha ao copiar para a área de transferência.', 'error');
-            });
-        } else {
-            window.location.href = mailtoLink;
-        }
-    };
-
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Relatório" scale={scale}>
             <div className="text-left bg-light-bg dark:bg-dark-bg-secondary p-6 rounded-lg max-h-[60vh] overflow-y-auto">
@@ -1205,15 +1188,12 @@ ${formatList(specialCat.pending)}`;
                 )}
             </div>
 
-            <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <button onClick={handleCopyReport} className="w-full py-4 font-bold text-white bg-primary rounded-lg hover:bg-primary-dark transition">
                     COPIAR
                 </button>
                 <button onClick={handleDownloadReport} className="w-full py-4 font-bold text-white bg-success rounded-lg hover:bg-green-600 transition">
                     BAIXAR
-                </button>
-                <button onClick={handleEmailReport} className="w-full py-4 font-bold text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition">
-                    E-MAIL
                 </button>
             </div>
         </Modal>
