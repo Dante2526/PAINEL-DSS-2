@@ -1023,10 +1023,10 @@ const ReportModal: React.FC<{
 
         const formatList = (list: Employee[], emptyLabel = "Nenhum") => {
             if (list.length === 0) return `   ( ${emptyLabel} )`;
-            return list.map(e => `   - ${e.name}`).join('\n');
+            return list.map(e => `   - ${e.name} (${e.matricula})`).join('\n');
         };
 
-        const employeeReport = `RELATÓRIO DE STATUS - ${today}
+        const employeeReport = `RELATÓRIO - ${today}
 ==================================================
 
 RESUMO GERAL
@@ -1085,7 +1085,7 @@ ${formatList(specialCat.pending)}`;
                    {e.mal ? <span className="text-red-500 font-bold">⚠</span> : 
                     (e.bem && e.assDss) ? <span className="text-green-500 font-bold">✓</span> : 
                     <span className="text-gray-400">•</span>}
-                   <span className={e.mal ? "font-bold" : ""}>{e.name}</span>
+                   <span className={e.mal ? "font-bold" : ""}>{e.name} <span className="text-xs font-normal text-gray-500 dark:text-gray-400">({e.matricula})</span></span>
                    {e.absent && <span className="text-xs text-gray-400">(Ausente)</span>}
                 </li>
             ))}
@@ -1126,7 +1126,7 @@ ${formatList(specialCat.pending)}`;
 
     const handleEmailReport = () => {
         const today = new Date().toLocaleDateString('pt-BR');
-        const subject = `Relatório de Status DSS - ${today}`;
+        const subject = `Relatório - ${today}`;
         const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(reportText)}`;
         
         if (mailtoLink.length > 2000) {
@@ -1142,7 +1142,7 @@ ${formatList(specialCat.pending)}`;
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Relatório de Status" scale={scale}>
+        <Modal isOpen={isOpen} onClose={onClose} title="Relatório" scale={scale}>
             <div className="text-left bg-light-bg dark:bg-dark-bg-secondary p-6 rounded-lg max-h-[60vh] overflow-y-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Column 7H */}
