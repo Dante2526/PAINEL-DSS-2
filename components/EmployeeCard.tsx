@@ -89,10 +89,10 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onStatusChange, o
         <div className="w-full bg-light-card dark:bg-dark-card rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
             <div className={`p-6 flex items-center text-white ${getHeaderClass()}`}>
                 <div className="w-14 h-14 bg-white/25 rounded-full flex items-center justify-center text-2xl mr-5 flex-shrink-0">👤</div>
-                <div className="flex-grow flex flex-col justify-center">
-                    <div className="flex items-baseline gap-2">
+                <div className="flex-grow flex flex-col justify-center overflow-hidden">
+                    <div className="flex items-baseline gap-2 whitespace-nowrap">
                         <span className="text-xl font-bold leading-tight">{employee.name}</span>
-                        <span className="text-sm opacity-90 whitespace-nowrap">({employee.matricula})</span>
+                        <span className="text-sm opacity-90">({employee.matricula})</span>
                     </div>
                 </div>
                 <div className="flex gap-2.5 ml-4">
