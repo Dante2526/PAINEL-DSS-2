@@ -1038,10 +1038,10 @@ RESUMO GERAL
 TURNO 7H
 ==================================================
 
-[ STATUS: ASS.DSS + ESTOU BEM ]
+[ ASS.DSS + ESTOU BEM ]
 ${formatList(mainCat.ok)}
 
-[ STATUS: ESTOU MAL ]
+[ ESTOU MAL ]
 ${formatList(mainCat.mal)}
 
 [ PENDENTES / AUSENTES ]
@@ -1051,10 +1051,10 @@ ${formatList(mainCat.pending)}
 TURNO 6H
 ==================================================
 
-[ STATUS: ASS.DSS + ESTOU BEM ]
+[ ASS.DSS + ESTOU BEM ]
 ${formatList(specialCat.ok)}
 
-[ STATUS: ESTOU MAL ]
+[ ESTOU MAL ]
 ${formatList(specialCat.mal)}
 
 [ PENDENTES / AUSENTES ]
@@ -1150,12 +1150,12 @@ ${formatList(specialCat.pending)}`;
                         <h2 className="text-xl font-bold text-primary mb-4 border-b-2 border-primary pb-2">TURNO 7H</h2>
                         
                         <div className="mb-6">
-                            <h3 className="bg-success text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">STATUS: ASS.DSS + ESTOU BEM ({mainCat.ok.length})</h3>
+                            <h3 className="bg-success text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">ASS.DSS + ESTOU BEM ({mainCat.ok.length})</h3>
                             {renderEmployeeList(mainCat.ok)}
                         </div>
 
                         <div className="mb-6">
-                            <h3 className="bg-danger text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">STATUS: ESTOU MAL ({mainCat.mal.length})</h3>
+                            <h3 className="bg-danger text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">ESTOU MAL ({mainCat.mal.length})</h3>
                             {renderEmployeeList(mainCat.mal)}
                         </div>
 
@@ -1170,12 +1170,12 @@ ${formatList(specialCat.pending)}`;
                         <h2 className="text-xl font-bold text-orange mb-4 border-b-2 border-orange pb-2">TURNO 6H</h2>
                         
                         <div className="mb-6">
-                            <h3 className="bg-success text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">STATUS: ASS.DSS + ESTOU BEM ({specialCat.ok.length})</h3>
+                            <h3 className="bg-success text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">ASS.DSS + ESTOU BEM ({specialCat.ok.length})</h3>
                             {renderEmployeeList(specialCat.ok)}
                         </div>
 
                         <div className="mb-6">
-                            <h3 className="bg-danger text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">STATUS: ESTOU MAL ({specialCat.mal.length})</h3>
+                            <h3 className="bg-danger text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">ESTOU MAL ({specialCat.mal.length})</h3>
                             {renderEmployeeList(specialCat.mal)}
                         </div>
 
