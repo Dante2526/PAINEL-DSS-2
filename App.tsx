@@ -106,60 +106,108 @@ const App: React.FC = () => {
         try {
             const currentTime = new Date().toLocaleString('pt-BR');
             
-            // HTML EMAIL BUILDER - DARK MODE THEME
+            // HTML EMAIL BUILDER - RESPONSIVE LIGHT/DARK MODE
             const emailContent = `
-                <div style="font-family: Arial, sans-serif; font-size: 16px; color: #eeeeee; background-color: #222222; max-width: 600px; margin: 0 auto; border: 1px solid #444444; border-radius: 8px;">
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <meta name="color-scheme" content="light dark">
+                <meta name="supported-color-schemes" content="light dark">
+                <style>
+                    /* Reset Básico */
+                    body { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
                     
-                    <div style="padding: 20px 20px 10px 20px;">
-                        <h2 style="color: #ff5252; margin: 0; padding-bottom: 10px; border-bottom: 2px solid #ff5252;">
-                            ⚠️ Alerta de Saúde e Segurança!
-                        </h2>
+                    /* --- VARIÁVEIS DE COR (LIGHT MODE DEFAULT) --- */
+                    .email-wrapper { background-color: #f3f4f6; padding: 20px; }
+                    .email-container { background-color: #ffffff; border: 1px solid #e5e7eb; color: #1f2937; }
+                    .header-title { color: #dc2626; border-bottom: 2px solid #dc2626; }
+                    .text-regular { color: #374151; }
+                    .details-box { background-color: #f9fafb; border: 1px solid #e5e7eb; }
+                    .details-label { color: #6b7280; border-bottom: 1px solid #e5e7eb; }
+                    .details-value { color: #111827; border-bottom: 1px solid #e5e7eb; }
+                    .alert-footer { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+                    .footer-note { color: #9ca3af; }
+
+                    /* --- DARK MODE OVERRIDES --- */
+                    @media (prefers-color-scheme: dark) {
+                        .email-wrapper { background-color: #1a1a1a !important; }
+                        .email-container { background-color: #222222 !important; border-color: #444444 !important; color: #eeeeee !important; }
+                        .header-title { color: #ff5252 !important; border-bottom-color: #ff5252 !important; }
+                        .text-regular { color: #e5e7eb !important; }
+                        .details-box { background-color: #333333 !important; border-color: #444444 !important; }
+                        .details-label { color: #9ca3af !important; border-bottom-color: #444444 !important; }
+                        .details-value { color: #ffffff !important; border-bottom-color: #444444 !important; }
+                        .alert-footer { background-color: #450a0a !important; color: #fca5a5 !important; border-color: #7f1d1d !important; }
+                        .footer-note { color: #6b7280 !important; }
+                    }
+
+                    /* --- OUTLOOK DARK MODE SPECIFIC --- */
+                    [data-ogsc] .email-wrapper { background-color: #1a1a1a !important; }
+                    [data-ogsc] .email-container { background-color: #222222 !important; border-color: #444444 !important; color: #eeeeee !important; }
+                    [data-ogsc] .details-box { background-color: #333333 !important; border-color: #444444 !important; }
+                    [data-ogsc] .details-value { color: #ffffff !important; }
+                    [data-ogsc] .alert-footer { background-color: #450a0a !important; color: #fca5a5 !important; border-color: #7f1d1d !important; }
+                </style>
+            </head>
+            <body>
+                <div class="email-wrapper">
+                    <div class="email-container" style="max-width: 600px; margin: 0 auto; border-radius: 8px; overflow: hidden;">
+                        
+                        <div style="padding: 20px 20px 10px 20px;">
+                            <h2 class="header-title" style="margin: 0; padding-bottom: 10px; font-size: 22px;">
+                                ⚠️ Alerta de Saúde e Segurança!
+                            </h2>
+                            
+                            <!-- Espaçador -->
+                            <div style="height: 20px; line-height: 20px; font-size: 20px;">&nbsp;</div>
+
+                            <p class="text-regular" style="font-size: 18px; margin: 0; line-height: 1.5;">
+                                O colaborador <strong>${name}</strong> informou que não está se sentindo bem.
+                            </p>
+                        </div>
+
+                        <!-- ESPAÇO SOLICITADO -->
+                        <div style="height: 20px; line-height: 20px; font-size: 20px;">&nbsp;</div>
+                        
+                        <div class="details-box" style="margin: 0 20px; padding: 20px; border-radius: 8px;">
+                            <h3 style="margin-top: 0; margin-bottom: 15px; opacity: 0.8; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Detalhes do Registro:</h3>
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td class="details-label" style="padding: 8px 0; font-weight: bold; width: 100px;">Nome:</td>
+                                    <td class="details-value" style="padding: 8px 0;">${name}</td>
+                                </tr>
+                                <tr>
+                                    <td class="details-label" style="padding: 8px 0; font-weight: bold;">Matrícula:</td>
+                                    <td class="details-value" style="padding: 8px 0;">${matricula}</td>
+                                </tr>
+                                <tr>
+                                    <td class="details-label" style="padding: 8px 0; font-weight: bold;">Turno:</td>
+                                    <td class="details-value" style="padding: 8px 0;">${turno}</td>
+                                </tr>
+                                <tr>
+                                    <td class="details-label" style="padding: 8px 0; font-weight: bold; border-bottom: none;">Horário:</td>
+                                    <td class="details-value" style="padding: 8px 0; border-bottom: none;">${currentTime}</td>
+                                </tr>
+                            </table>
+                        </div>
                         
                         <!-- Espaçador -->
-                        <div style="height: 20px; line-height: 20px; font-size: 20px;">&nbsp;</div>
+                        <div style="height: 30px; line-height: 30px; font-size: 30px;">&nbsp;</div>
 
-                        <p style="font-size: 18px; margin: 0; line-height: 1.5; color: #ffffff;">
-                            O colaborador <strong>${name}</strong> informou que não está se sentindo bem.
+                        <div class="alert-footer" style="margin: 0 20px 20px 20px; padding: 15px; font-weight: bold; text-align: center; border-radius: 6px; font-size: 16px;">
+                            Por favor, verifique a situação imediatamente.
+                        </div>
+
+                        <div style="height: 10px; line-height: 10px; font-size: 10px;">&nbsp;</div>
+                        <p class="footer-note" style="font-size: 12px; text-align: center; margin: 0; padding-bottom: 20px;">
+                            Este é um e-mail automático do sistema DSS.
                         </p>
                     </div>
-
-                    <!-- ESPAÇO SOLICITADO ENTRE O TEXTO E OS DETALHES -->
-                    <div style="height: 20px; line-height: 20px; font-size: 20px;">&nbsp;</div>
-                    
-                    <div style="margin: 0 20px; background-color: #333333; padding: 20px; border-radius: 8px; border: 1px solid #444444;">
-                        <h3 style="margin-top: 0; margin-bottom: 15px; color: #b0b0b0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Detalhes do Registro:</h3>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <tr>
-                                <td style="padding: 8px 0; font-weight: bold; color: #aaaaaa; width: 100px; border-bottom: 1px solid #444444;">Nome:</td>
-                                <td style="padding: 8px 0; color: #ffffff; border-bottom: 1px solid #444444;">${name}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 8px 0; font-weight: bold; color: #aaaaaa; border-bottom: 1px solid #444444;">Matrícula:</td>
-                                <td style="padding: 8px 0; color: #ffffff; border-bottom: 1px solid #444444;">${matricula}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 8px 0; font-weight: bold; color: #aaaaaa; border-bottom: 1px solid #444444;">Turno:</td>
-                                <td style="padding: 8px 0; color: #ffffff; border-bottom: 1px solid #444444;">${turno}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 8px 0; font-weight: bold; color: #aaaaaa;">Horário:</td>
-                                <td style="padding: 8px 0; color: #ffffff;">${currentTime}</td>
-                            </tr>
-                        </table>
-                    </div>
-                    
-                    <!-- Espaçador -->
-                    <div style="height: 30px; line-height: 30px; font-size: 30px;">&nbsp;</div>
-
-                    <div style="margin: 0 20px 20px 20px; padding: 15px; background-color: #450a0a; color: #fca5a5; font-weight: bold; text-align: center; border-radius: 6px; font-size: 16px; border: 1px solid #7f1d1d;">
-                        Por favor, verifique a situação imediatamente.
-                    </div>
-
-                    <div style="height: 10px; line-height: 10px; font-size: 10px;">&nbsp;</div>
-                    <p style="font-size: 12px; color: #666666; text-align: center; margin: 0; padding-bottom: 20px;">
-                        Este é um e-mail automático do sistema DSS.
-                    </p>
                 </div>
+            </body>
+            </html>
             `;
 
             const templateParams = {
