@@ -1035,7 +1035,7 @@ RESUMO GERAL
 - Ausentes: ${absentCount}
 
 ==================================================
-TURNO 7H-19H
+TURNO 7H
 ==================================================
 
 [ STATUS: 100% OK ]
@@ -1060,18 +1060,8 @@ ${formatList(specialCat.mal)}
 [ PENDENTES / AUSENTES ]
 ${formatList(specialCat.pending)}`;
 
-        let manualRegistrationsText = 'Nenhum registro manual adicionado.';
-        if (manualRegistrations.length > 0) {
-            manualRegistrationsText = manualRegistrations
-              .map(reg => {
-                const employee = employees.find(e => e.matricula === reg.matricula);
-                const employeeName = employee ? employee.name : 'Matrícula não encontrada';
-                return `- Matrícula: ${reg.matricula} (${employeeName}) | Assunto: ${reg.assunto} | Turno: ${reg.TURNO}`
-              }).join('\n');
-        }
-
-        return `${employeeReport}\n\n==================================================\nREGISTROS MANUAIS\n--------------------------------------------------\n${manualRegistrationsText}`;
-    }, [employees, manualRegistrations]);
+        return employeeReport;
+    }, [employees]);
 
     // Logic for Visual HTML Report
     const categorizeEmployees = (team: Employee[]) => {
@@ -1155,9 +1145,9 @@ ${formatList(specialCat.pending)}`;
         <Modal isOpen={isOpen} onClose={onClose} title="Relatório de Status" scale={scale}>
             <div className="text-left bg-light-bg dark:bg-dark-bg-secondary p-6 rounded-lg max-h-[60vh] overflow-y-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* Column 7H-19H */}
+                    {/* Column 7H */}
                     <div>
-                        <h2 className="text-xl font-bold text-primary mb-4 border-b-2 border-primary pb-2">TURNO 7H-19H</h2>
+                        <h2 className="text-xl font-bold text-primary mb-4 border-b-2 border-primary pb-2">TURNO 7H</h2>
                         
                         <div className="mb-6">
                             <h3 className="bg-success text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">STATUS: 100% OK ({mainCat.ok.length})</h3>
@@ -1196,7 +1186,7 @@ ${formatList(specialCat.pending)}`;
                     </div>
                 </div>
 
-                {/* Manual Registrations Section */}
+                {/* Manual Registrations Section - REMOVED FROM TEXT REPORT BUT KEPT IN VISUAL AS REQUESTED IMPLICITLY OR JUST REMOVE FROM TEXT */}
                 {manualRegistrations.length > 0 && (
                     <div className="mt-8 pt-6 border-t-2 border-gray-200 dark:border-gray-700">
                         <h2 className="text-lg font-bold text-light-text dark:text-dark-text mb-4">REGISTROS MANUAIS</h2>
