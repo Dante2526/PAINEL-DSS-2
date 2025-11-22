@@ -107,75 +107,58 @@ const App: React.FC = () => {
         try {
             const currentTime = new Date().toLocaleString('pt-BR');
             
-            // HTML EMAIL BUILDER - FIXED LIGHT MODE WITH MEDIA QUERY OVERRIDES ONLY
+            // HTML EMAIL BUILDER - MODO CLARO FIXO (LIGHT MODE ONLY)
             const emailContent = `
             <!DOCTYPE html>
             <html lang="pt-BR">
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <style>
-                    /* Reset Básico */
-                    body { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; background-color: #f3f4f6; color: #1f2937; }
-                    
-                    /* --- DARK MODE OVERRIDES --- 
-                       Apenas aplicado se o dispositivo suportar e pedir explicitamente.
-                    */
-                    @media (prefers-color-scheme: dark) {
-                        .email-wrapper { background-color: #1a1a1a !important; }
-                        .email-container { background-color: #222222 !important; border-color: #444444 !important; color: #eeeeee !important; }
-                        .header-title { color: #ff5252 !important; border-bottom-color: #ff5252 !important; }
-                        .text-regular { color: #e5e7eb !important; }
-                        .details-box { background-color: #333333 !important; border-color: #444444 !important; }
-                        .details-label { color: #9ca3af !important; border-bottom-color: #444444 !important; }
-                        .details-value { color: #ffffff !important; border-bottom-color: #444444 !important; }
-                        .alert-footer { background-color: #450a0a !important; color: #fca5a5 !important; border-color: #7f1d1d !important; }
-                        .footer-note { color: #6b7280 !important; }
-                    }
-                </style>
+                <title>Alerta DSS</title>
             </head>
-            <body style="margin: 0; padding: 0; background-color: #f3f4f6;">
-                <!-- Wrapper com cor de fundo CLARA EXPLÍCITA (Light Mode Default) -->
-                <div class="email-wrapper" style="background-color: #f3f4f6; padding: 20px; width: 100%;">
+            <body style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: Arial, sans-serif;">
+                <!-- Wrapper GERAL -->
+                <div style="background-color: #f3f4f6; padding: 20px; width: 100%;">
                     
-                    <!-- Container Principal BRANCO EXPLÍCITO (Light Mode Default) -->
-                    <div class="email-container" style="background-color: #ffffff; border: 1px solid #e5e7eb; color: #1f2937; max-width: 600px; margin: 0 auto; border-radius: 8px; overflow: hidden;">
+                    <!-- Cartão Branco -->
+                    <div style="background-color: #ffffff; border: 1px solid #e5e7eb; color: #1f2937; max-width: 600px; margin: 0 auto; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                         
-                        <div style="padding: 20px 20px 10px 20px;">
-                            <h2 class="header-title" style="color: #dc2626; border-bottom: 2px solid #dc2626; margin: 0; padding-bottom: 10px; font-size: 22px;">
+                        <div style="padding: 25px 25px 10px 25px;">
+                            <h2 style="color: #dc2626; border-bottom: 2px solid #dc2626; margin: 0; padding-bottom: 15px; font-size: 22px;">
                                 ⚠️ Alerta de Saúde e Segurança!
                             </h2>
                             
                             <!-- Espaçador -->
                             <div style="height: 20px; line-height: 20px; font-size: 20px;">&nbsp;</div>
 
-                            <p class="text-regular" style="color: #374151; font-size: 18px; margin: 0; line-height: 1.5;">
-                                O colaborador <strong>${name}</strong> informou que não está se sentindo bem.
+                            <p style="color: #374151; font-size: 18px; margin: 0; line-height: 1.6;">
+                                O colaborador <strong style="color: #111827;">${name}</strong> informou que não está se sentindo bem.
                             </p>
                         </div>
 
-                        <!-- ESPAÇO SOLICITADO -->
-                        <div style="height: 20px; line-height: 20px; font-size: 20px;">&nbsp;</div>
+                        <!-- ESPAÇO -->
+                        <div style="height: 10px; line-height: 10px; font-size: 10px;">&nbsp;</div>
                         
-                        <!-- Caixa de Detalhes CINZA CLARO EXPLÍCITO (Light Mode Default) -->
-                        <div class="details-box" style="background-color: #f9fafb; border: 1px solid #e5e7eb; margin: 0 20px; padding: 20px; border-radius: 8px;">
-                            <h3 style="margin-top: 0; margin-bottom: 15px; opacity: 0.8; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #374151;">Detalhes do Registro:</h3>
+                        <!-- Caixa de Detalhes (Cinza Claro) -->
+                        <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; margin: 0 25px; padding: 20px; border-radius: 8px;">
+                            <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #6b7280; font-weight: bold;">Detalhes do Registro:</h3>
+                            
                             <table style="width: 100%; border-collapse: collapse;">
                                 <tr>
-                                    <td class="details-label" style="color: #6b7280; border-bottom: 1px solid #e5e7eb; padding: 8px 0; font-weight: bold; width: 100px;">Nome:</td>
-                                    <td class="details-value" style="color: #111827; border-bottom: 1px solid #e5e7eb; padding: 8px 0;">${name}</td>
+                                    <td style="color: #6b7280; border-bottom: 1px solid #e5e7eb; padding: 10px 0; font-weight: bold; width: 100px; font-size: 15px;">Nome:</td>
+                                    <td style="color: #111827; border-bottom: 1px solid #e5e7eb; padding: 10px 0; font-size: 15px;">${name}</td>
                                 </tr>
                                 <tr>
-                                    <td class="details-label" style="color: #6b7280; border-bottom: 1px solid #e5e7eb; padding: 8px 0; font-weight: bold;">Matrícula:</td>
-                                    <td class="details-value" style="color: #111827; border-bottom: 1px solid #e5e7eb; padding: 8px 0;">${matricula}</td>
+                                    <td style="color: #6b7280; border-bottom: 1px solid #e5e7eb; padding: 10px 0; font-weight: bold; font-size: 15px;">Matrícula:</td>
+                                    <td style="color: #111827; border-bottom: 1px solid #e5e7eb; padding: 10px 0; font-size: 15px;">${matricula}</td>
                                 </tr>
                                 <tr>
-                                    <td class="details-label" style="color: #6b7280; border-bottom: 1px solid #e5e7eb; padding: 8px 0; font-weight: bold;">Turno:</td>
-                                    <td class="details-value" style="color: #111827; border-bottom: 1px solid #e5e7eb; padding: 8px 0;">${turno}</td>
+                                    <td style="color: #6b7280; border-bottom: 1px solid #e5e7eb; padding: 10px 0; font-weight: bold; font-size: 15px;">Turno:</td>
+                                    <td style="color: #111827; border-bottom: 1px solid #e5e7eb; padding: 10px 0; font-size: 15px;">${turno}</td>
                                 </tr>
                                 <tr>
-                                    <td class="details-label" style="color: #6b7280; border-bottom: none; padding: 8px 0; font-weight: bold;">Horário:</td>
-                                    <td class="details-value" style="color: #111827; border-bottom: none; padding: 8px 0;">${currentTime}</td>
+                                    <td style="color: #6b7280; border-bottom: none; padding: 10px 0; font-weight: bold; font-size: 15px;">Horário:</td>
+                                    <td style="color: #111827; border-bottom: none; padding: 10px 0; font-size: 15px;">${currentTime}</td>
                                 </tr>
                             </table>
                         </div>
@@ -183,15 +166,18 @@ const App: React.FC = () => {
                         <!-- Espaçador -->
                         <div style="height: 30px; line-height: 30px; font-size: 30px;">&nbsp;</div>
 
-                        <!-- Footer de Alerta VERMELHO CLARO (Light Mode Default) -->
-                        <div class="alert-footer" style="background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; margin: 0 20px 20px 20px; padding: 15px; font-weight: bold; text-align: center; border-radius: 6px; font-size: 16px;">
+                        <!-- Footer de Alerta (Vermelho Claro) -->
+                        <div style="background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; margin: 0 25px 25px 25px; padding: 15px; font-weight: bold; text-align: center; border-radius: 6px; font-size: 16px;">
                             Por favor, verifique a situação imediatamente.
                         </div>
 
                         <div style="height: 10px; line-height: 10px; font-size: 10px;">&nbsp;</div>
-                        <p class="footer-note" style="color: #9ca3af; font-size: 12px; text-align: center; margin: 0; padding-bottom: 20px;">
-                            Este é um e-mail automático do sistema DSS.
-                        </p>
+                        
+                        <div style="background-color: #f3f4f6; padding: 15px; text-align: center; border-top: 1px solid #e5e7eb;">
+                            <p style="color: #9ca3af; font-size: 12px; margin: 0;">
+                                Este é um e-mail automático do sistema DSS.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </body>
