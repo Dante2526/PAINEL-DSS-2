@@ -106,7 +106,7 @@ const App: React.FC = () => {
         try {
             const currentTime = new Date().toLocaleString('pt-BR');
             
-            // HTML EMAIL BUILDER - RESPONSIVE LIGHT/DARK MODE
+            // HTML EMAIL BUILDER - ROBUST LIGHT MODE (INLINE) WITH DARK MODE OVERRIDES
             const emailContent = `
             <!DOCTYPE html>
             <html lang="pt-BR">
@@ -119,18 +119,9 @@ const App: React.FC = () => {
                     /* Reset Básico */
                     body { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
                     
-                    /* --- VARIÁVEIS DE COR (LIGHT MODE DEFAULT) --- */
-                    .email-wrapper { background-color: #f3f4f6; padding: 20px; }
-                    .email-container { background-color: #ffffff; border: 1px solid #e5e7eb; color: #1f2937; }
-                    .header-title { color: #dc2626; border-bottom: 2px solid #dc2626; }
-                    .text-regular { color: #374151; }
-                    .details-box { background-color: #f9fafb; border: 1px solid #e5e7eb; }
-                    .details-label { color: #6b7280; border-bottom: 1px solid #e5e7eb; }
-                    .details-value { color: #111827; border-bottom: 1px solid #e5e7eb; }
-                    .alert-footer { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-                    .footer-note { color: #9ca3af; }
-
-                    /* --- DARK MODE OVERRIDES --- */
+                    /* --- DARK MODE OVERRIDES --- 
+                       Apenas aplicado se o dispositivo pedir. Usa !important para sobrescrever o estilo inline claro.
+                    */
                     @media (prefers-color-scheme: dark) {
                         .email-wrapper { background-color: #1a1a1a !important; }
                         .email-container { background-color: #222222 !important; border-color: #444444 !important; color: #eeeeee !important; }
@@ -151,19 +142,22 @@ const App: React.FC = () => {
                     [data-ogsc] .alert-footer { background-color: #450a0a !important; color: #fca5a5 !important; border-color: #7f1d1d !important; }
                 </style>
             </head>
-            <body>
-                <div class="email-wrapper">
-                    <div class="email-container" style="max-width: 600px; margin: 0 auto; border-radius: 8px; overflow: hidden;">
+            <body style="margin: 0; padding: 0;">
+                <!-- Wrapper com cor de fundo CLARA (Light Mode Default) -->
+                <div class="email-wrapper" style="background-color: #f3f4f6; padding: 20px; width: 100%;">
+                    
+                    <!-- Container Principal BRANCO (Light Mode Default) -->
+                    <div class="email-container" style="background-color: #ffffff; border: 1px solid #e5e7eb; color: #1f2937; max-width: 600px; margin: 0 auto; border-radius: 8px; overflow: hidden;">
                         
                         <div style="padding: 20px 20px 10px 20px;">
-                            <h2 class="header-title" style="margin: 0; padding-bottom: 10px; font-size: 22px;">
+                            <h2 class="header-title" style="color: #dc2626; border-bottom: 2px solid #dc2626; margin: 0; padding-bottom: 10px; font-size: 22px;">
                                 ⚠️ Alerta de Saúde e Segurança!
                             </h2>
                             
                             <!-- Espaçador -->
                             <div style="height: 20px; line-height: 20px; font-size: 20px;">&nbsp;</div>
 
-                            <p class="text-regular" style="font-size: 18px; margin: 0; line-height: 1.5;">
+                            <p class="text-regular" style="color: #374151; font-size: 18px; margin: 0; line-height: 1.5;">
                                 O colaborador <strong>${name}</strong> informou que não está se sentindo bem.
                             </p>
                         </div>
@@ -171,24 +165,25 @@ const App: React.FC = () => {
                         <!-- ESPAÇO SOLICITADO -->
                         <div style="height: 20px; line-height: 20px; font-size: 20px;">&nbsp;</div>
                         
-                        <div class="details-box" style="margin: 0 20px; padding: 20px; border-radius: 8px;">
+                        <!-- Caixa de Detalhes CINZA CLARO (Light Mode Default) -->
+                        <div class="details-box" style="background-color: #f9fafb; border: 1px solid #e5e7eb; margin: 0 20px; padding: 20px; border-radius: 8px;">
                             <h3 style="margin-top: 0; margin-bottom: 15px; opacity: 0.8; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Detalhes do Registro:</h3>
                             <table style="width: 100%; border-collapse: collapse;">
                                 <tr>
-                                    <td class="details-label" style="padding: 8px 0; font-weight: bold; width: 100px;">Nome:</td>
-                                    <td class="details-value" style="padding: 8px 0;">${name}</td>
+                                    <td class="details-label" style="color: #6b7280; border-bottom: 1px solid #e5e7eb; padding: 8px 0; font-weight: bold; width: 100px;">Nome:</td>
+                                    <td class="details-value" style="color: #111827; border-bottom: 1px solid #e5e7eb; padding: 8px 0;">${name}</td>
                                 </tr>
                                 <tr>
-                                    <td class="details-label" style="padding: 8px 0; font-weight: bold;">Matrícula:</td>
-                                    <td class="details-value" style="padding: 8px 0;">${matricula}</td>
+                                    <td class="details-label" style="color: #6b7280; border-bottom: 1px solid #e5e7eb; padding: 8px 0; font-weight: bold;">Matrícula:</td>
+                                    <td class="details-value" style="color: #111827; border-bottom: 1px solid #e5e7eb; padding: 8px 0;">${matricula}</td>
                                 </tr>
                                 <tr>
-                                    <td class="details-label" style="padding: 8px 0; font-weight: bold;">Turno:</td>
-                                    <td class="details-value" style="padding: 8px 0;">${turno}</td>
+                                    <td class="details-label" style="color: #6b7280; border-bottom: 1px solid #e5e7eb; padding: 8px 0; font-weight: bold;">Turno:</td>
+                                    <td class="details-value" style="color: #111827; border-bottom: 1px solid #e5e7eb; padding: 8px 0;">${turno}</td>
                                 </tr>
                                 <tr>
-                                    <td class="details-label" style="padding: 8px 0; font-weight: bold; border-bottom: none;">Horário:</td>
-                                    <td class="details-value" style="padding: 8px 0; border-bottom: none;">${currentTime}</td>
+                                    <td class="details-label" style="color: #6b7280; border-bottom: none; padding: 8px 0; font-weight: bold;">Horário:</td>
+                                    <td class="details-value" style="color: #111827; border-bottom: none; padding: 8px 0;">${currentTime}</td>
                                 </tr>
                             </table>
                         </div>
@@ -196,12 +191,13 @@ const App: React.FC = () => {
                         <!-- Espaçador -->
                         <div style="height: 30px; line-height: 30px; font-size: 30px;">&nbsp;</div>
 
-                        <div class="alert-footer" style="margin: 0 20px 20px 20px; padding: 15px; font-weight: bold; text-align: center; border-radius: 6px; font-size: 16px;">
+                        <!-- Footer de Alerta VERMELHO CLARO (Light Mode Default) -->
+                        <div class="alert-footer" style="background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; margin: 0 20px 20px 20px; padding: 15px; font-weight: bold; text-align: center; border-radius: 6px; font-size: 16px;">
                             Por favor, verifique a situação imediatamente.
                         </div>
 
                         <div style="height: 10px; line-height: 10px; font-size: 10px;">&nbsp;</div>
-                        <p class="footer-note" style="font-size: 12px; text-align: center; margin: 0; padding-bottom: 20px;">
+                        <p class="footer-note" style="color: #9ca3af; font-size: 12px; text-align: center; margin: 0; padding-bottom: 20px;">
                             Este é um e-mail automático do sistema DSS.
                         </p>
                     </div>
