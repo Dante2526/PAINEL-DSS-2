@@ -126,6 +126,13 @@ const App: React.FC = () => {
                             <!-- Container (Max Width 600px for Mobile) -->
                             <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; width: 100%;">
                                 
+                                <!-- Pre-header (Inbox Preview Text) -->
+                                <tr>
+                                    <td style="display:none !important; visibility:hidden; mso-hide:all; font-size:1px; color:#ffffff; line-height:1px; max-height:0px; max-width:0px; opacity:0; overflow:hidden;">
+                                        🚨 Alerta de Saúde: Colaborador informou "ESTOU MAL". Verifique imediatamente.
+                                    </td>
+                                </tr>
+
                                 <!-- Header Alert -->
                                 <tr>
                                     <td style="padding-bottom: 20px;">
@@ -240,8 +247,8 @@ const App: React.FC = () => {
             const templateParams = {
                 // O Template do EmailJS deve conter APENAS: {{{html_content}}}
                 html_content: emailContent,
-                // Assunto personalizado com TURMA B fixo e "ESTOU MAL" em maiúsculo
-                subject: `ALERTA URGENTE TURMA B: "ESTOU MAL"`,
+                // Assunto personalizado com Sirene e "ESTOU MAL" em maiúsculo
+                subject: `🚨 ALERTA URGENTE TURMA B: "ESTOU MAL"`,
             };
 
             await emailjs.send(
@@ -843,7 +850,7 @@ const ManualRegisterSection: React.FC<ManualRegisterSectionProps> = ({
                     type="text" 
                     value={subject} 
                     onChange={(e) => onSubjectChange(e.target.value)} 
-                    placeholder="Assunto do DSS (7H-19H)" 
+                    placeholder="Assunto do DSS" 
                     className="w-full pl-12 pr-4 py-4 bg-light-bg dark:bg-dark-bg border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"
                 />
             </div>
@@ -853,7 +860,7 @@ const ManualRegisterSection: React.FC<ManualRegisterSectionProps> = ({
                     type="text" 
                     value={matricula} 
                     onChange={handleMatriculaChange} 
-                    placeholder="Sua Matrícula" 
+                    placeholder="Matrícula" 
                     className="w-full pl-12 pr-4 py-4 bg-light-bg dark:bg-dark-bg border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"
                     inputMode="numeric"
                     pattern="[0-9]*"
