@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Header from './components/Header';
 import EmployeeCard from './components/EmployeeCard';
@@ -106,9 +107,7 @@ const App: React.FC = () => {
         try {
             const currentTime = new Date().toLocaleString('pt-BR');
             
-            // HTML EMAIL BUILDER - LIGHT MODE (Standard)
-            // Projetado para ser clean e permitir que o Outlook converta para Dark Mode nativamente se necessário.
-            // Usa border-collapse para garantir que as linhas divisórias fiquem nítidas.
+            // HTML EMAIL BUILDER - SIDE-BY-SIDE LAYOUT WITH BLACK TEXT
             const emailContent = `
             <!DOCTYPE html>
             <html lang="pt-BR">
@@ -145,7 +144,7 @@ const App: React.FC = () => {
                                 <!-- Main Message -->
                                 <tr>
                                     <td style="padding-bottom: 30px;">
-                                        <p style="margin: 0; font-size: 18px; line-height: 1.5; color: #111827;">
+                                        <p style="margin: 0; font-size: 18px; line-height: 1.5; color: #000000;">
                                             O colaborador <strong>${name}</strong> informou que não está se sentindo bem.
                                         </p>
                                     </td>
@@ -158,36 +157,44 @@ const App: React.FC = () => {
                                             <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-collapse: collapse;">
                                                 <!-- Header Row -->
                                                 <tr>
-                                                    <td style="padding: 15px 20px; border-bottom: 1px solid #e5e7eb; background-color: #f3f4f6;">
-                                                        <span style="font-size: 13px; font-weight: bold; color: #4b5563; text-transform: uppercase; letter-spacing: 0.5px;">DETALHES DO REGISTRO</span>
+                                                    <td colspan="2" style="padding: 15px 20px; border-bottom: 1px solid #e5e7eb; background-color: #f3f4f6;">
+                                                        <span style="font-size: 13px; font-weight: bold; color: #000000; text-transform: uppercase; letter-spacing: 0.5px;">DETALHES DO REGISTRO:</span>
                                                     </td>
                                                 </tr>
                                                 <!-- Nome -->
                                                 <tr>
-                                                    <td style="padding: 12px 20px; border-bottom: 1px solid #e5e7eb;">
-                                                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 2px;">Nome</div>
-                                                        <div style="font-size: 16px; font-weight: 600; color: #111827;">${name}</div>
+                                                    <td style="padding: 12px 20px; border-bottom: 1px solid #e5e7eb; width: 30%; vertical-align: top;">
+                                                        <strong style="font-size: 15px; color: #000000;">Nome:</strong>
+                                                    </td>
+                                                    <td style="padding: 12px 20px; border-bottom: 1px solid #e5e7eb; vertical-align: top;">
+                                                        <span style="font-size: 15px; color: #000000;">${name}</span>
                                                     </td>
                                                 </tr>
                                                 <!-- Matrícula -->
                                                 <tr>
-                                                    <td style="padding: 12px 20px; border-bottom: 1px solid #e5e7eb;">
-                                                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 2px;">Matrícula</div>
-                                                        <div style="font-size: 16px; font-weight: 600; color: #111827;">${matricula}</div>
+                                                    <td style="padding: 12px 20px; border-bottom: 1px solid #e5e7eb; width: 30%; vertical-align: top;">
+                                                        <strong style="font-size: 15px; color: #000000;">Matrícula:</strong>
+                                                    </td>
+                                                    <td style="padding: 12px 20px; border-bottom: 1px solid #e5e7eb; vertical-align: top;">
+                                                        <span style="font-size: 15px; color: #000000;">${matricula}</span>
                                                     </td>
                                                 </tr>
                                                 <!-- Turno -->
                                                 <tr>
-                                                    <td style="padding: 12px 20px; border-bottom: 1px solid #e5e7eb;">
-                                                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 2px;">Turno</div>
-                                                        <div style="font-size: 16px; font-weight: 600; color: #111827;">${turno}</div>
+                                                    <td style="padding: 12px 20px; border-bottom: 1px solid #e5e7eb; width: 30%; vertical-align: top;">
+                                                        <strong style="font-size: 15px; color: #000000;">Turno:</strong>
+                                                    </td>
+                                                    <td style="padding: 12px 20px; border-bottom: 1px solid #e5e7eb; vertical-align: top;">
+                                                        <span style="font-size: 15px; color: #000000;">${turno}</span>
                                                     </td>
                                                 </tr>
                                                 <!-- Horário (Sem borda no final) -->
                                                 <tr>
-                                                    <td style="padding: 12px 20px;">
-                                                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 2px;">Horário</div>
-                                                        <div style="font-size: 16px; font-weight: 600; color: #111827;">${currentTime}</div>
+                                                    <td style="padding: 12px 20px; width: 30%; vertical-align: top;">
+                                                        <strong style="font-size: 15px; color: #000000;">Horário:</strong>
+                                                    </td>
+                                                    <td style="padding: 12px 20px; vertical-align: top;">
+                                                        <span style="font-size: 15px; color: #000000;">${currentTime}</span>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -213,7 +220,7 @@ const App: React.FC = () => {
                                 <!-- Footer Note -->
                                 <tr>
                                     <td align="center" style="padding-top: 30px;">
-                                        <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+                                        <p style="margin: 0; font-size: 12px; color: #666666;">
                                             Este é um e-mail automático do sistema DSS.
                                         </p>
                                     </td>
