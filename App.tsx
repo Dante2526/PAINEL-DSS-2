@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Header from './components/Header';
 import EmployeeCard from './components/EmployeeCard';
@@ -106,21 +107,19 @@ const App: React.FC = () => {
         try {
             const currentTime = new Date().toLocaleString('pt-BR');
             
-            // HTML EMAIL BUILDER - ROBUST LIGHT MODE (INLINE) WITH DARK MODE OVERRIDES
+            // HTML EMAIL BUILDER - FIXED LIGHT MODE WITH MEDIA QUERY OVERRIDES ONLY
             const emailContent = `
             <!DOCTYPE html>
             <html lang="pt-BR">
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <meta name="color-scheme" content="light dark">
-                <meta name="supported-color-schemes" content="light dark">
                 <style>
                     /* Reset Básico */
-                    body { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+                    body { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; background-color: #f3f4f6; color: #1f2937; }
                     
                     /* --- DARK MODE OVERRIDES --- 
-                       Apenas aplicado se o dispositivo pedir. Usa !important para sobrescrever o estilo inline claro.
+                       Apenas aplicado se o dispositivo suportar e pedir explicitamente.
                     */
                     @media (prefers-color-scheme: dark) {
                         .email-wrapper { background-color: #1a1a1a !important; }
@@ -133,20 +132,13 @@ const App: React.FC = () => {
                         .alert-footer { background-color: #450a0a !important; color: #fca5a5 !important; border-color: #7f1d1d !important; }
                         .footer-note { color: #6b7280 !important; }
                     }
-
-                    /* --- OUTLOOK DARK MODE SPECIFIC --- */
-                    [data-ogsc] .email-wrapper { background-color: #1a1a1a !important; }
-                    [data-ogsc] .email-container { background-color: #222222 !important; border-color: #444444 !important; color: #eeeeee !important; }
-                    [data-ogsc] .details-box { background-color: #333333 !important; border-color: #444444 !important; }
-                    [data-ogsc] .details-value { color: #ffffff !important; }
-                    [data-ogsc] .alert-footer { background-color: #450a0a !important; color: #fca5a5 !important; border-color: #7f1d1d !important; }
                 </style>
             </head>
-            <body style="margin: 0; padding: 0;">
-                <!-- Wrapper com cor de fundo CLARA (Light Mode Default) -->
+            <body style="margin: 0; padding: 0; background-color: #f3f4f6;">
+                <!-- Wrapper com cor de fundo CLARA EXPLÍCITA (Light Mode Default) -->
                 <div class="email-wrapper" style="background-color: #f3f4f6; padding: 20px; width: 100%;">
                     
-                    <!-- Container Principal BRANCO (Light Mode Default) -->
+                    <!-- Container Principal BRANCO EXPLÍCITO (Light Mode Default) -->
                     <div class="email-container" style="background-color: #ffffff; border: 1px solid #e5e7eb; color: #1f2937; max-width: 600px; margin: 0 auto; border-radius: 8px; overflow: hidden;">
                         
                         <div style="padding: 20px 20px 10px 20px;">
@@ -165,9 +157,9 @@ const App: React.FC = () => {
                         <!-- ESPAÇO SOLICITADO -->
                         <div style="height: 20px; line-height: 20px; font-size: 20px;">&nbsp;</div>
                         
-                        <!-- Caixa de Detalhes CINZA CLARO (Light Mode Default) -->
+                        <!-- Caixa de Detalhes CINZA CLARO EXPLÍCITO (Light Mode Default) -->
                         <div class="details-box" style="background-color: #f9fafb; border: 1px solid #e5e7eb; margin: 0 20px; padding: 20px; border-radius: 8px;">
-                            <h3 style="margin-top: 0; margin-bottom: 15px; opacity: 0.8; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Detalhes do Registro:</h3>
+                            <h3 style="margin-top: 0; margin-bottom: 15px; opacity: 0.8; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #374151;">Detalhes do Registro:</h3>
                             <table style="width: 100%; border-collapse: collapse;">
                                 <tr>
                                     <td class="details-label" style="color: #6b7280; border-bottom: 1px solid #e5e7eb; padding: 8px 0; font-weight: bold; width: 100px;">Nome:</td>
