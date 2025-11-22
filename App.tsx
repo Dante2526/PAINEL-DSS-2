@@ -1023,10 +1023,10 @@ const ReportModal: React.FC<{
 
         const formatList = (list: Employee[], emptyLabel = "Nenhum") => {
             if (list.length === 0) return `   ( ${emptyLabel} )`;
-            return list.map(e => `   - ${e.name}`).join('\n');
+            return list.map(e => `   - ${e.name} (${e.matricula})`).join('\n');
         };
 
-        const employeeReport = `RELATÓRIO DE STATUS - ${today}
+        const employeeReport = `RELATÓRIO - ${today}
 ==================================================
 
 RESUMO GERAL
@@ -1038,10 +1038,10 @@ RESUMO GERAL
 TURNO 7H
 ==================================================
 
-[ STATUS: 100% OK ]
+[ ASS.DSS + ESTOU BEM ]
 ${formatList(mainCat.ok)}
 
-[ STATUS: ESTOU MAL ]
+[ ESTOU MAL ]
 ${formatList(mainCat.mal)}
 
 [ PENDENTES / AUSENTES ]
@@ -1051,10 +1051,10 @@ ${formatList(mainCat.pending)}
 TURNO 6H
 ==================================================
 
-[ STATUS: 100% OK ]
+[ ASS.DSS + ESTOU BEM ]
 ${formatList(specialCat.ok)}
 
-[ STATUS: ESTOU MAL ]
+[ ESTOU MAL ]
 ${formatList(specialCat.mal)}
 
 [ PENDENTES / AUSENTES ]
@@ -1085,7 +1085,7 @@ ${formatList(specialCat.pending)}`;
                    {e.mal ? <span className="text-red-500 font-bold">⚠</span> : 
                     (e.bem && e.assDss) ? <span className="text-green-500 font-bold">✓</span> : 
                     <span className="text-gray-400">•</span>}
-                   <span className={e.mal ? "font-bold" : ""}>{e.name}</span>
+                   <span className={e.mal ? "font-bold" : ""}>{e.name} ({e.matricula})</span>
                    {e.absent && <span className="text-xs text-gray-400">(Ausente)</span>}
                 </li>
             ))}
@@ -1126,7 +1126,7 @@ ${formatList(specialCat.pending)}`;
 
     const handleEmailReport = () => {
         const today = new Date().toLocaleDateString('pt-BR');
-        const subject = `Relatório de Status DSS - ${today}`;
+        const subject = `Relatório DSS - ${today}`;
         const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(reportText)}`;
         
         if (mailtoLink.length > 2000) {
@@ -1142,7 +1142,7 @@ ${formatList(specialCat.pending)}`;
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Relatório de Status" scale={scale}>
+        <Modal isOpen={isOpen} onClose={onClose} title="Relatório" scale={scale}>
             <div className="text-left bg-light-bg dark:bg-dark-bg-secondary p-6 rounded-lg max-h-[60vh] overflow-y-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Column 7H */}
@@ -1150,12 +1150,12 @@ ${formatList(specialCat.pending)}`;
                         <h2 className="text-xl font-bold text-primary mb-4 border-b-2 border-primary pb-2">TURNO 7H</h2>
                         
                         <div className="mb-6">
-                            <h3 className="bg-success text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">STATUS: 100% OK ({mainCat.ok.length})</h3>
+                            <h3 className="bg-success text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">ASS.DSS + ESTOU BEM ({mainCat.ok.length})</h3>
                             {renderEmployeeList(mainCat.ok)}
                         </div>
 
                         <div className="mb-6">
-                            <h3 className="bg-danger text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">STATUS: ESTOU MAL ({mainCat.mal.length})</h3>
+                            <h3 className="bg-danger text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">ESTOU MAL ({mainCat.mal.length})</h3>
                             {renderEmployeeList(mainCat.mal)}
                         </div>
 
@@ -1170,12 +1170,12 @@ ${formatList(specialCat.pending)}`;
                         <h2 className="text-xl font-bold text-orange mb-4 border-b-2 border-orange pb-2">TURNO 6H</h2>
                         
                         <div className="mb-6">
-                            <h3 className="bg-success text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">STATUS: 100% OK ({specialCat.ok.length})</h3>
+                            <h3 className="bg-success text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">ASS.DSS + ESTOU BEM ({specialCat.ok.length})</h3>
                             {renderEmployeeList(specialCat.ok)}
                         </div>
 
                         <div className="mb-6">
-                            <h3 className="bg-danger text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">STATUS: ESTOU MAL ({specialCat.mal.length})</h3>
+                            <h3 className="bg-danger text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">ESTOU MAL ({specialCat.mal.length})</h3>
                             {renderEmployeeList(specialCat.mal)}
                         </div>
 
