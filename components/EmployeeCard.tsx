@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Employee, StatusType } from '../types';
 import { ShiftIcon, AbsentIcon, TrashIcon } from './icons';
@@ -92,7 +93,7 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onStatusChange, o
                 <div className="flex-grow flex flex-col justify-center">
                     <div className="flex items-baseline gap-2">
                         <span className="text-xl font-bold leading-tight">{employee.name}</span>
-                        <span className="text-sm opacity-90 whitespace-nowrap">({employee.matricula})</span>
+                        <span className="text-sm opacity-90">({employee.matricula})</span>
                     </div>
                 </div>
                 <div className="flex gap-2.5 ml-4">
