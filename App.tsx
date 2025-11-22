@@ -107,7 +107,8 @@ const App: React.FC = () => {
         try {
             const currentTime = new Date().toLocaleString('pt-BR');
             
-            // HTML EMAIL BUILDER - MODO CLARO FIXO (LIGHT MODE ONLY)
+            // HTML EMAIL BUILDER - TABLE LAYOUT (RESPONSIVE + NATIVE DARK MODE SUPPORT)
+            // Utilizando tabelas para evitar estouro de largura e permitir que o Outlook inverta as cores naturalmente.
             const emailContent = `
             <!DOCTYPE html>
             <html lang="pt-BR">
@@ -116,70 +117,89 @@ const App: React.FC = () => {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Alerta DSS</title>
             </head>
-            <body style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: Arial, sans-serif;">
-                <!-- Wrapper GERAL -->
-                <div style="background-color: #f3f4f6; padding: 20px; width: 100%;">
-                    
-                    <!-- Cartão Branco -->
-                    <div style="background-color: #ffffff; border: 1px solid #e5e7eb; color: #1f2937; max-width: 600px; margin: 0 auto; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                        
-                        <div style="padding: 25px 25px 10px 25px;">
-                            <h2 style="color: #dc2626; border-bottom: 2px solid #dc2626; margin: 0; padding-bottom: 15px; font-size: 22px;">
-                                ⚠️ Alerta de Saúde e Segurança!
-                            </h2>
+            <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f3f4f6;">
+                <!-- Tabela Principal (Fundo) -->
+                <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f3f4f6;">
+                    <tr>
+                        <td align="center" style="padding: 20px 10px;">
                             
-                            <!-- Espaçador -->
-                            <div style="height: 20px; line-height: 20px; font-size: 20px;">&nbsp;</div>
-
-                            <p style="color: #374151; font-size: 18px; margin: 0; line-height: 1.6;">
-                                O colaborador <strong style="color: #111827;">${name}</strong> informou que não está se sentindo bem.
-                            </p>
-                        </div>
-
-                        <!-- ESPAÇO -->
-                        <div style="height: 10px; line-height: 10px; font-size: 10px;">&nbsp;</div>
-                        
-                        <!-- Caixa de Detalhes (Cinza Claro) -->
-                        <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; margin: 0 25px; padding: 20px; border-radius: 8px;">
-                            <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #6b7280; font-weight: bold;">Detalhes do Registro:</h3>
-                            
-                            <table style="width: 100%; border-collapse: collapse;">
+                            <!-- Cartão Central -->
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                                
+                                <!-- Cabeçalho -->
                                 <tr>
-                                    <td style="color: #6b7280; border-bottom: 1px solid #e5e7eb; padding: 10px 0; font-weight: bold; width: 100px; font-size: 15px;">Nome:</td>
-                                    <td style="color: #111827; border-bottom: 1px solid #e5e7eb; padding: 10px 0; font-size: 15px;">${name}</td>
+                                    <td style="padding: 25px 25px 10px 25px; border-bottom: 2px solid #dc2626;">
+                                        <h2 style="margin: 0; color: #dc2626; font-size: 22px;">
+                                            ⚠️ Alerta de Saúde e Segurança!
+                                        </h2>
+                                    </td>
                                 </tr>
+                                
+                                <!-- Corpo da Mensagem -->
                                 <tr>
-                                    <td style="color: #6b7280; border-bottom: 1px solid #e5e7eb; padding: 10px 0; font-weight: bold; font-size: 15px;">Matrícula:</td>
-                                    <td style="color: #111827; border-bottom: 1px solid #e5e7eb; padding: 10px 0; font-size: 15px;">${matricula}</td>
+                                    <td style="padding: 20px 25px;">
+                                        <p style="margin: 0; color: #374151; font-size: 18px; line-height: 1.6;">
+                                            O colaborador <strong style="color: #111827;">${name}</strong> informou que não está se sentindo bem.
+                                        </p>
+                                    </td>
                                 </tr>
+                                
+                                <!-- Caixa de Detalhes -->
                                 <tr>
-                                    <td style="color: #6b7280; border-bottom: 1px solid #e5e7eb; padding: 10px 0; font-weight: bold; font-size: 15px;">Turno:</td>
-                                    <td style="color: #111827; border-bottom: 1px solid #e5e7eb; padding: 10px 0; font-size: 15px;">${turno}</td>
+                                    <td style="padding: 0 25px 20px 25px;">
+                                        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="15" style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px;">
+                                            <tr>
+                                                <td style="padding: 0;">
+                                                    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+                                                        <tr>
+                                                            <td style="padding: 10px 15px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-weight: bold; font-size: 14px; width: 30%;">NOME:</td>
+                                                            <td style="padding: 10px 15px; border-bottom: 1px solid #e5e7eb; color: #111827; font-size: 15px;">${name}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 10px 15px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-weight: bold; font-size: 14px;">MATRÍCULA:</td>
+                                                            <td style="padding: 10px 15px; border-bottom: 1px solid #e5e7eb; color: #111827; font-size: 15px;">${matricula}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 10px 15px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-weight: bold; font-size: 14px;">TURNO:</td>
+                                                            <td style="padding: 10px 15px; border-bottom: 1px solid #e5e7eb; color: #111827; font-size: 15px;">${turno}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="padding: 10px 15px; color: #6b7280; font-weight: bold; font-size: 14px;">HORÁRIO:</td>
+                                                            <td style="padding: 10px 15px; color: #111827; font-size: 15px;">${currentTime}</td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
                                 </tr>
+                                
+                                <!-- Alerta de Rodapé -->
                                 <tr>
-                                    <td style="color: #6b7280; border-bottom: none; padding: 10px 0; font-weight: bold; font-size: 15px;">Horário:</td>
-                                    <td style="color: #111827; border-bottom: none; padding: 10px 0; font-size: 15px;">${currentTime}</td>
+                                    <td style="padding: 0 25px 25px 25px;">
+                                        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="15" style="background-color: #fee2e2; border: 1px solid #fecaca; border-radius: 6px;">
+                                            <tr>
+                                                <td align="center" style="color: #991b1b; font-weight: bold; font-size: 16px;">
+                                                    Por favor, verifique a situação imediatamente.
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
                                 </tr>
+                                
+                                <!-- Footer Sistema -->
+                                <tr>
+                                    <td align="center" style="padding: 15px; background-color: #f3f4f6; border-top: 1px solid #e5e7eb;">
+                                        <p style="margin: 0; color: #9ca3af; font-size: 12px;">
+                                            Este é um e-mail automático do sistema DSS.
+                                        </p>
+                                    </td>
+                                </tr>
+                                
                             </table>
-                        </div>
-                        
-                        <!-- Espaçador -->
-                        <div style="height: 30px; line-height: 30px; font-size: 30px;">&nbsp;</div>
-
-                        <!-- Footer de Alerta (Vermelho Claro) -->
-                        <div style="background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; margin: 0 25px 25px 25px; padding: 15px; font-weight: bold; text-align: center; border-radius: 6px; font-size: 16px;">
-                            Por favor, verifique a situação imediatamente.
-                        </div>
-
-                        <div style="height: 10px; line-height: 10px; font-size: 10px;">&nbsp;</div>
-                        
-                        <div style="background-color: #f3f4f6; padding: 15px; text-align: center; border-top: 1px solid #e5e7eb;">
-                            <p style="color: #9ca3af; font-size: 12px; margin: 0;">
-                                Este é um e-mail automático do sistema DSS.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+                        </td>
+                    </tr>
+                </table>
             </body>
             </html>
             `;
