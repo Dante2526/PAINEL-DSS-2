@@ -156,7 +156,7 @@ const App: React.FC = () => {
                                         <div style="background-color: #f8f9fa; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px;">
                                             
                                             <!-- Card Header -->
-                                            <p style="margin: 0 0 16px 0; font-size: 12px; font-weight: bold; color: #374151; text-transform: uppercase; letter-spacing: 1px;">
+                                            <p style="margin: 0 0 16px 0; font-size: 12px; font-weight: bold; color: #000000; text-transform: uppercase; letter-spacing: 1px;">
                                                 DETALHES DO REGISTRO:
                                             </p>
 
@@ -165,37 +165,37 @@ const App: React.FC = () => {
                                                 <!-- Nome -->
                                                 <tr>
                                                     <td style="padding-bottom: 8px; width: 100px; vertical-align: top;">
-                                                        <strong style="font-size: 15px; color: #374151;">Nome:</strong>
+                                                        <strong style="font-size: 15px; color: #000000;">Nome:</strong>
                                                     </td>
                                                     <td style="padding-bottom: 8px; vertical-align: top;">
-                                                        <span style="font-size: 15px; color: #000000;">${name}</span>
+                                                        <span style="font-size: 15px; color: #000000; font-weight: bold;">${name}</span>
                                                     </td>
                                                 </tr>
                                                 <!-- Matrícula -->
                                                 <tr>
                                                     <td style="padding-bottom: 8px; width: 100px; vertical-align: top;">
-                                                        <strong style="font-size: 15px; color: #374151;">Matrícula:</strong>
+                                                        <strong style="font-size: 15px; color: #000000;">Matrícula:</strong>
                                                     </td>
                                                     <td style="padding-bottom: 8px; vertical-align: top;">
-                                                        <span style="font-size: 15px; color: #000000;">${matricula}</span>
+                                                        <span style="font-size: 15px; color: #000000; font-weight: bold;">${matricula}</span>
                                                     </td>
                                                 </tr>
                                                 <!-- Turno -->
                                                 <tr>
                                                     <td style="padding-bottom: 8px; width: 100px; vertical-align: top;">
-                                                        <strong style="font-size: 15px; color: #374151;">Turno:</strong>
+                                                        <strong style="font-size: 15px; color: #000000;">Turno:</strong>
                                                     </td>
                                                     <td style="padding-bottom: 8px; vertical-align: top;">
-                                                        <span style="font-size: 15px; color: #000000;">${turno}</span>
+                                                        <span style="font-size: 15px; color: #000000; font-weight: bold;">${turno}</span>
                                                     </td>
                                                 </tr>
                                                 <!-- Horário -->
                                                 <tr>
                                                     <td style="padding-bottom: 0; width: 100px; vertical-align: top;">
-                                                        <strong style="font-size: 15px; color: #374151;">Horário:</strong>
+                                                        <strong style="font-size: 15px; color: #000000;">Horário:</strong>
                                                     </td>
                                                     <td style="padding-bottom: 0; vertical-align: top;">
-                                                        <span style="font-size: 15px; color: #000000;">${currentTime}</span>
+                                                        <span style="font-size: 15px; color: #000000; font-weight: bold;">${currentTime}</span>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -208,8 +208,8 @@ const App: React.FC = () => {
                                     <td>
                                         <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                             <tr>
-                                                <td align="center" style="background-color: #fee2e2; border-radius: 8px; padding: 16px; border: 1px solid #fecaca;">
-                                                    <span style="color: #991b1b; font-weight: bold; font-size: 16px;">
+                                                <td align="center" style="background-color: #fca5a5; border-radius: 8px; padding: 16px; border: 1px solid #f87171;">
+                                                    <span style="color: #000000; font-weight: bold; font-size: 16px;">
                                                         Por favor, verifique a situação imediatamente.
                                                     </span>
                                                 </td>
