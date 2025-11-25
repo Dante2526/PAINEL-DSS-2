@@ -87,26 +87,20 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onStatusChange, o
 
     return (
         <div className="w-full bg-light-card dark:bg-dark-card rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-            {/* Header com padding reduzido (p-3) para ganhar espaço */}
-            <div className={`p-3 flex items-center text-white ${getHeaderClass()}`}>
-                {/* Avatar reduzido (w-12 h-12) e margem reduzida (mr-3) */}
-                <div className="w-12 h-12 bg-white/25 rounded-full flex items-center justify-center text-2xl mr-3 flex-shrink-0">👤</div>
-                
+            <div className={`p-5 flex items-center text-white ${getHeaderClass()}`}>
+                <div className="w-16 h-16 bg-white/25 rounded-full flex items-center justify-center text-3xl mr-6 flex-shrink-0">👤</div>
                 <div className="flex-grow min-w-0">
-                    {/* Tamanho da fonte do nome ajustado para text-xl */}
-                    <div className="text-xl font-bold truncate pr-2" title={employee.name}>{employee.name}</div>
-                    <div className="text-sm opacity-90 truncate">Matrícula: {employee.matricula}</div>
+                    <div className="text-2xl font-bold truncate pr-2">{employee.name}</div>
+                    <div className="text-base opacity-90 truncate">Matrícula: {employee.matricula}</div>
                 </div>
-                
-                {/* Gap entre botões reduzido para gap-1 */}
-                <div className="flex gap-1 flex-shrink-0 items-center">
+                <div className="flex gap-2 flex-shrink-0">
                     <button
                         onClick={handleToggleSpecialTeamClick}
                         disabled={isTogglingSpecialTeam}
-                        className={`turno-button ${employee.turno === '6H' ? 'active' : ''} ${isTogglingSpecialTeam ? 'loading' : ''}`}
+                        className={`turno-button text-base ${employee.turno === '6H' ? 'active' : ''} ${isTogglingSpecialTeam ? 'loading' : ''}`}
                     >
                         <div className="default-state">
-                            <ShiftIcon className="w-4 h-4" /> {/* Ícone menor */}
+                            <ShiftIcon className="w-5 h-5" />
                             <span>TURNO 6H</span>
                         </div>
                         <div className="loading-state">
@@ -116,18 +110,18 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onStatusChange, o
                     </button>
                     <button
                         onClick={handleAbsentButtonClick}
-                        className={`absent-button ${employee.absent ? 'marked' : ''}`}
+                        className={`absent-button text-base ${employee.absent ? 'marked' : ''}`}
                     >
-                        <AbsentIcon className="w-4 h-4" /> {/* Ícone menor */}
+                        <AbsentIcon className="w-5 h-5" />
                         <span>AUSENTE</span>
                     </button>
                     {isAdmin && (
                         <button
                             onClick={() => onDelete(employee.id)}
-                            className="delete-button"
+                            className="delete-button text-base"
                             aria-label={`Deletar ${employee.name}`}
                         >
-                            <TrashIcon className="w-4 h-4" /> {/* Ícone menor */}
+                            <TrashIcon className="w-5 h-5" />
                             <span>DELETAR</span>
                         </button>
                     )}
