@@ -1127,7 +1127,7 @@ ${formatList(specialCat.pending)}`;
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Relatório" scale={scale}>
             <div className="text-left bg-light-bg dark:bg-dark-bg-secondary p-6 rounded-lg max-h-[80vh] overflow-y-auto">
-                <div className="grid grid-cols-1 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Column 7H */}
                     <div>
                         <h2 className="text-xl font-bold text-primary mb-4 border-b-2 border-primary pb-2">TURNO 7H</h2>
