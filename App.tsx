@@ -848,14 +848,14 @@ const App: React.FC = () => {
             {/* CUSTOM CONFIRMATION MODAL WITH ROBUST CENTERING */}
             {activeModal === ModalType.ConfirmMal && (
                 <div 
-                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 h-[100dvh] w-full"
+                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60"
                     onClick={() => {
                         setPendingMalEmployeeId(null);
                         setActiveModal(ModalType.None);
                     }}
                 >
                     <div 
-                        className="bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center relative"
+                        className="bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center relative mx-4"
                         style={{ 
                             transform: `scale(${modalScale})`, 
                             animation: 'fade-in-scale 0.3s forwards ease-out' 
