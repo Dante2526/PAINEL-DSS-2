@@ -79,11 +79,8 @@ const App: React.FC = () => {
             const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
             
             if (isTouchDevice) {
-                // The previous scale factor (4.5) was still a bit too large,
-                // causing the modal to be clipped vertically on some phone screens.
-                // This further reduced factor provides a better fit, ensuring the entire
-                // modal is visible while remaining large and legible.
-                setModalScale(2.0);
+                // Aumentado para 3.5 para garantir visibilidade em telas móveis
+                setModalScale(3.5);
             } else {
                 setModalScale(1); // Default scale for desktop
             }
