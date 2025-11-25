@@ -78,8 +78,8 @@ const App: React.FC = () => {
         // Responsive logic for modal scale
         const updateScale = () => {
             const isSmallScreen = window.innerWidth < 768;
-            // Use 0.75 scale for mobile to make it smaller as requested
-            setModalScale(isSmallScreen ? 0.75 : 1);
+            // Use 0.85 scale for mobile as requested
+            setModalScale(isSmallScreen ? 0.85 : 1);
         };
 
         // Initial check
