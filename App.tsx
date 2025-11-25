@@ -80,7 +80,7 @@ const App: React.FC = () => {
                 // causing the modal to be clipped vertically on some phone screens.
                 // This further reduced factor provides a better fit, ensuring the entire
                 // modal is visible while remaining large and legible.
-                setModalScale(3.8);
+                setModalScale(2.0);
             } else {
                 setModalScale(1); // Default scale for desktop
             }
@@ -1040,24 +1040,24 @@ const ReportModal: React.FC<{
 
 EQUIPE TURNO 7H
 --------------------------------------------------
-STATUS: "ASS.DSS + ESTOU BEM"
+ASS.DSS + ESTOU BEM
 ${formatList(mainCat.ok)}
 
-STATUS: "ESTOU MAL"
+ESTOU MAL
 ${formatList(mainCat.mal)}
 
-STATUS: "PENDENTES / AUSENTES"
+PENDENTES / AUSENTES
 ${formatList(mainCat.pending)}
 
 EQUIPE TURNO 6H
 --------------------------------------------------
-STATUS: "ASS.DSS + ESTOU BEM"
+ASS.DSS + ESTOU BEM
 ${formatList(specialCat.ok)}
 
-STATUS: "ESTOU MAL"
+ESTOU MAL
 ${formatList(specialCat.mal)}
 
-STATUS: "PENDENTES / AUSENTES"
+PENDENTES / AUSENTES
 ${formatList(specialCat.pending)}`;
 
         return employeeReport;
@@ -1126,7 +1126,7 @@ ${formatList(specialCat.pending)}`;
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Relatório" scale={scale}>
-            <div className="text-left bg-light-bg dark:bg-dark-bg-secondary p-6 rounded-lg max-h-[60vh] overflow-y-auto">
+            <div className="text-left bg-light-bg dark:bg-dark-bg-secondary p-6 rounded-lg max-h-[800px] overflow-y-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Column 7H */}
                     <div>
