@@ -848,14 +848,14 @@ const App: React.FC = () => {
             {/* CUSTOM CONFIRMATION MODAL WITH ROBUST CENTERING */}
             {activeModal === ModalType.ConfirmMal && (
                 <div 
-                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60"
+                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/75 backdrop-blur-sm"
                     onClick={() => {
                         setPendingMalEmployeeId(null);
                         setActiveModal(ModalType.None);
                     }}
                 >
                     <div 
-                        className="bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center relative mx-4"
+                        className="bg-light-card dark:bg-dark-card rounded-3xl shadow-2xl p-10 w-full max-w-3xl text-center relative mx-4 border-4 border-gray-100 dark:border-gray-700"
                         style={{ 
                             transform: `scale(${modalScale})`, 
                             animation: 'fade-in-scale 0.3s forwards ease-out' 
@@ -867,30 +867,30 @@ const App: React.FC = () => {
                                 setPendingMalEmployeeId(null);
                                 setActiveModal(ModalType.None);
                             }} 
-                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-3xl z-10"
+                            className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-5xl z-10"
                         >
                             &times;
                         </button>
                         
-                        <h2 className="text-xl font-bold uppercase text-light-text dark:text-dark-text mb-6">CONFIRMAÇÃO NECESSÁRIA</h2>
+                        <h2 className="text-4xl font-bold uppercase text-light-text dark:text-dark-text mb-10 tracking-wide">CONFIRMAÇÃO NECESSÁRIA</h2>
 
-                        <div className="space-y-6 text-center p-2 flex flex-col items-center">
-                            <div className="mx-auto w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-2">
-                                <span className="text-4xl">🚨</span>
+                        <div className="space-y-8 text-center p-2 flex flex-col items-center">
+                            <div className="mx-auto w-32 h-32 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
+                                <span className="text-7xl">🚨</span>
                             </div>
                             
-                            <div className="text-lg text-light-text dark:text-dark-text font-medium flex flex-col items-center gap-2">
+                            <div className="text-3xl text-light-text dark:text-dark-text font-medium flex flex-col items-center gap-3">
                                 <span>Você selecionou a opção</span>
-                                <span className="text-danger font-bold text-3xl">"ESTOU MAL"</span>
+                                <span className="text-danger font-black text-6xl mt-2">"ESTOU MAL"</span>
                             </div>
 
-                            <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mt-2">
+                            <p className="text-2xl text-light-text-secondary dark:text-dark-text-secondary mt-4 max-w-2xl leading-relaxed">
                                 Isso enviará um alerta imediato para a <strong>gestão</strong>. <br/>Deseja realmente confirmar que não está se sentindo bem?
                             </p>
-                            <div className="grid grid-cols-1 gap-3 mt-6 w-full">
+                            <div className="grid grid-cols-1 gap-5 mt-8 w-full">
                                 <button 
                                     onClick={handleConfirmMal} 
-                                    className="w-full py-4 font-bold text-white bg-danger rounded-lg hover:bg-red-700 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
+                                    className="w-full py-6 text-3xl font-bold text-white bg-danger rounded-xl hover:bg-red-700 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
                                 >
                                     SIM, ESTOU MAL
                                 </button>
@@ -899,7 +899,7 @@ const App: React.FC = () => {
                                         setPendingMalEmployeeId(null);
                                         setActiveModal(ModalType.None);
                                     }} 
-                                    className="w-full py-4 font-bold text-light-text dark:text-white bg-gray-200 dark:bg-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition"
+                                    className="w-full py-6 text-3xl font-bold text-light-text dark:text-white bg-gray-200 dark:bg-gray-600 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-500 transition"
                                 >
                                     CANCELAR
                                 </button>
