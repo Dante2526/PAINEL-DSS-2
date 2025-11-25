@@ -848,14 +848,14 @@ const App: React.FC = () => {
             {/* CUSTOM CONFIRMATION MODAL WITH ROBUST CENTERING */}
             {activeModal === ModalType.ConfirmMal && (
                 <div 
-                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60"
+                    className="fixed inset-0 z-[9999] grid place-items-center bg-black/60 p-4"
                     onClick={() => {
                         setPendingMalEmployeeId(null);
                         setActiveModal(ModalType.None);
                     }}
                 >
                     <div 
-                        className="bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center relative mx-4"
+                        className="bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center relative"
                         style={{ 
                             transform: `scale(${modalScale})`, 
                             animation: 'fade-in-scale 0.3s forwards ease-out' 
@@ -906,6 +906,13 @@ const App: React.FC = () => {
                             </div>
                         </div>
                     </div>
+                    {/* Ensure keyframes are available for this specific modal if not globally defined or if Modal component hasn't mounted */}
+                    <style>{`
+                        @keyframes fade-in-scale {
+                        from { opacity: 0; transform: scale(${modalScale * 0.95}); }
+                        to { opacity: 1; transform: scale(${modalScale}); }
+                        }
+                    `}</style>
                 </div>
             )}
 
