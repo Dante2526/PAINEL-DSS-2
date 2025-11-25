@@ -75,9 +75,19 @@ const App: React.FC = () => {
     }, [isDarkMode]);
 
     useEffect(() => {
-        // With viewport set to device-width, we use 1.0 scale (native size) for modals.
-        // The previous 2.0 scale was only necessary when viewport was fixed to 2448px.
-        setModalScale(1); 
+        // Responsive logic for modal scale
+        const updateScale = () => {
+            const isSmallScreen = window.innerWidth < 768;
+            // Use 0.75 scale for mobile to make it smaller as requested
+            setModalScale(isSmallScreen ? 0.75 : 1);
+        };
+
+        // Initial check
+        updateScale();
+
+        // Listen for resize events
+        window.addEventListener('resize', updateScale);
+        return () => window.removeEventListener('resize', updateScale);
     }, []);
 
     const handleToggleDarkMode = () => setIsDarkMode(prev => !prev);
@@ -841,7 +851,7 @@ const App: React.FC = () => {
                     }}
                 >
                     <div 
-                        className="bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center relative"
+                        className="bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-5 md:p-8 w-full max-w-sm text-center relative"
                         style={{ 
                             transform: `scale(${modalScale})`, 
                             animation: 'fade-in-scale 0.3s forwards ease-out' 
