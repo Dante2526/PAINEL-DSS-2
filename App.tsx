@@ -79,6 +79,10 @@ const App: React.FC = () => {
             const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
             
             if (isTouchDevice) {
+                // The previous scale factor (4.5) was still a bit too large,
+                // causing the modal to be clipped vertically on some phone screens.
+                // This further reduced factor provides a better fit, ensuring the entire
+                // modal is visible while remaining large and legible.
                 setModalScale(2.0);
             } else {
                 setModalScale(1); // Default scale for desktop
@@ -106,6 +110,7 @@ const App: React.FC = () => {
         try {
             const currentTime = new Date().toLocaleString('pt-BR');
             
+            // HTML EMAIL BUILDER - CLEAN CARD LAYOUT (NO BORDERS, BLACK TEXT)
             const emailContent = `
             <!DOCTYPE html>
             <html lang="pt-BR">
@@ -115,15 +120,23 @@ const App: React.FC = () => {
                 <title>Alerta de Saúde</title>
             </head>
             <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #ffffff;">
+                
+                <!-- Main Wrapper -->
                 <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; width: 100%;">
                     <tr>
                         <td align="center" style="padding: 20px 0;">
+                            
+                            <!-- Container (Max Width 600px for Mobile) -->
                             <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; width: 100%;">
+                                
+                                <!-- Pre-header (Inbox Preview Text) -->
                                 <tr>
                                     <td style="display:none !important; visibility:hidden; mso-hide:all; font-size:1px; color:#ffffff; line-height:1px; max-height:0px; max-width:0px; opacity:0; overflow:hidden;">
                                         🚨 Alerta de Saúde: Colaborador informou "ESTOU MAL". Verifique imediatamente.
                                     </td>
                                 </tr>
+
+                                <!-- Header Alert -->
                                 <tr>
                                     <td style="padding-bottom: 20px;">
                                         <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -137,6 +150,8 @@ const App: React.FC = () => {
                                         </table>
                                     </td>
                                 </tr>
+
+                                <!-- Main Message -->
                                 <tr>
                                     <td style="padding-bottom: 30px;">
                                         <p style="margin: 0; font-size: 18px; line-height: 1.5; color: #000000;">
@@ -144,13 +159,20 @@ const App: React.FC = () => {
                                         </p>
                                     </td>
                                 </tr>
+
+                                <!-- Details Card (Clean Layout) -->
                                 <tr>
                                     <td style="padding-bottom: 30px;">
                                         <div style="background-color: #f8f9fa; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+                                            
+                                            <!-- Card Header -->
                                             <p style="margin: 0 0 16px 0; font-size: 12px; font-weight: bold; color: #000000; text-transform: uppercase; letter-spacing: 1px;">
                                                 DETALHES DO REGISTRO:
                                             </p>
+
+                                            <!-- Data Table (No Borders) -->
                                             <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                                <!-- Nome -->
                                                 <tr>
                                                     <td style="padding-bottom: 8px; width: 100px; vertical-align: top;">
                                                         <strong style="font-size: 15px; color: #000000;">Nome:</strong>
@@ -159,6 +181,7 @@ const App: React.FC = () => {
                                                         <span style="font-size: 15px; color: #000000; font-weight: bold;">${name}</span>
                                                     </td>
                                                 </tr>
+                                                <!-- Matrícula -->
                                                 <tr>
                                                     <td style="padding-bottom: 8px; width: 100px; vertical-align: top;">
                                                         <strong style="font-size: 15px; color: #000000;">Matrícula:</strong>
@@ -167,6 +190,7 @@ const App: React.FC = () => {
                                                         <span style="font-size: 15px; color: #000000; font-weight: bold;">${matricula}</span>
                                                     </td>
                                                 </tr>
+                                                <!-- Turno -->
                                                 <tr>
                                                     <td style="padding-bottom: 8px; width: 100px; vertical-align: top;">
                                                         <strong style="font-size: 15px; color: #000000;">Turno:</strong>
@@ -175,6 +199,7 @@ const App: React.FC = () => {
                                                         <span style="font-size: 15px; color: #000000; font-weight: bold;">${turno}</span>
                                                     </td>
                                                 </tr>
+                                                <!-- Horário -->
                                                 <tr>
                                                     <td style="padding-bottom: 0; width: 100px; vertical-align: top;">
                                                         <strong style="font-size: 15px; color: #000000;">Horário:</strong>
@@ -187,6 +212,8 @@ const App: React.FC = () => {
                                         </div>
                                     </td>
                                 </tr>
+
+                                <!-- Footer Alert Box -->
                                 <tr>
                                     <td>
                                         <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -200,6 +227,8 @@ const App: React.FC = () => {
                                         </table>
                                     </td>
                                 </tr>
+
+                                <!-- Footer Note -->
                                 <tr>
                                     <td align="center" style="padding-top: 30px;">
                                         <p style="margin: 0; font-size: 12px; color: #000000;">
@@ -207,7 +236,10 @@ const App: React.FC = () => {
                                         </p>
                                     </td>
                                 </tr>
+
                             </table>
+                            <!-- End Container -->
+
                         </td>
                     </tr>
                 </table>
@@ -216,7 +248,9 @@ const App: React.FC = () => {
             `;
 
             const templateParams = {
+                // O Template do EmailJS deve conter APENAS: {{{html_content}}}
                 html_content: emailContent,
+                // Assunto personalizado com Sirene e "ESTOU MAL" em maiúsculo
                 subject: `🚨 ALERTA URGENTE TURMA B: "ESTOU MAL"`,
             };
 
@@ -230,6 +264,7 @@ const App: React.FC = () => {
             showNotification('Alerta enviado por e-mail ao setor responsável.', 'success');
         } catch (error) {
             console.error("Erro ao enviar e-mail via EmailJS:", error);
+            // Não mostramos erro visual para o usuário final para não gerar pânico, apenas logamos
         }
     };
 
@@ -249,6 +284,7 @@ const App: React.FC = () => {
                 await signInAnonymously(auth);
                 console.log("Signed in anonymously");
 
+                // Listener for employees
                 const employeesQuery = query(collection(db, 'employees'), orderBy("name", "asc"));
                 unsubscribeEmployees = onSnapshot(employeesQuery, (querySnapshot) => {
                     const employeesData: Employee[] = querySnapshot.docs.map(doc => {
@@ -273,6 +309,7 @@ const App: React.FC = () => {
                     setLoading(false);
                 });
                 
+                // Listener for manual registrations to persist fields
                 const registrationsQuery = query(collection(db, 'registrosDSS'));
                 unsubscribeRegistrations = onSnapshot(registrationsQuery, (querySnapshot) => {
                     const registrations = querySnapshot.docs.map(d => ({ id: d.id, ...d.data() })) as ManualRegistration[];
@@ -314,6 +351,8 @@ const App: React.FC = () => {
         const finalScale = Math.max(0.1, Math.min(newScale, 2.0));
         scaleStateRef.current.currentScale = finalScale;
 
+        // Dynamically set minWidth and minHeight to ensure the container always fills the viewport,
+        // effectively expanding it when zoomed out.
         scalableContainer.style.minWidth = `${viewport.clientWidth / finalScale}px`;
         scalableContainer.style.minHeight = `${viewport.clientHeight / finalScale}px`;
 
@@ -405,6 +444,8 @@ const App: React.FC = () => {
         const handleResize = () => {
             if (window.innerWidth !== lastWidth) {
                 lastWidth = window.innerWidth;
+                // Re-applying the scale will trigger a recalculation of minWidth/minHeight
+                // based on the new viewport dimensions.
                 setScale(scaleStateRef.current.currentScale);
             }
         };
@@ -814,17 +855,20 @@ const App: React.FC = () => {
                 title="CONFIRMAÇÃO NECESSÁRIA" 
                 scale={modalScale}
             >
-                <div className="space-y-6 text-center p-2">
-                    <div className="mx-auto w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
+                <div className="space-y-6 text-center p-2 flex flex-col items-center">
+                    <div className="mx-auto w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-2">
                         <span className="text-4xl">🚨</span>
                     </div>
-                    <p className="text-lg text-light-text dark:text-dark-text font-medium">
-                        Você selecionou a opção <span className="text-danger font-bold">"ESTOU MAL"</span>.
-                    </p>
+                    
+                    <div className="text-lg text-light-text dark:text-dark-text font-medium flex flex-col items-center gap-1">
+                        <span>Você selecionou a opção</span>
+                        <span className="text-danger font-bold text-2xl mt-1">"ESTOU MAL"</span>
+                    </div>
+
                     <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-                        Isso enviará um alerta imediato para a equipe de segurança. <br/>Deseja realmente confirmar que não está se sentindo bem?
+                        Isso enviará um alerta imediato para a gestão. <br/>Deseja realmente confirmar que não está se sentindo bem?
                     </p>
-                    <div className="grid grid-cols-1 gap-3 mt-6">
+                    <div className="grid grid-cols-1 gap-3 mt-4 w-full">
                         <button 
                             onClick={handleConfirmMal} 
                             className="w-full py-4 font-bold text-white bg-danger rounded-lg hover:bg-red-700 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
@@ -1030,7 +1074,6 @@ const ReportModal: React.FC<{
         const categorizeEmployees = (team: Employee[]) => {
             const mal = team.filter(e => e.mal);
             const ok = team.filter(e => !e.mal && e.bem && e.assDss);
-            // Pendentes covers everyone else (including explicit absent)
             const pending = team.filter(e => !e.mal && !(e.bem && e.assDss));
             return { mal, ok, pending };
         };
