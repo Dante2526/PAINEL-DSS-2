@@ -783,7 +783,7 @@ const App: React.FC = () => {
                     <Header
                         stats={stats}
                         loading={loading}
-                        onAdminClick={() => setActiveModal(ModalType.AdminLogin)}
+                        onAdminClick={() => isAdmin ? setActiveModal(ModalType.AdminOptions) : setActiveModal(ModalType.AdminLogin)}
                         isDarkMode={isDarkMode}
                         onToggleDarkMode={handleToggleDarkMode}
                     />
@@ -1113,7 +1113,7 @@ const ReportModal: React.FC<{
             return list.map(e => `• ${e.name} (Matrícula: ${e.matricula})`).join('\n');
         };
 
-        const employeeReport = `RESUMO GERAL
+        let employeeReport = `RESUMO GERAL
 --------------------------------------------------
 • Total de Funcionários: ${total}
 • Presentes (DSS + Bem/Mal): ${presentCount}
@@ -1141,8 +1141,14 @@ ${formatList(specialCat.mal)}
 PENDENTES / AUSENTES
 ${formatList(specialCat.pending)}`;
 
+        if (manualRegistrations.length > 0) {
+            employeeReport += `\n\nASSUNTOS DA DSS
+--------------------------------------------------
+${manualRegistrations.map(reg => `• ${reg.matricula} - ${reg.assunto} (${reg.TURNO === '7H-19H' ? '7H' : reg.TURNO})`).join('\n')}`;
+        }
+
         return employeeReport;
-    }, [employees]);
+    }, [employees, manualRegistrations]);
 
     // Logic for Visual HTML Report
     const categorizeEmployees = (team: Employee[]) => {
