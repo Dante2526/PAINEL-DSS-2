@@ -779,7 +779,7 @@ const App: React.FC = () => {
     return (
         <div className="bg-light-bg-secondary dark:bg-dark-bg min-h-screen text-light-text dark:text-dark-text transition-colors">
             <div ref={viewportRef} className="viewport fixed inset-0">
-                <div ref={scalableContainerRef} className="scalable-container w-[2688px] p-8">
+                <div ref={scalableContainerRef} className="scalable-container w-[2768px] p-8">
                     <Header
                         stats={stats}
                         loading={loading}
@@ -788,7 +788,7 @@ const App: React.FC = () => {
                         onToggleDarkMode={handleToggleDarkMode}
                     />
                     
-                    <div className="flex gap-8 w-[2624px]">
+                    <div className="flex gap-8 w-[2704px]">
                        <div className="w-[1792px] flex flex-col gap-8">
                             <ManualRegisterSection 
                                 subject={mainSubject}
