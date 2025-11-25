@@ -446,14 +446,14 @@ body {
 .turno-button {
     position: relative;
     overflow: hidden;
-    padding: 0.6rem 1rem; /* Compact padding */
-    font-size: 0.85rem; /* Compact font */
+    padding: 0.5rem 0.8rem; /* Extra Compact padding */
+    font-size: 0.75rem; /* Extra Compact font */
     font-weight: 700; /* font-bold */
     border-radius: 0.5rem; /* rounded-lg */
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.35rem; /* Compact gap */
+    gap: 0.25rem; /* Compact gap */
     color: white;
     background: linear-gradient(135deg, #F97316 0%, #EA580C 100%); /* Orange gradient */
     transition: all 0.3s ease;
@@ -477,7 +477,7 @@ body {
 .turno-button .loading-state {
     display: flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.25rem;
 }
 
 .turno-button .loading-state {
@@ -501,8 +501,8 @@ body {
 }
 
 .turno-button .spinner {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-top-color: #ffffff;
     border-radius: 50%;
@@ -538,13 +538,13 @@ body {
 .absent-button {
     position: relative;
     overflow: hidden;
-    padding: 0.6rem 1rem; /* Compact padding */
-    font-size: 0.85rem; /* Compact font */
+    padding: 0.5rem 0.8rem; /* Extra Compact padding */
+    font-size: 0.75rem; /* Extra Compact font */
     font-weight: 700;
     border-radius: 0.5rem;
     display: flex;
     align-items: center;
-    gap: 0.35rem; /* Compact gap */
+    gap: 0.25rem; /* Compact gap */
     color: white;
     background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); /* Amber gradient */
     box-shadow: 0 10px 32px rgba(217, 119, 6, 0.35);
@@ -569,13 +569,13 @@ body {
 .delete-button {
     position: relative;
     overflow: hidden;
-    padding: 0.6rem 1rem; /* Compact padding */
-    font-size: 0.85rem; /* Compact font */
+    padding: 0.5rem 0.8rem; /* Extra Compact padding */
+    font-size: 0.75rem; /* Extra Compact font */
     font-weight: 700;
     border-radius: 0.5rem;
     display: flex;
     align-items: center;
-    gap: 0.35rem; /* Compact gap */
+    gap: 0.25rem; /* Compact gap */
     color: white;
     background: linear-gradient(135deg, #ff5252 0%, #c51111 100%); /* Red gradient */
     box-shadow: 0 10px 32px rgba(255, 82, 82, 0.35);
