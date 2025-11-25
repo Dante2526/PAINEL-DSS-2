@@ -1126,8 +1126,11 @@ ${formatList(specialCat.pending)}`;
 
     if (!isOpen) return null;
 
+    // Apply scaling factor of 0.85 to make the card smaller/more distant
+    const reducedScale = scale * 0.85;
+
     const modalStyle = { 
-        transform: `scale(${scale})`, 
+        transform: `scale(${reducedScale})`, 
         animation: 'fade-in-scale 0.3s forwards ease-out' 
     };
 
@@ -1136,9 +1139,9 @@ ${formatList(specialCat.pending)}`;
             className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 transition-opacity duration-300"
             onClick={onClose}
         >
-            {/* Custom Modal Container with max-w-4xl to override shared modal constraints */}
+            {/* Custom Modal Container with max-w-2xl to override shared modal constraints and make it narrower */}
             <div 
-                className="bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 w-full max-w-4xl text-center"
+                className="bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 w-full max-w-2xl text-center"
                 style={modalStyle}
                 onClick={(e) => e.stopPropagation()}
             >
@@ -1218,8 +1221,8 @@ ${formatList(specialCat.pending)}`;
             </div>
             <style>{`
                 @keyframes fade-in-scale {
-                  from { opacity: 0; transform: scale(${scale * 0.95}); }
-                  to { opacity: 1; transform: scale(${scale}); }
+                  from { opacity: 0; transform: scale(${reducedScale * 0.95}); }
+                  to { opacity: 1; transform: scale(${reducedScale}); }
                 }
             `}</style>
         </div>
