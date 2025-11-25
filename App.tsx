@@ -978,7 +978,7 @@ const ReportModal: React.FC<{
     employees: Employee[];
     showNotification: (message: string, type?: 'success' | 'error') => void;
     scale?: number;
-}> = ({ isOpen, onClose, employees, showNotification, scale }) => {
+}> = ({ isOpen, onClose, employees, showNotification, scale = 1 }) => {
     const [manualRegistrations, setManualRegistrations] = useState<ManualRegistration[]>([]);
     
     useEffect(() => {
@@ -1124,79 +1124,105 @@ ${formatList(specialCat.pending)}`;
         }
     };
 
+    if (!isOpen) return null;
+
+    const modalStyle = { 
+        transform: `scale(${scale})`, 
+        animation: 'fade-in-scale 0.3s forwards ease-out' 
+    };
+
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Relatório" scale={scale}>
-            <div className="text-left bg-light-bg dark:bg-dark-bg-secondary p-6 rounded-lg max-h-[80vh] overflow-y-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* Column 7H */}
-                    <div>
-                        <h2 className="text-xl font-bold text-primary mb-4 border-b-2 border-primary pb-2">TURNO 7H</h2>
-                        
-                        <div className="mb-6">
-                            <h3 className="bg-success text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">ASS.DSS + ESTOU BEM ({mainCat.ok.length})</h3>
-                            {renderEmployeeList(mainCat.ok)}
+        <div 
+            className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 transition-opacity duration-300"
+            onClick={onClose}
+        >
+            {/* Custom Modal Container with max-w-4xl to override shared modal constraints */}
+            <div 
+                className="bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 w-full max-w-4xl text-center"
+                style={modalStyle}
+                onClick={(e) => e.stopPropagation()}
+            >
+                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-3xl z-10">&times;</button>
+                <h2 className="text-xl font-bold uppercase text-light-text dark:text-dark-text mb-6">RELATÓRIO</h2>
+                
+                <div className="text-left bg-light-bg dark:bg-dark-bg-secondary p-6 rounded-lg max-h-[80vh] overflow-y-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Column 7H */}
+                        <div>
+                            <h2 className="text-xl font-bold text-primary mb-4 border-b-2 border-primary pb-2">TURNO 7H</h2>
+                            
+                            <div className="mb-6">
+                                <h3 className="bg-success text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">ASS.DSS + ESTOU BEM ({mainCat.ok.length})</h3>
+                                {renderEmployeeList(mainCat.ok)}
+                            </div>
+
+                            <div className="mb-6">
+                                <h3 className="bg-danger text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">ESTOU MAL ({mainCat.mal.length})</h3>
+                                {renderEmployeeList(mainCat.mal)}
+                            </div>
+
+                            <div className="mb-6">
+                                <h3 className="bg-neutral text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">PENDENTES / AUSENTES ({mainCat.pending.length})</h3>
+                                {renderEmployeeList(mainCat.pending)}
+                            </div>
                         </div>
 
-                        <div className="mb-6">
-                            <h3 className="bg-danger text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">ESTOU MAL ({mainCat.mal.length})</h3>
-                            {renderEmployeeList(mainCat.mal)}
-                        </div>
+                        {/* Column 6H */}
+                         <div>
+                            <h2 className="text-xl font-bold text-orange mb-4 border-b-2 border-orange pb-2">TURNO 6H</h2>
+                            
+                            <div className="mb-6">
+                                <h3 className="bg-success text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">ASS.DSS + ESTOU BEM ({specialCat.ok.length})</h3>
+                                {renderEmployeeList(specialCat.ok)}
+                            </div>
 
-                        <div className="mb-6">
-                            <h3 className="bg-neutral text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">PENDENTES / AUSENTES ({mainCat.pending.length})</h3>
-                            {renderEmployeeList(mainCat.pending)}
+                            <div className="mb-6">
+                                <h3 className="bg-danger text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">ESTOU MAL ({specialCat.mal.length})</h3>
+                                {renderEmployeeList(specialCat.mal)}
+                            </div>
+
+                            <div className="mb-6">
+                                <h3 className="bg-neutral text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">PENDENTES / AUSENTES ({specialCat.pending.length})</h3>
+                                {renderEmployeeList(specialCat.pending)}
+                            </div>
                         </div>
                     </div>
 
-                    {/* Column 6H */}
-                     <div>
-                        <h2 className="text-xl font-bold text-orange mb-4 border-b-2 border-orange pb-2">TURNO 6H</h2>
-                        
-                        <div className="mb-6">
-                            <h3 className="bg-success text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">ASS.DSS + ESTOU BEM ({specialCat.ok.length})</h3>
-                            {renderEmployeeList(specialCat.ok)}
+                    {/* Manual Registrations Section */}
+                    {manualRegistrations.length > 0 && (
+                        <div className="mt-8 pt-6 border-t-2 border-gray-200 dark:border-gray-700">
+                            <h2 className="text-lg font-bold text-light-text dark:text-dark-text mb-4">REGISTROS MANUAIS</h2>
+                            <ul className="list-disc pl-5 space-y-2">
+                                 {manualRegistrations.map(reg => {
+                                     const employee = employees.find(e => e.matricula === reg.matricula);
+                                     const name = employee ? employee.name : 'Desconhecido';
+                                     return (
+                                         <li key={reg.id} className="text-sm text-light-text dark:text-dark-text">
+                                             <span className="font-bold">{reg.matricula}</span> ({name}) - {reg.assunto} <span className="text-xs bg-gray-200 dark:bg-gray-600 px-1 rounded">{reg.TURNO}</span>
+                                         </li>
+                                     )
+                                 })}
+                            </ul>
                         </div>
-
-                        <div className="mb-6">
-                            <h3 className="bg-danger text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">ESTOU MAL ({specialCat.mal.length})</h3>
-                            {renderEmployeeList(specialCat.mal)}
-                        </div>
-
-                        <div className="mb-6">
-                            <h3 className="bg-neutral text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">PENDENTES / AUSENTES ({specialCat.pending.length})</h3>
-                            {renderEmployeeList(specialCat.pending)}
-                        </div>
-                    </div>
+                    )}
                 </div>
 
-                {/* Manual Registrations Section - REMOVED FROM TEXT REPORT BUT KEPT IN VISUAL AS REQUESTED IMPLICITLY OR JUST REMOVE FROM TEXT */}
-                {manualRegistrations.length > 0 && (
-                    <div className="mt-8 pt-6 border-t-2 border-gray-200 dark:border-gray-700">
-                        <h2 className="text-lg font-bold text-light-text dark:text-dark-text mb-4">REGISTROS MANUAIS</h2>
-                        <ul className="list-disc pl-5 space-y-2">
-                             {manualRegistrations.map(reg => {
-                                 const employee = employees.find(e => e.matricula === reg.matricula);
-                                 const name = employee ? employee.name : 'Desconhecido';
-                                 return (
-                                     <li key={reg.id} className="text-sm text-light-text dark:text-dark-text">
-                                         <span className="font-bold">{reg.matricula}</span> ({name}) - {reg.assunto} <span className="text-xs bg-gray-200 dark:bg-gray-600 px-1 rounded">{reg.TURNO}</span>
-                                     </li>
-                                 )
-                             })}
-                        </ul>
-                    </div>
-                )}
+                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <button onClick={handleCopyReport} className="w-full py-4 font-bold text-white bg-primary rounded-lg hover:bg-primary-dark transition">
+                        COPIAR
+                    </button>
+                    <button onClick={handleDownloadReport} className="w-full py-4 font-bold text-white bg-success rounded-lg hover:bg-green-600 transition">
+                        BAIXAR
+                    </button>
+                </div>
             </div>
-
-            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <button onClick={handleCopyReport} className="w-full py-4 font-bold text-white bg-primary rounded-lg hover:bg-primary-dark transition">
-                    COPIAR
-                </button>
-                <button onClick={handleDownloadReport} className="w-full py-4 font-bold text-white bg-success rounded-lg hover:bg-green-600 transition">
-                    BAIXAR
-                </button>
-            </div>
-        </Modal>
+            <style>{`
+                @keyframes fade-in-scale {
+                  from { opacity: 0; transform: scale(${scale * 0.95}); }
+                  to { opacity: 1; transform: scale(${scale}); }
+                }
+            `}</style>
+        </div>
     );
 };
 
