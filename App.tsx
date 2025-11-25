@@ -1126,11 +1126,13 @@ ${formatList(specialCat.pending)}`;
 
     if (!isOpen) return null;
 
-    // Apply scaling factor of 0.70 to make the card smaller/more distant
-    const reducedScale = scale * 0.70;
+    const isMobile = scale > 1.1; // Threshold to detect if we are scaled up for mobile
+    const finalScale = isMobile ? scale * 0.7 : 1;
+    const maxWidthClass = isMobile ? 'max-w-2xl' : 'max-w-5xl';
+    const maxHeightClass = isMobile ? 'max-h-[40vh]' : 'max-h-[80vh]';
 
     const modalStyle = { 
-        transform: `scale(${reducedScale})`, 
+        transform: `scale(${finalScale})`, 
         animation: 'fade-in-scale 0.3s forwards ease-out' 
     };
 
@@ -1139,16 +1141,15 @@ ${formatList(specialCat.pending)}`;
             className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 transition-opacity duration-300"
             onClick={onClose}
         >
-            {/* Custom Modal Container with max-w-2xl to override shared modal constraints and make it narrower */}
             <div 
-                className="bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 w-full max-w-2xl text-center"
+                className={`bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 w-full ${maxWidthClass} text-center`}
                 style={modalStyle}
                 onClick={(e) => e.stopPropagation()}
             >
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-3xl z-10">&times;</button>
                 <h2 className="text-xl font-bold uppercase text-light-text dark:text-dark-text mb-6">RELATÓRIO</h2>
                 
-                <div className="text-left bg-light-bg dark:bg-dark-bg-secondary p-6 rounded-lg max-h-[40vh] overflow-y-auto">
+                <div className={`text-left bg-light-bg dark:bg-dark-bg-secondary p-6 rounded-lg ${maxHeightClass} overflow-y-auto`}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {/* Column 7H */}
                         <div>
@@ -1219,8 +1220,8 @@ ${formatList(specialCat.pending)}`;
             </div>
             <style>{`
                 @keyframes fade-in-scale {
-                  from { opacity: 0; transform: scale(${reducedScale * 0.95}); }
-                  to { opacity: 1; transform: scale(${reducedScale}); }
+                  from { opacity: 0; transform: scale(${finalScale * 0.95}); }
+                  to { opacity: 1; transform: scale(${finalScale}); }
                 }
             `}</style>
         </div>
