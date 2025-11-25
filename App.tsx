@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Header from './components/Header';
 import EmployeeCard from './components/EmployeeCard';
@@ -1125,8 +1126,8 @@ ${formatList(specialCat.pending)}`;
 
     if (!isOpen) return null;
 
-    // Apply scaling factor of 0.8 to make the card smaller/more distant
-    const reducedScale = scale * 0.8;
+    // Apply scaling factor of 0.75 to make the card smaller/more distant
+    const reducedScale = scale * 0.75;
 
     const modalStyle = { 
         transform: `scale(${reducedScale})`, 
@@ -1147,7 +1148,7 @@ ${formatList(specialCat.pending)}`;
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-3xl z-10">&times;</button>
                 <h2 className="text-xl font-bold uppercase text-light-text dark:text-dark-text mb-6">RELATÓRIO</h2>
                 
-                <div className="text-left bg-light-bg dark:bg-dark-bg-secondary p-6 rounded-lg max-h-[50vh] overflow-y-auto">
+                <div className="text-left bg-light-bg dark:bg-dark-bg-secondary p-6 rounded-lg max-h-[45vh] overflow-y-auto">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {/* Column 7H */}
                         <div>
