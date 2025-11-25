@@ -1127,7 +1127,7 @@ ${formatList(specialCat.pending)}`;
     if (!isOpen) return null;
 
     const isMobile = scale > 1.1; // Threshold to detect if we are scaled up for mobile
-    const finalScale = isMobile ? scale * 0.7 : 1;
+    const finalScale = isMobile ? scale * 0.7 : 0.85;
     const maxWidthClass = isMobile ? 'max-w-2xl' : 'max-w-5xl';
     const maxHeightClass = isMobile ? 'max-h-[40vh]' : 'max-h-[80vh]';
 
