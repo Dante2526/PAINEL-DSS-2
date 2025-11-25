@@ -1148,7 +1148,7 @@ ${formatList(specialCat.pending)}`;
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-3xl z-10">&times;</button>
                 <h2 className="text-xl font-bold uppercase text-light-text dark:text-dark-text mb-6">RELATÓRIO</h2>
                 
-                <div className="text-left bg-light-bg dark:bg-dark-bg-secondary p-6 rounded-lg max-h-[80vh] overflow-y-auto">
+                <div className="text-left bg-light-bg dark:bg-dark-bg-secondary p-6 rounded-lg max-h-[60vh] overflow-y-auto">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {/* Column 7H */}
                         <div>
