@@ -79,10 +79,6 @@ const App: React.FC = () => {
             const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
             
             if (isTouchDevice) {
-                // The previous scale factor (4.5) was still a bit too large,
-                // causing the modal to be clipped vertically on some phone screens.
-                // This further reduced factor provides a better fit, ensuring the entire
-                // modal is visible while remaining large and legible.
                 setModalScale(2.0);
             } else {
                 setModalScale(1); // Default scale for desktop
@@ -779,6 +775,10 @@ const App: React.FC = () => {
     const leftColumn = mainTeam.slice(0, columnSize);
     const rightColumn = mainTeam.slice(columnSize);
 
+    // Determine scaling for the ConfirmMal modal
+    const isMobileDevice = modalScale > 1.1;
+    const confirmModalScale = isMobileDevice ? modalScale * 0.7 : 1;
+
     return (
         <div className="bg-light-bg-secondary dark:bg-dark-bg min-h-screen text-light-text dark:text-dark-text transition-colors">
             <div ref={viewportRef} className="viewport fixed inset-0">
@@ -857,7 +857,7 @@ const App: React.FC = () => {
                     <div 
                         className="bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center relative"
                         style={{ 
-                            transform: `scale(${modalScale})`, 
+                            transform: `scale(${confirmModalScale})`, // FIX: Use the calculated scale
                             animation: 'fade-in-scale 0.3s forwards ease-out' 
                         }}
                         onClick={(e) => e.stopPropagation()}
@@ -879,6 +879,7 @@ const App: React.FC = () => {
                                 <span className="text-4xl">🚨</span>
                             </div>
                             
+                            {/* Layout requested: Text, then line break, then ESTOU MAL */}
                             <div className="text-lg text-light-text dark:text-dark-text font-medium flex flex-col items-center gap-2">
                                 <span>Você selecionou a opção</span>
                                 <span className="text-danger font-bold text-3xl">"ESTOU MAL"</span>
