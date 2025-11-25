@@ -26,13 +26,13 @@ interface CheckboxItemProps {
 
 const CheckboxItem: React.FC<CheckboxItemProps> = ({ label, icon, type, checked, checkedClass, textColor, borderColor, darkBg, onClick }) => (
     <div
-        className={`p-4 flex flex-col items-center gap-2 rounded-xl cursor-pointer transition-all duration-300 ease-in-out transform hover:scale-105 border-2 ${checked ? `${checkedClass} border-${borderColor} dark:bg-${darkBg}` : 'bg-light-bg dark:bg-dark-bg border-transparent'}`}
+        className={`p-5 flex flex-col items-center gap-3 rounded-xl cursor-pointer transition-all duration-300 ease-in-out transform hover:scale-105 border-2 ${checked ? `${checkedClass} border-${borderColor} dark:bg-${darkBg}` : 'bg-light-bg dark:bg-dark-bg border-transparent'}`}
         onClick={onClick}
     >
-        <div className={`text-4xl transition-all duration-300 ${checked ? 'grayscale-0 opacity-100' : 'grayscale opacity-50'}`}>{icon}</div>
-        <div className={`text-sm font-bold text-center ${checked ? `text-${textColor} dark:text-white` : 'text-light-text-secondary dark:text-dark-text-secondary'}`}>{label}</div>
-        <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-colors ${checked ? `bg-${borderColor} border-${borderColor}` : 'bg-white dark:bg-dark-bg-secondary border-gray-300 dark:border-gray-500'}`}>
-            {checked && <span className="text-white font-bold">✓</span>}
+        <div className={`text-5xl transition-all duration-300 ${checked ? 'grayscale-0 opacity-100' : 'grayscale opacity-50'}`}>{icon}</div>
+        <div className={`text-base font-bold text-center ${checked ? `text-${textColor} dark:text-white` : 'text-light-text-secondary dark:text-dark-text-secondary'}`}>{label}</div>
+        <div className={`w-9 h-9 rounded-full border-2 flex items-center justify-center transition-colors ${checked ? `bg-${borderColor} border-${borderColor}` : 'bg-white dark:bg-dark-bg-secondary border-gray-300 dark:border-gray-500'}`}>
+            {checked && <span className="text-white font-bold text-lg">✓</span>}
         </div>
     </div>
 );
@@ -86,20 +86,20 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onStatusChange, o
 
     return (
         <div className="w-full bg-light-card dark:bg-dark-card rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-            <div className={`p-6 flex items-center text-white ${getHeaderClass()}`}>
-                <div className="w-14 h-14 bg-white/25 rounded-full flex items-center justify-center text-2xl mr-5">👤</div>
+            <div className={`p-7 flex items-center text-white ${getHeaderClass()}`}>
+                <div className="w-16 h-16 bg-white/25 rounded-full flex items-center justify-center text-3xl mr-6">👤</div>
                 <div className="flex-grow">
-                    <div className="text-xl font-bold">{employee.name}</div>
-                    <div className="text-sm opacity-90">Matrícula: {employee.matricula}</div>
+                    <div className="text-2xl font-bold">{employee.name}</div>
+                    <div className="text-base opacity-90">Matrícula: {employee.matricula}</div>
                 </div>
-                <div className="flex gap-2.5">
+                <div className="flex gap-3">
                     <button
                         onClick={handleToggleSpecialTeamClick}
                         disabled={isTogglingSpecialTeam}
-                        className={`turno-button ${employee.turno === '6H' ? 'active' : ''} ${isTogglingSpecialTeam ? 'loading' : ''}`}
+                        className={`turno-button text-base ${employee.turno === '6H' ? 'active' : ''} ${isTogglingSpecialTeam ? 'loading' : ''}`}
                     >
                         <div className="default-state">
-                            <ShiftIcon className="w-5 h-5" />
+                            <ShiftIcon className="w-6 h-6" />
                             <span>TURNO 6H</span>
                         </div>
                         <div className="loading-state">
@@ -109,25 +109,25 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onStatusChange, o
                     </button>
                     <button
                         onClick={handleAbsentButtonClick}
-                        className={`absent-button ${employee.absent ? 'marked' : ''}`}
+                        className={`absent-button text-base ${employee.absent ? 'marked' : ''}`}
                     >
-                        <AbsentIcon className="w-5 h-5" />
+                        <AbsentIcon className="w-6 h-6" />
                         <span>AUSENTE</span>
                     </button>
                     {isAdmin && (
                         <button
                             onClick={() => onDelete(employee.id)}
-                            className="delete-button"
+                            className="delete-button text-base"
                             aria-label={`Deletar ${employee.name}`}
                         >
-                            <TrashIcon className="w-5 h-5" />
+                            <TrashIcon className="w-6 h-6" />
                             <span>DELETAR</span>
                         </button>
                     )}
                 </div>
             </div>
 
-            <div className="p-6 grid grid-cols-3 gap-4">
+            <div className="p-7 grid grid-cols-3 gap-5">
                 <CheckboxItem
                     label="ASS. DSS"
                     icon="📄"
@@ -163,11 +163,11 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onStatusChange, o
                 />
             </div>
 
-            <div className="px-6 pb-6 text-center">
-                <div className={`py-3 px-5 inline-block rounded-lg font-bold text-sm min-w-[220px] ${employee.time ? 'bg-gradient-to-r from-orange to-amber-500 text-white' : 'bg-light-bg dark:bg-dark-bg text-light-text-secondary dark:text-dark-text-secondary'}`}>
+            <div className="px-7 pb-7 text-center">
+                <div className={`py-4 px-6 inline-block rounded-lg font-bold text-base min-w-[240px] ${employee.time ? 'bg-gradient-to-r from-orange to-amber-500 text-white' : 'bg-light-bg dark:bg-dark-bg text-light-text-secondary dark:text-dark-text-secondary'}`}>
                     {formatTimestamp(employee.time)}
                 </div>
-                <div className="mt-2 text-xs font-semibold text-light-text-secondary dark:text-dark-text-secondary uppercase tracking-wider">
+                <div className="mt-3 text-sm font-semibold text-light-text-secondary dark:text-dark-text-secondary uppercase tracking-wider">
                     Data / Hora da Assinatura
                 </div>
             </div>

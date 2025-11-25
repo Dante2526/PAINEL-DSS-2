@@ -445,8 +445,8 @@ body {
 .turno-button {
     position: relative;
     overflow: hidden;
-    padding: 0.75rem 1rem; /* py-3 px-4 */
-    font-size: 0.875rem; /* text-sm */
+    padding: 0.875rem 1.25rem; /* Increased padding */
+    font-size: 1rem; /* Increased font size */
     font-weight: 700; /* font-bold */
     border-radius: 0.5rem; /* rounded-lg */
     display: flex;
@@ -537,8 +537,8 @@ body {
 .absent-button {
     position: relative;
     overflow: hidden;
-    padding: 0.75rem 1rem;
-    font-size: 0.875rem;
+    padding: 0.875rem 1.25rem; /* Increased padding */
+    font-size: 1rem; /* Increased font size */
     font-weight: 700;
     border-radius: 0.5rem;
     display: flex;
@@ -568,8 +568,8 @@ body {
 .delete-button {
     position: relative;
     overflow: hidden;
-    padding: 0.75rem 1rem;
-    font-size: 0.875rem;
+    padding: 0.875rem 1.25rem; /* Increased padding */
+    font-size: 1rem; /* Increased font size */
     font-weight: 700;
     border-radius: 0.5rem;
     display: flex;
