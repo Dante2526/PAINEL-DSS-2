@@ -23,7 +23,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, scale =
       onClick={onClose}
     >
       <div 
-        className="bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 w-full max-w-5xl text-center"
+        className="bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center"
         style={modalStyle}
         onClick={(e) => e.stopPropagation()}
       >
