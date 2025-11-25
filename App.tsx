@@ -1040,24 +1040,24 @@ const ReportModal: React.FC<{
 
 EQUIPE TURNO 7H
 --------------------------------------------------
-"ASS.DSS + ESTOU BEM"
+STATUS: "ASS.DSS + ESTOU BEM"
 ${formatList(mainCat.ok)}
 
-"ESTOU MAL"
+STATUS: "ESTOU MAL"
 ${formatList(mainCat.mal)}
 
-"PENDENTES / AUSENTES"
+STATUS: "PENDENTES / AUSENTES"
 ${formatList(mainCat.pending)}
 
 EQUIPE TURNO 6H
 --------------------------------------------------
-"ASS.DSS + ESTOU BEM"
+STATUS: "ASS.DSS + ESTOU BEM"
 ${formatList(specialCat.ok)}
 
-"ESTOU MAL"
+STATUS: "ESTOU MAL"
 ${formatList(specialCat.mal)}
 
-"PENDENTES / AUSENTES"
+STATUS: "PENDENTES / AUSENTES"
 ${formatList(specialCat.pending)}`;
 
         return employeeReport;

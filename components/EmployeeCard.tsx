@@ -89,10 +89,8 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onStatusChange, o
             <div className={`p-6 flex items-center text-white ${getHeaderClass()}`}>
                 <div className="w-14 h-14 bg-white/25 rounded-full flex items-center justify-center text-2xl mr-5">👤</div>
                 <div className="flex-grow">
-                    <div className="text-xl font-bold">
-                        {employee.name} 
-                        <span className="text-sm font-normal opacity-90 ml-2">(Mat: {employee.matricula})</span>
-                    </div>
+                    <div className="text-xl font-bold">{employee.name}</div>
+                    <div className="text-sm opacity-90">Matrícula: {employee.matricula}</div>
                 </div>
                 <div className="flex gap-2.5">
                     <button
