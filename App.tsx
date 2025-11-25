@@ -75,19 +75,23 @@ const App: React.FC = () => {
     }, [isDarkMode]);
 
     useEffect(() => {
-        // Responsive logic for modal scale
-        const updateScale = () => {
-            const isSmallScreen = window.innerWidth < 768;
-            // Use 0.85 scale for mobile as requested
-            setModalScale(isSmallScreen ? 0.85 : 1);
+        const calculateModalScale = () => {
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            
+            if (isTouchDevice) {
+                // The previous scale factor (4.5) was still a bit too large,
+                // causing the modal to be clipped vertically on some phone screens.
+                // This further reduced factor provides a better fit, ensuring the entire
+                // modal is visible while remaining large and legible.
+                setModalScale(2.0);
+            } else {
+                setModalScale(1); // Default scale for desktop
+            }
         };
 
-        // Initial check
-        updateScale();
-
-        // Listen for resize events
-        window.addEventListener('resize', updateScale);
-        return () => window.removeEventListener('resize', updateScale);
+        calculateModalScale();
+        window.addEventListener('resize', calculateModalScale);
+        return () => window.removeEventListener('resize', calculateModalScale);
     }, []);
 
     const handleToggleDarkMode = () => setIsDarkMode(prev => !prev);
@@ -844,14 +848,14 @@ const App: React.FC = () => {
             {/* CUSTOM CONFIRMATION MODAL WITH ROBUST CENTERING */}
             {activeModal === ModalType.ConfirmMal && (
                 <div 
-                    className="fixed inset-0 z-[9999] grid place-items-center bg-black/60 p-4"
+                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60"
                     onClick={() => {
                         setPendingMalEmployeeId(null);
                         setActiveModal(ModalType.None);
                     }}
                 >
                     <div 
-                        className="bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-5 md:p-8 w-full max-w-sm text-center relative"
+                        className="bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center relative mx-4"
                         style={{ 
                             transform: `scale(${modalScale})`, 
                             animation: 'fade-in-scale 0.3s forwards ease-out' 
@@ -902,13 +906,6 @@ const App: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                    {/* Ensure keyframes are available for this specific modal if not globally defined or if Modal component hasn't mounted */}
-                    <style>{`
-                        @keyframes fade-in-scale {
-                        from { opacity: 0; transform: scale(${modalScale * 0.95}); }
-                        to { opacity: 1; transform: scale(${modalScale}); }
-                        }
-                    `}</style>
                 </div>
             )}
 
