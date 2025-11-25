@@ -845,48 +845,69 @@ const App: React.FC = () => {
                 scale={modalScale}
             />
             
-            {/* NEW CONFIRMATION MODAL */}
-            <Modal 
-                isOpen={activeModal === ModalType.ConfirmMal} 
-                onClose={() => {
-                    setPendingMalEmployeeId(null);
-                    setActiveModal(ModalType.None);
-                }} 
-                title="CONFIRMAÇÃO NECESSÁRIA" 
-                scale={modalScale}
-            >
-                <div className="space-y-6 text-center p-2 flex flex-col items-center">
-                    <div className="mx-auto w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-2">
-                        <span className="text-4xl">🚨</span>
-                    </div>
-                    
-                    <div className="text-lg text-light-text dark:text-dark-text font-medium flex flex-col items-center gap-1">
-                        <span>Você selecionou a opção</span>
-                        <span className="text-danger font-bold text-2xl mt-1">"ESTOU MAL"</span>
-                    </div>
-
-                    <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-                        Isso enviará um alerta imediato para a gestão. <br/>Deseja realmente confirmar que não está se sentindo bem?
-                    </p>
-                    <div className="grid grid-cols-1 gap-3 mt-4 w-full">
-                        <button 
-                            onClick={handleConfirmMal} 
-                            className="w-full py-4 font-bold text-white bg-danger rounded-lg hover:bg-red-700 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
-                        >
-                            SIM, ESTOU MAL
-                        </button>
+            {/* CUSTOM CONFIRMATION MODAL WITH ROBUST CENTERING */}
+            {activeModal === ModalType.ConfirmMal && (
+                <div 
+                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 h-[100dvh] w-full"
+                    onClick={() => {
+                        setPendingMalEmployeeId(null);
+                        setActiveModal(ModalType.None);
+                    }}
+                >
+                    <div 
+                        className="bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center relative"
+                        style={{ 
+                            transform: `scale(${modalScale})`, 
+                            animation: 'fade-in-scale 0.3s forwards ease-out' 
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <button 
                             onClick={() => {
                                 setPendingMalEmployeeId(null);
                                 setActiveModal(ModalType.None);
                             }} 
-                            className="w-full py-4 font-bold text-light-text dark:text-white bg-gray-200 dark:bg-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition"
+                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-3xl z-10"
                         >
-                            CANCELAR
+                            &times;
                         </button>
+                        
+                        <h2 className="text-xl font-bold uppercase text-light-text dark:text-dark-text mb-6">CONFIRMAÇÃO NECESSÁRIA</h2>
+
+                        <div className="space-y-6 text-center p-2 flex flex-col items-center">
+                            <div className="mx-auto w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-2">
+                                <span className="text-4xl">🚨</span>
+                            </div>
+                            
+                            <div className="text-lg text-light-text dark:text-dark-text font-medium flex flex-col items-center gap-2">
+                                <span>Você selecionou a opção</span>
+                                <span className="text-danger font-bold text-3xl">"ESTOU MAL"</span>
+                            </div>
+
+                            <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mt-2">
+                                Isso enviará um alerta imediato para a <strong>gestão</strong>. <br/>Deseja realmente confirmar que não está se sentindo bem?
+                            </p>
+                            <div className="grid grid-cols-1 gap-3 mt-6 w-full">
+                                <button 
+                                    onClick={handleConfirmMal} 
+                                    className="w-full py-4 font-bold text-white bg-danger rounded-lg hover:bg-red-700 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
+                                >
+                                    SIM, ESTOU MAL
+                                </button>
+                                <button 
+                                    onClick={() => {
+                                        setPendingMalEmployeeId(null);
+                                        setActiveModal(ModalType.None);
+                                    }} 
+                                    className="w-full py-4 font-bold text-light-text dark:text-white bg-gray-200 dark:bg-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition"
+                                >
+                                    CANCELAR
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </Modal>
+            )}
 
             <div 
                 className="fixed top-5 right-5 z-[100] space-y-3"
