@@ -1194,14 +1194,12 @@ ${formatList(specialCat.pending)}`;
                     {/* Manual Registrations Section */}
                     {manualRegistrations.length > 0 && (
                         <div className="mt-8 pt-6 border-t-2 border-gray-200 dark:border-gray-700">
-                            <h2 className="text-lg font-bold text-light-text dark:text-dark-text mb-4">REGISTROS MANUAIS</h2>
+                            <h2 className="text-lg font-bold text-light-text dark:text-dark-text mb-4">ASSUNTOS DA DSS</h2>
                             <ul className="list-disc pl-5 space-y-2">
                                  {manualRegistrations.map(reg => {
-                                     const employee = employees.find(e => e.matricula === reg.matricula);
-                                     const name = employee ? employee.name : 'Desconhecido';
                                      return (
                                          <li key={reg.id} className="text-sm text-light-text dark:text-dark-text">
-                                             <span className="font-bold">{reg.matricula}</span> ({name}) - {reg.assunto} <span className="text-xs bg-gray-200 dark:bg-gray-600 px-1 rounded">{reg.TURNO === '7H-19H' ? '7H' : reg.TURNO}</span>
+                                             <span className="font-bold">{reg.matricula}</span> - {reg.assunto} <span className="text-xs bg-gray-200 dark:bg-gray-600 px-1 rounded">{reg.TURNO === '7H-19H' ? '7H' : reg.TURNO}</span>
                                          </li>
                                      )
                                  })}
