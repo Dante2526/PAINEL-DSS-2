@@ -778,7 +778,7 @@ const App: React.FC = () => {
     return (
         <div className="bg-light-bg-secondary dark:bg-dark-bg min-h-screen text-light-text dark:text-dark-text transition-colors">
             <div ref={viewportRef} className="viewport fixed inset-0">
-                <div ref={scalableContainerRef} className="scalable-container w-[2678px] p-8">
+                <div ref={scalableContainerRef} className="scalable-container w-[2738px] p-8">
                     <Header
                         stats={stats}
                         loading={loading}
@@ -787,8 +787,8 @@ const App: React.FC = () => {
                         onToggleDarkMode={handleToggleDarkMode}
                     />
                     
-                    <div className="flex gap-8 w-[2614px]">
-                       <div className="w-[1732px] flex flex-col gap-8">
+                    <div className="flex gap-8 w-[2674px]">
+                       <div className="w-[1772px] flex flex-col gap-8">
                             <ManualRegisterSection 
                                 subject={mainSubject}
                                 matricula={mainMatricula}
@@ -797,10 +797,10 @@ const App: React.FC = () => {
                                 onRegister={() => handleManualRegister('7H-19H')} 
                             />
                             <div className="flex-grow flex gap-8">
-                                <div className="flex flex-col gap-6 w-[850px]">
+                                <div className="flex flex-col gap-6 w-[870px]">
                                     {leftColumn.map(emp => <EmployeeCard key={emp.id} employee={emp} onStatusChange={handleStatusChange} onToggleSpecialTeam={handleToggleSpecialTeam} isTogglingSpecialTeam={togglingSpecialTeamId === emp.id} isAdmin={isAdmin} onDelete={handleDeleteUser} />)}
                                 </div>
-                                <div className="flex flex-col gap-6 w-[850px]">
+                                <div className="flex flex-col gap-6 w-[870px]">
                                     {rightColumn.map(emp => <EmployeeCard key={emp.id} employee={emp} onStatusChange={handleStatusChange} onToggleSpecialTeam={handleToggleSpecialTeam} isTogglingSpecialTeam={togglingSpecialTeamId === emp.id} isAdmin={isAdmin} onDelete={handleDeleteUser} />)}
                                 </div>
                             </div>
