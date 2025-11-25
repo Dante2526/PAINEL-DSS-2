@@ -783,7 +783,7 @@ const App: React.FC = () => {
                     <Header
                         stats={stats}
                         loading={loading}
-                        onAdminClick={() => isAdmin ? setActiveModal(ModalType.AdminOptions) : setActiveModal(ModalType.AdminLogin)}
+                        onAdminClick={() => setActiveModal(ModalType.AdminLogin)}
                         isDarkMode={isDarkMode}
                         onToggleDarkMode={handleToggleDarkMode}
                     />
