@@ -1,3 +1,4 @@
+
 export interface Employee {
   id: string;
   name: string;
@@ -25,4 +26,5 @@ export enum ModalType {
   AdminOptions,
   AddUser,
   Report,
+  ConfirmMal, // Added for safety confirmation
 }

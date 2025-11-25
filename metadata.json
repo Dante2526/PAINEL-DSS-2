@@ -1,5 +1,5 @@
 {
-  "name": "Copy of DSS Monitoring Panell",
+  "name": "Painel DSS",
   "description": "A real-time dashboard to monitor the daily safety dialogue (DSS) status of employees, built with React and Tailwind CSS.",
   "requestFramePermissions": []
 }

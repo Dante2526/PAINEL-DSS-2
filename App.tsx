@@ -55,6 +55,9 @@ const App: React.FC = () => {
     const [specialSubject, setSpecialSubject] = useState('');
     const [specialMatricula, setSpecialMatricula] = useState('');
 
+    // State for safety confirmation
+    const [pendingMalEmployeeId, setPendingMalEmployeeId] = useState<string | null>(null);
+
     const [isDarkMode, setIsDarkMode] = useState(() => {
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) return savedTheme === 'dark';
@@ -76,10 +79,6 @@ const App: React.FC = () => {
             const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
             
             if (isTouchDevice) {
-                // The previous scale factor (4.5) was still a bit too large,
-                // causing the modal to be clipped vertically on some phone screens.
-                // This further reduced factor provides a better fit, ensuring the entire
-                // modal is visible while remaining large and legible.
                 setModalScale(2.0);
             } else {
                 setModalScale(1); // Default scale for desktop
@@ -107,7 +106,6 @@ const App: React.FC = () => {
         try {
             const currentTime = new Date().toLocaleString('pt-BR');
             
-            // HTML EMAIL BUILDER - CLEAN CARD LAYOUT (NO BORDERS, BLACK TEXT)
             const emailContent = `
             <!DOCTYPE html>
             <html lang="pt-BR">
@@ -117,23 +115,15 @@ const App: React.FC = () => {
                 <title>Alerta de Saúde</title>
             </head>
             <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #ffffff;">
-                
-                <!-- Main Wrapper -->
                 <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; width: 100%;">
                     <tr>
                         <td align="center" style="padding: 20px 0;">
-                            
-                            <!-- Container (Max Width 600px for Mobile) -->
                             <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; width: 100%;">
-                                
-                                <!-- Pre-header (Inbox Preview Text) -->
                                 <tr>
                                     <td style="display:none !important; visibility:hidden; mso-hide:all; font-size:1px; color:#ffffff; line-height:1px; max-height:0px; max-width:0px; opacity:0; overflow:hidden;">
                                         🚨 Alerta de Saúde: Colaborador informou "ESTOU MAL". Verifique imediatamente.
                                     </td>
                                 </tr>
-
-                                <!-- Header Alert -->
                                 <tr>
                                     <td style="padding-bottom: 20px;">
                                         <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -147,8 +137,6 @@ const App: React.FC = () => {
                                         </table>
                                     </td>
                                 </tr>
-
-                                <!-- Main Message -->
                                 <tr>
                                     <td style="padding-bottom: 30px;">
                                         <p style="margin: 0; font-size: 18px; line-height: 1.5; color: #000000;">
@@ -156,20 +144,13 @@ const App: React.FC = () => {
                                         </p>
                                     </td>
                                 </tr>
-
-                                <!-- Details Card (Clean Layout) -->
                                 <tr>
                                     <td style="padding-bottom: 30px;">
                                         <div style="background-color: #f8f9fa; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px;">
-                                            
-                                            <!-- Card Header -->
                                             <p style="margin: 0 0 16px 0; font-size: 12px; font-weight: bold; color: #000000; text-transform: uppercase; letter-spacing: 1px;">
                                                 DETALHES DO REGISTRO:
                                             </p>
-
-                                            <!-- Data Table (No Borders) -->
                                             <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                                <!-- Nome -->
                                                 <tr>
                                                     <td style="padding-bottom: 8px; width: 100px; vertical-align: top;">
                                                         <strong style="font-size: 15px; color: #000000;">Nome:</strong>
@@ -178,7 +159,6 @@ const App: React.FC = () => {
                                                         <span style="font-size: 15px; color: #000000; font-weight: bold;">${name}</span>
                                                     </td>
                                                 </tr>
-                                                <!-- Matrícula -->
                                                 <tr>
                                                     <td style="padding-bottom: 8px; width: 100px; vertical-align: top;">
                                                         <strong style="font-size: 15px; color: #000000;">Matrícula:</strong>
@@ -187,7 +167,6 @@ const App: React.FC = () => {
                                                         <span style="font-size: 15px; color: #000000; font-weight: bold;">${matricula}</span>
                                                     </td>
                                                 </tr>
-                                                <!-- Turno -->
                                                 <tr>
                                                     <td style="padding-bottom: 8px; width: 100px; vertical-align: top;">
                                                         <strong style="font-size: 15px; color: #000000;">Turno:</strong>
@@ -196,7 +175,6 @@ const App: React.FC = () => {
                                                         <span style="font-size: 15px; color: #000000; font-weight: bold;">${turno}</span>
                                                     </td>
                                                 </tr>
-                                                <!-- Horário -->
                                                 <tr>
                                                     <td style="padding-bottom: 0; width: 100px; vertical-align: top;">
                                                         <strong style="font-size: 15px; color: #000000;">Horário:</strong>
@@ -209,8 +187,6 @@ const App: React.FC = () => {
                                         </div>
                                     </td>
                                 </tr>
-
-                                <!-- Footer Alert Box -->
                                 <tr>
                                     <td>
                                         <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -224,8 +200,6 @@ const App: React.FC = () => {
                                         </table>
                                     </td>
                                 </tr>
-
-                                <!-- Footer Note -->
                                 <tr>
                                     <td align="center" style="padding-top: 30px;">
                                         <p style="margin: 0; font-size: 12px; color: #000000;">
@@ -233,10 +207,7 @@ const App: React.FC = () => {
                                         </p>
                                     </td>
                                 </tr>
-
                             </table>
-                            <!-- End Container -->
-
                         </td>
                     </tr>
                 </table>
@@ -245,9 +216,7 @@ const App: React.FC = () => {
             `;
 
             const templateParams = {
-                // O Template do EmailJS deve conter APENAS: {{{html_content}}}
                 html_content: emailContent,
-                // Assunto personalizado com Sirene e "ESTOU MAL" em maiúsculo
                 subject: `🚨 ALERTA URGENTE TURMA B: "ESTOU MAL"`,
             };
 
@@ -261,7 +230,6 @@ const App: React.FC = () => {
             showNotification('Alerta enviado por e-mail ao setor responsável.', 'success');
         } catch (error) {
             console.error("Erro ao enviar e-mail via EmailJS:", error);
-            // Não mostramos erro visual para o usuário final para não gerar pânico, apenas logamos
         }
     };
 
@@ -281,7 +249,6 @@ const App: React.FC = () => {
                 await signInAnonymously(auth);
                 console.log("Signed in anonymously");
 
-                // Listener for employees
                 const employeesQuery = query(collection(db, 'employees'), orderBy("name", "asc"));
                 unsubscribeEmployees = onSnapshot(employeesQuery, (querySnapshot) => {
                     const employeesData: Employee[] = querySnapshot.docs.map(doc => {
@@ -306,7 +273,6 @@ const App: React.FC = () => {
                     setLoading(false);
                 });
                 
-                // Listener for manual registrations to persist fields
                 const registrationsQuery = query(collection(db, 'registrosDSS'));
                 unsubscribeRegistrations = onSnapshot(registrationsQuery, (querySnapshot) => {
                     const registrations = querySnapshot.docs.map(d => ({ id: d.id, ...d.data() })) as ManualRegistration[];
@@ -348,8 +314,6 @@ const App: React.FC = () => {
         const finalScale = Math.max(0.1, Math.min(newScale, 2.0));
         scaleStateRef.current.currentScale = finalScale;
 
-        // Dynamically set minWidth and minHeight to ensure the container always fills the viewport,
-        // effectively expanding it when zoomed out.
         scalableContainer.style.minWidth = `${viewport.clientWidth / finalScale}px`;
         scalableContainer.style.minHeight = `${viewport.clientHeight / finalScale}px`;
 
@@ -441,8 +405,6 @@ const App: React.FC = () => {
         const handleResize = () => {
             if (window.innerWidth !== lastWidth) {
                 lastWidth = window.innerWidth;
-                // Re-applying the scale will trigger a recalculation of minWidth/minHeight
-                // based on the new viewport dimensions.
                 setScale(scaleStateRef.current.currentScale);
             }
         };
@@ -465,7 +427,8 @@ const App: React.FC = () => {
 
     }, [initializeScale, setScale]);
 
-    const handleStatusChange = async (id: string, type: StatusType) => {
+    // Original logic separated for reuse
+    const processStatusUpdate = async (id: string, type: StatusType) => {
         if (!db) {
             showNotification("A conexão com o banco de dados não está disponível.", "error");
             return;
@@ -485,14 +448,14 @@ const App: React.FC = () => {
 
         if (type === 'absent') {
             updatedData.absent = isChecking;
-            if (isChecking) { // If marking as absent
+            if (isChecking) { 
                 updatedData.assDss = false;
                 updatedData.bem = false;
                 updatedData.mal = false;
             }
-        } else { // For assDss, bem, mal
+        } else { 
             if (isChecking) {
-                updatedData.absent = false; // If checking any of these, employee is not absent
+                updatedData.absent = false; 
             }
 
             if (type === 'assDss') {
@@ -500,20 +463,18 @@ const App: React.FC = () => {
             } else if (type === 'bem') {
                 updatedData.bem = isChecking;
                 if (isChecking) {
-                    updatedData.assDss = true; // Checking 'bem' implies DSS is done
+                    updatedData.assDss = true; 
                     updatedData.mal = false;
                 }
             } else if (type === 'mal') {
                 updatedData.mal = isChecking;
                 if (isChecking) {
                     updatedData.bem = false;
-                    // TRIGGER EMAIL ALERT HERE
                     sendAlertEmail(employee.name, employee.matricula, employee.turno);
                 }
             }
         }
         
-        // Determine the final state after the update to decide on the timestamp
         const finalStates = {
             absent: updatedData.absent !== undefined ? updatedData.absent : employee.absent,
             assDss: updatedData.assDss !== undefined ? updatedData.assDss : employee.assDss,
@@ -536,6 +497,32 @@ const App: React.FC = () => {
             console.error("Error updating status:", error);
             const message = error instanceof Error ? error.message : 'Ocorreu um erro desconhecido.';
             showNotification(`Falha ao atualizar status: ${message}`, 'error');
+        }
+    };
+
+    // Intercept click handler
+    const handleStatusChange = (id: string, type: StatusType) => {
+        const employee = employees.find(e => e.id === id);
+        if (!employee) return;
+
+        const isChecking = !(employee as any)[type];
+
+        // Only intercept if it's 'mal' AND the user is trying to check it (turn it on)
+        if (type === 'mal' && isChecking) {
+            setPendingMalEmployeeId(id);
+            setActiveModal(ModalType.ConfirmMal);
+            return;
+        }
+
+        // Otherwise, proceed normally
+        processStatusUpdate(id, type);
+    };
+
+    const handleConfirmMal = () => {
+        if (pendingMalEmployeeId) {
+            processStatusUpdate(pendingMalEmployeeId, 'mal');
+            setPendingMalEmployeeId(null);
+            setActiveModal(ModalType.None);
         }
     };
     
@@ -588,16 +575,13 @@ const App: React.FC = () => {
         };
 
         try {
-            // Upsert logic: Check if a registration for this turn already exists
             const q = query(collection(db, 'registrosDSS'), where("TURNO", "==", turno));
             const querySnapshot = await getDocs(q);
 
             if (!querySnapshot.empty) {
-                // Update the existing document
                 const docRef = doc(db, 'registrosDSS', querySnapshot.docs[0].id);
                 await updateDoc(docRef, registrationData);
             } else {
-                // Add a new document
                 await addDoc(collection(db, 'registrosDSS'), registrationData);
             }
             showNotification(`Registro para turno ${turno} salvo com sucesso.`, 'success');
@@ -708,7 +692,6 @@ const App: React.FC = () => {
         try {
             const batch = writeBatch(db);
             
-            // 1. Limpar status dos funcionários
             const employeesSnapshot = await getDocs(collection(db, 'employees'));
             employeesSnapshot.forEach((doc) => {
                 batch.update(doc.ref, {
@@ -720,7 +703,6 @@ const App: React.FC = () => {
                 });
             });
 
-            // 2. Limpar registros manuais (Assunto DSS e Matrícula)
             const registrationsSnapshot = await getDocs(collection(db, 'registrosDSS'));
             registrationsSnapshot.forEach((doc) => {
                 batch.delete(doc.ref);
@@ -793,7 +775,6 @@ const App: React.FC = () => {
                             togglingSpecialTeamId={togglingSpecialTeamId}
                             isAdmin={isAdmin}
                             onDeleteUser={handleDeleteUser}
-                            // Props for controlled inputs
                             subject={specialSubject}
                             matricula={specialMatricula}
                             onSubjectChange={setSpecialSubject}
@@ -822,6 +803,47 @@ const App: React.FC = () => {
                 showNotification={showNotification}
                 scale={modalScale}
             />
+            
+            {/* NEW CONFIRMATION MODAL */}
+            <Modal 
+                isOpen={activeModal === ModalType.ConfirmMal} 
+                onClose={() => {
+                    setPendingMalEmployeeId(null);
+                    setActiveModal(ModalType.None);
+                }} 
+                title="CONFIRMAÇÃO NECESSÁRIA" 
+                scale={modalScale}
+            >
+                <div className="space-y-6 text-center p-2">
+                    <div className="mx-auto w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
+                        <span className="text-4xl">🚨</span>
+                    </div>
+                    <p className="text-lg text-light-text dark:text-dark-text font-medium">
+                        Você selecionou a opção <span className="text-danger font-bold">"ESTOU MAL"</span>.
+                    </p>
+                    <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
+                        Isso enviará um alerta imediato para a equipe de segurança. <br/>Deseja realmente confirmar que não está se sentindo bem?
+                    </p>
+                    <div className="grid grid-cols-1 gap-3 mt-6">
+                        <button 
+                            onClick={handleConfirmMal} 
+                            className="w-full py-4 font-bold text-white bg-danger rounded-lg hover:bg-red-700 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
+                        >
+                            SIM, ESTOU MAL
+                        </button>
+                        <button 
+                            onClick={() => {
+                                setPendingMalEmployeeId(null);
+                                setActiveModal(ModalType.None);
+                            }} 
+                            className="w-full py-4 font-bold text-light-text dark:text-white bg-gray-200 dark:bg-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition"
+                        >
+                            CANCELAR
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
             <div 
                 className="fixed top-5 right-5 z-[100] space-y-3"
                 style={{ transform: `scale(${modalScale})`, transformOrigin: 'top right' }}
@@ -858,7 +880,7 @@ const ManualRegisterSection: React.FC<ManualRegisterSectionProps> = ({
                 <input 
                     type="text" 
                     value={subject} 
-                    onChange={(e) => onSubjectChange(e.target.value)} 
+                    onChange={(e) => onSubjectChange(e.target.value.toUpperCase())} 
                     placeholder="Assunto do DSS" 
                     className="w-full pl-12 pr-4 py-4 bg-light-bg dark:bg-dark-bg border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"
                 />
@@ -1027,8 +1049,6 @@ const ReportModal: React.FC<{
         // Format helper
         const formatList = (list: Employee[], emptyLabel = "Nenhum") => {
             if (list.length === 0) return emptyLabel;
-            // Sort by name for better readability? The list is likely already sorted by the main query listener, but good to ensure.
-            // Assuming employees are sorted in state.
             return list.map(e => `• ${e.name} (Matrícula: ${e.matricula})`).join('\n');
         };
 
@@ -1067,7 +1087,6 @@ ${formatList(specialCat.pending)}`;
     const categorizeEmployees = (team: Employee[]) => {
         const mal = team.filter(e => e.mal);
         const ok = team.filter(e => !e.mal && e.bem && e.assDss);
-        // Pendentes: Quem não está mal, e não completou o processo (ausente ou esqueceu de marcar algo)
         const pending = team.filter(e => !e.mal && !(e.bem && e.assDss));
         return { mal, ok, pending };
     };
@@ -1126,7 +1145,7 @@ ${formatList(specialCat.pending)}`;
 
     if (!isOpen) return null;
 
-    const isMobile = scale > 1.1; // Threshold to detect if we are scaled up for mobile
+    const isMobile = scale > 1.1; 
     const finalScale = isMobile ? scale * 0.7 : 0.85;
     const maxWidthClass = isMobile ? 'max-w-2xl' : 'max-w-5xl';
     const maxHeightClass = isMobile ? 'max-h-[40vh]' : 'max-h-[80vh]';
