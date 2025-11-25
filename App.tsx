@@ -75,23 +75,9 @@ const App: React.FC = () => {
     }, [isDarkMode]);
 
     useEffect(() => {
-        const calculateModalScale = () => {
-            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-            
-            if (isTouchDevice) {
-                // The previous scale factor (4.5) was still a bit too large,
-                // causing the modal to be clipped vertically on some phone screens.
-                // This further reduced factor provides a better fit, ensuring the entire
-                // modal is visible while remaining large and legible.
-                setModalScale(2.0);
-            } else {
-                setModalScale(1); // Default scale for desktop
-            }
-        };
-
-        calculateModalScale();
-        window.addEventListener('resize', calculateModalScale);
-        return () => window.removeEventListener('resize', calculateModalScale);
+        // With viewport set to device-width, we use 1.0 scale (native size) for modals.
+        // The previous 2.0 scale was only necessary when viewport was fixed to 2448px.
+        setModalScale(1); 
     }, []);
 
     const handleToggleDarkMode = () => setIsDarkMode(prev => !prev);
