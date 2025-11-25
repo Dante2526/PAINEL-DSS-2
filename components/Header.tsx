@@ -24,7 +24,7 @@ const StatCard: React.FC<{ label: string; value: number; colorClass: string }> =
 
 const Header: React.FC<HeaderProps> = ({ stats, loading, onAdminClick, isDarkMode, onToggleDarkMode }) => {
     return (
-        <header className="bg-light-card dark:bg-dark-card rounded-3xl p-6 md:p-10 mb-8 shadow-lg flex justify-between items-center w-[2374px] transition-colors">
+        <header className="bg-light-card dark:bg-dark-card rounded-3xl p-6 md:p-10 mb-8 shadow-lg flex justify-between items-center w-[2434px] transition-colors">
             <div className="flex items-center gap-4">
                 {loading ? (
                     <div className="w-10 h-10 border-4 border-primary-light border-t-primary rounded-full animate-spin"></div>
