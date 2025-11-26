@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Header from './components/Header';
 import EmployeeCard from './components/EmployeeCard';
@@ -5,7 +6,6 @@ import SpecialTeamPanel from './components/SpecialTeamPanel';
 import Modal from './components/Modal';
 import Notification from './components/Notification';
 import Footer from './components/Footer';
-import ReportModal from './components/ReportModal';
 import { SubjectIcon, UserIcon } from './components/icons';
 import { Employee, StatusType, ModalType, ManualRegistration } from './types';
 import type { NotificationData } from './components/Notification';
@@ -94,9 +94,8 @@ const App: React.FC = () => {
             const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
             
             if (isTouchDevice) {
-                // Reduzido para 0.55 para permitir que o cartão de 2 colunas caiba na tela
-                // O cartão terá largura de aprox 800px, que escalado a 0.55 vira ~440px
-                setModalScale(0.55);
+                // Aumentado para 3.5 para garantir visibilidade em telas móveis
+                setModalScale(3.5);
             } else {
                 setModalScale(1); // Default scale for desktop
             }
@@ -993,100 +992,352 @@ const AdminLoginModal: React.FC<{isOpen: boolean, onClose: () => void, onLogin: 
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Acesso Administrativo" scale={scale}>
-            <div className="space-y-6">
+            <div className="space-y-4">
+                <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
+                    Insira o e-mail de administrador para continuar.
+                </p>
                 <div className="relative">
-                    <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                     <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input 
                         type="email" 
                         value={email} 
-                        onChange={(e) => setEmail(e.target.value)} 
-                        placeholder="Email do Administrador" 
-                        className="w-full pl-12 pr-4 py-3 bg-light-bg dark:bg-dark-bg border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary outline-none transition"
-                        onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+                        onChange={e => setEmail(e.target.value)} 
+                        placeholder="E-MAIL DO ADMINISTRADOR" 
+                        className="w-full pl-12 pr-4 py-3 bg-light-bg dark:bg-dark-bg-secondary border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:ring-primary outline-none"
                     />
                 </div>
-                <button 
-                    onClick={handleSubmit} 
-                    className="w-full py-3 font-bold text-white bg-primary rounded-lg hover:bg-primary-dark transition-all transform hover:-translate-y-0.5"
-                >
-                    ENTRAR
-                </button>
+                <button onClick={handleSubmit} className="w-full py-4 font-bold text-white bg-primary rounded-lg hover:bg-primary-dark transition">ENTRAR</button>
             </div>
         </Modal>
     );
 };
 
 const AdminOptionsModal: React.FC<{
-    isOpen: boolean; 
-    onClose: () => void; 
-    onClear: () => void; 
-    onReorganize: () => void;
-    onAddUser: () => void;
-    onSendReport: () => void;
-    scale?: number;
-}> = ({ isOpen, onClose, onClear, onReorganize, onAddUser, onSendReport, scale }) => {
-    return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Painel Administrativo" scale={scale}>
-            <div className="grid grid-cols-1 gap-4">
-                 <button onClick={onSendReport} className="flex items-center justify-center gap-3 p-4 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition shadow-sm">
-                    <SubjectIcon className="w-5 h-5" />
-                    GERAR RELATÓRIO
-                </button>
-                 <button onClick={onAddUser} className="flex items-center justify-center gap-3 p-4 bg-green-500 text-white font-bold rounded-xl hover:bg-green-600 transition shadow-sm">
-                    <UserIcon className="w-5 h-5" />
-                    ADICIONAR USUÁRIO
-                </button>
-                <button onClick={onReorganize} className="flex items-center justify-center gap-3 p-4 bg-orange text-white font-bold rounded-xl hover:bg-amber-600 transition shadow-sm">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" /></svg>
-                    REORGANIZAR ALFABÉTICO
-                </button>
-                <div className="h-px bg-gray-200 dark:bg-gray-600 my-2"></div>
-                <button onClick={() => { if(window.confirm('Isso limpará TODOS os status diários. Continuar?')) onClear(); }} className="flex items-center justify-center gap-3 p-4 bg-danger text-white font-bold rounded-xl hover:bg-red-700 transition shadow-sm">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                    LIMPAR DIÁRIO (RESET)
-                </button>
-            </div>
-        </Modal>
-    );
-};
+    isOpen: boolean, 
+    onClose: () => void, 
+    onClear: () => void, 
+    onReorganize: () => void, 
+    onAddUser: () => void, 
+    onSendReport: () => void,
+    scale?: number
+}> = ({isOpen, onClose, onClear, onReorganize, onAddUser, onSendReport, scale}) => (
+    <Modal isOpen={isOpen} onClose={onClose} title="Opções Administrativas" scale={scale}>
+        <div className="space-y-4">
+            <button onClick={onClear} className="w-full py-4 font-bold text-white bg-orange rounded-lg hover:bg-orange-600 transition">LIMPAR STATUS DIÁRIO</button>
+            <button onClick={onSendReport} className="w-full py-4 font-bold text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition">GERAR RELATÓRIO</button>
+            <button onClick={onReorganize} className="w-full py-4 font-bold text-white bg-danger rounded-lg hover:bg-red-600 transition">REORGANIZAR PAINEL</button>
+            <button onClick={onAddUser} className="w-full py-4 font-bold text-white bg-success rounded-lg hover:bg-green-600 transition">NOVO USUÁRIO</button>
+        </div>
+    </Modal>
+);
 
 const AddUserModal: React.FC<{isOpen: boolean, onClose: () => void, onAdd: (name: string, matricula: string) => void, scale?: number}> = ({isOpen, onClose, onAdd, scale}) => {
     const [name, setName] = useState('');
     const [matricula, setMatricula] = useState('');
-
+    
     const handleSubmit = () => {
-        if (!name || !matricula) return;
-        onAdd(name.toUpperCase(), matricula);
-        setName('');
-        setMatricula('');
+        if (name) {
+            onAdd(name, matricula);
+            setName('');
+            setMatricula('');
+        }
+    };
+
+    const handleMatriculaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setMatricula(e.target.value.replace(/[^0-9]/g, ''));
     };
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Adicionar Novo Usuário" scale={scale}>
             <div className="space-y-4">
-                <input 
-                    type="text" 
-                    value={name} 
-                    onChange={(e) => setName(e.target.value)} 
-                    placeholder="Nome Completo" 
-                    className="w-full px-4 py-3 bg-light-bg dark:bg-dark-bg border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary outline-none transition"
-                />
-                 <input 
-                    type="text" 
-                    value={matricula} 
-                    onChange={(e) => setMatricula(e.target.value.replace(/[^0-9]/g, ''))} 
-                    placeholder="Matrícula" 
-                    className="w-full px-4 py-3 bg-light-bg dark:bg-dark-bg border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary outline-none transition"
-                    inputMode="numeric"
-                />
-                <button 
-                    onClick={handleSubmit} 
-                    className="w-full py-3 font-bold text-white bg-success rounded-lg hover:bg-green-600 transition-all transform hover:-translate-y-0.5"
-                >
-                    SALVAR
-                </button>
+                <div className="relative">
+                    <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input type="text" value={name} onChange={e => setName(e.target.value.toUpperCase())} placeholder="NOME DO FUNCIONÁRIO" className="w-full pl-12 pr-4 py-3 bg-light-bg dark:bg-dark-bg-secondary border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:ring-primary outline-none"/>
+                </div>
+                <div className="relative">
+                    <SubjectIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input 
+                        type="text" 
+                        value={matricula} 
+                        onChange={handleMatriculaChange} 
+                        placeholder="MATRÍCULA" 
+                        className="w-full pl-12 pr-4 py-3 bg-light-bg dark:bg-dark-bg-secondary border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:ring-primary outline-none"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                    />
+                </div>
+                <button onClick={handleSubmit} className="w-full py-4 font-bold text-white bg-success rounded-lg hover:bg-green-600 transition">ADICIONAR</button>
             </div>
         </Modal>
+    );
+};
+
+const ReportModal: React.FC<{
+    isOpen: boolean;
+    onClose: () => void;
+    employees: Employee[];
+    showNotification: (message: string, type?: 'success' | 'error') => void;
+    scale?: number;
+}> = ({ isOpen, onClose, employees, showNotification, scale = 1 }) => {
+    const [manualRegistrations, setManualRegistrations] = useState<ManualRegistration[]>([]);
+    
+    useEffect(() => {
+        if (isOpen && db) {
+            const fetchRegistrations = async () => {
+                try {
+                    const registrationsQuery = query(collection(db, 'registrosDSS'));
+                    const querySnapshot = await getDocs(registrationsQuery);
+                    const registrationsData: ManualRegistration[] = querySnapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    } as ManualRegistration));
+                    setManualRegistrations(registrationsData);
+                } catch (error) {
+                    console.error("Error fetching manual registrations for report:", error);
+                    showNotification('Erro ao carregar registros manuais para o relatório.', 'error');
+                }
+            };
+            fetchRegistrations();
+        }
+    }, [isOpen, showNotification]);
+
+    // Logic for plain text clipboard/email
+    const reportText = useMemo(() => {
+        const total = employees.length;
+        
+        const categorizeEmployees = (team: Employee[]) => {
+            const mal = team.filter(e => e.mal);
+            const ok = team.filter(e => !e.mal && e.bem && e.assDss);
+            const pending = team.filter(e => !e.mal && !(e.bem && e.assDss));
+            return { mal, ok, pending };
+        };
+
+        const mainTeam = employees.filter(e => e.turno !== '6H');
+        const specialTeam = employees.filter(e => e.turno === '6H');
+
+        const mainCat = categorizeEmployees(mainTeam);
+        const specialCat = categorizeEmployees(specialTeam);
+        
+        const totalOk = mainCat.ok.length + specialCat.ok.length;
+        const totalMal = mainCat.mal.length + specialCat.mal.length;
+        const presentCount = totalOk + totalMal;
+        const pendingAbsentCount = total - presentCount;
+
+        // Format helper
+        const formatList = (list: Employee[], emptyLabel = "Nenhum") => {
+            if (list.length === 0) return emptyLabel;
+            return list.map(e => `• ${e.name} (Matrícula: ${e.matricula})`).join('\n');
+        };
+
+        let employeeReport = `RESUMO GERAL
+--------------------------------------------------
+• Total de Funcionários: ${total}
+• Presentes (DSS + Bem/Mal): ${presentCount}
+• Pendentes / Ausentes: ${pendingAbsentCount}
+
+TURNO 7H
+--------------------------------------------------
+ASS.DSS + ESTOU BEM
+${formatList(mainCat.ok)}
+
+ESTOU MAL
+${formatList(mainCat.mal)}
+
+PENDENTES / AUSENTES
+${formatList(mainCat.pending)}
+
+TURNO 6H
+--------------------------------------------------
+ASS.DSS + ESTOU BEM
+${formatList(specialCat.ok)}
+
+ESTOU MAL
+${formatList(specialCat.mal)}
+
+PENDENTES / AUSENTES
+${formatList(specialCat.pending)}
+
+TURNO 6H
+--------------------------------------------------
+ASS.DSS + ESTOU BEM
+${formatList(specialCat.ok)}
+
+ESTOU MAL
+${formatList(specialCat.mal)}
+
+PENDENTES / AUSENTES
+${formatList(specialCat.pending)}`;
+
+        if (manualRegistrations.length > 0) {
+            employeeReport += `\n\nASSUNTOS DA DSS
+--------------------------------------------------
+${manualRegistrations.map(reg => `• ${reg.matricula} - ${reg.assunto} (${reg.TURNO === '7H-19H' ? '7H' : reg.TURNO})`).join('\n')}`;
+        }
+
+        return employeeReport;
+    }, [employees, manualRegistrations]);
+
+    // Logic for Visual HTML Report
+    const categorizeEmployees = (team: Employee[]) => {
+        const mal = team.filter(e => e.mal);
+        const ok = team.filter(e => !e.mal && e.bem && e.assDss);
+        const pending = team.filter(e => !e.mal && !(e.bem && e.assDss));
+        return { mal, ok, pending };
+    };
+
+    const mainTeam = employees.filter(e => e.turno !== '6H');
+    const specialTeam = employees.filter(e => e.turno === '6H');
+
+    const mainCat = categorizeEmployees(mainTeam);
+    const specialCat = categorizeEmployees(specialTeam);
+
+    const renderEmployeeList = (list: Employee[], emptyText: string = 'Ninguém') => (
+        <ul className="list-none space-y-1 pl-1">
+            {list.map(e => (
+                <li key={e.id} className="text-light-text dark:text-dark-text text-sm flex items-center gap-2">
+                   {e.mal ? <span className="text-red-500 font-bold">⚠</span> : 
+                    (e.bem && e.assDss) ? <span className="text-green-500 font-bold">✓</span> : 
+                    <span className="text-gray-400">•</span>}
+                   <span className={e.mal ? "font-bold" : ""}>{e.name} ({e.matricula})</span>
+                   {e.absent && <span className="text-xs text-gray-400">(Ausente)</span>}
+                </li>
+            ))}
+            {list.length === 0 && <li className="text-gray-400 text-xs italic ml-4">{emptyText}</li>}
+        </ul>
+    );
+
+    const handleCopyReport = () => {
+        navigator.clipboard.writeText(reportText).then(() => {
+            showNotification('Relatório copiado para a área de transferência!', 'success');
+        }).catch(err => {
+            console.error('Failed to copy report: ', err);
+            showNotification('Falha ao copiar o relatório.', 'error');
+        });
+    };
+
+    const handleDownloadReport = () => {
+        try {
+            const today = new Date().toISOString().slice(0, 10);
+            const filename = `relatorio-dss-${today}.txt`;
+            const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            URL.revokeObjectURL(link.href);
+            showNotification('Download do relatório iniciado!', 'success');
+        } catch (err) {
+            console.error('Failed to download report: ', err);
+            showNotification('Falha ao baixar o relatório.', 'error');
+        }
+    };
+
+    if (!isOpen) return null;
+
+    const isMobile = scale > 1.1; 
+    const finalScale = isMobile ? scale * 0.55 : 0.85;
+    const maxWidthClass = isMobile ? 'max-w-2xl' : 'max-w-5xl';
+    const maxHeightClass = isMobile ? 'max-h-[40vh]' : 'max-h-[80vh]';
+
+    const modalStyle = { 
+        transform: `scale(${finalScale})`, 
+        animation: 'fade-in-scale 0.3s forwards ease-out' 
+    };
+
+    return (
+        <div 
+            className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 transition-opacity duration-300"
+            onClick={onClose}
+        >
+            <div 
+                className={`bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 w-full ${maxWidthClass} text-center`}
+                style={modalStyle}
+                onClick={(e) => e.stopPropagation()}
+            >
+                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-3xl z-10">&times;</button>
+                <h2 className="text-xl font-bold uppercase text-light-text dark:text-dark-text mb-6">RELATÓRIO</h2>
+                
+                <div className={`text-left bg-light-bg dark:bg-dark-bg-secondary p-6 rounded-lg ${maxHeightClass} overflow-y-auto`}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Column 7H */}
+                        <div>
+                            <h2 className="text-xl font-bold text-primary mb-4 border-b-2 border-primary pb-2">TURNO 7H</h2>
+                            
+                            <div className="mb-6">
+                                <h3 className="bg-success text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">ASS.DSS + ESTOU BEM ({mainCat.ok.length})</h3>
+                                {renderEmployeeList(mainCat.ok)}
+                            </div>
+
+                            <div className="mb-6">
+                                <h3 className="bg-danger text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">ESTOU MAL ({mainCat.mal.length})</h3>
+                                {renderEmployeeList(mainCat.mal)}
+                            </div>
+
+                            <div className="mb-6">
+                                <h3 className="bg-neutral text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">PENDENTES / AUSENTES ({mainCat.pending.length})</h3>
+                                {renderEmployeeList(mainCat.pending)}
+                            </div>
+                        </div>
+
+                        {/* Column 6H */}
+                         <div>
+                            <h2 className="text-xl font-bold text-orange mb-4 border-b-2 border-orange pb-2">TURNO 6H</h2>
+                            
+                            <div className="mb-6">
+                                <h3 className="bg-success text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">ASS.DSS + ESTOU BEM ({specialCat.ok.length})</h3>
+                                {renderEmployeeList(specialCat.ok)}
+                            </div>
+
+                            <div className="mb-6">
+                                <h3 className="bg-danger text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">ESTOU MAL ({specialCat.mal.length})</h3>
+                                {renderEmployeeList(specialCat.mal)}
+                            </div>
+
+                            <div className="mb-6">
+                                <h3 className="bg-neutral text-white font-bold px-3 py-1 rounded text-sm uppercase mb-2">PENDENTES / AUSENTES ({specialCat.pending.length})</h3>
+                                {renderEmployeeList(specialCat.pending)}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Manual Registrations Section */}
+                    {manualRegistrations.length > 0 && (
+                        <div className="mt-8 pt-6 border-t-2 border-gray-200 dark:border-gray-700">
+                            <h2 className="text-lg font-bold text-light-text dark:text-dark-text mb-4">ASSUNTOS DA DSS</h2>
+                            <ul className="list-disc pl-5 space-y-2">
+                                 {manualRegistrations.map(reg => {
+                                     return (
+                                         <li key={reg.id} className="text-sm text-light-text dark:text-dark-text">
+                                             <span className="font-bold">{reg.matricula}</span> - {reg.assunto} <span className="text-xs bg-gray-200 dark:bg-gray-600 px-1 rounded">{reg.TURNO === '7H-19H' ? '7H' : reg.TURNO}</span>
+                                         </li>
+                                     )
+                                 })}
+                            </ul>
+                        </div>
+                    )}
+                </div>
+
+                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <button onClick={handleCopyReport} className="w-full py-4 font-bold text-white bg-primary rounded-lg hover:bg-primary-dark transition">
+                        COPIAR
+                    </button>
+                    <button onClick={handleDownloadReport} className="w-full py-4 font-bold text-white bg-success rounded-lg hover:bg-green-600 transition">
+                        BAIXAR
+                    </button>
+                </div>
+            </div>
+            <style>{`
+                @keyframes fade-in-scale {
+                  from { opacity: 0; transform: scale(${finalScale * 0.95}); }
+                  to { opacity: 1; transform: scale(${finalScale}); }
+                }
+            `}</style>
+        </div>
     );
 };
 

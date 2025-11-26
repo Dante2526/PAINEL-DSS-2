@@ -7,10 +7,9 @@ interface ModalProps {
   title: string;
   children: ReactNode;
   scale?: number;
-  maxWidth?: string;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, scale = 1, maxWidth = 'max-w-sm' }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, scale = 1 }) => {
   if (!isOpen) return null;
 
   const modalStyle = { 
@@ -24,7 +23,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, scale =
       onClick={onClose}
     >
       <div 
-        className={`bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 w-full ${maxWidth} text-center`}
+        className="bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center"
         style={modalStyle}
         onClick={(e) => e.stopPropagation()}
       >
