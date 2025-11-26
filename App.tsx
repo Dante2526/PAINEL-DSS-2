@@ -1240,7 +1240,7 @@ ${manualRegistrations.map(reg => `• ${reg.matricula} - ${reg.assunto} (${reg.T
     if (!isOpen) return null;
 
     const isMobile = scale > 1.1; 
-    const finalScale = isMobile ? scale * 0.55 : 0.85;
+    const finalScale = isMobile ? scale * 0.45 : 0.85;
     const maxWidthClass = isMobile ? 'max-w-2xl' : 'max-w-5xl';
     const maxHeightClass = isMobile ? 'max-h-[40vh]' : 'max-h-[80vh]';
 
