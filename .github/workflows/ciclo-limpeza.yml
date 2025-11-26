@@ -1,0 +1,51 @@
+name: Limpar Checkboxes (Manual e Agendado 2x2)
+
+on:
+  workflow_dispatch: 
+  schedule:
+    - cron: '0 4 * * *' # 1h da manhã BRT
+
+jobs:
+  limpar-dados-firebase:
+    runs-on: ubuntu-latest
+    # REMOVEMOS a secção 'defaults:' daqui
+
+    steps:
+      - name: Checkout código (Correção)
+        uses: actions/checkout@v4
+        with:
+          path: . # <-- ESTA É A CORREÇÃO para o caminho duplicado
+
+      - name: Verificar se é dia de trabalho OU teste manual
+        id: verificar-dia
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            echo "É um TESTE MANUAL. A limpeza VAI rodar."
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "É uma execução AGENDADA. Verificando o ciclo 2x2..."
+            ANCHOR_DATE="2025-11-07"
+            ANCHOR_SECONDS=$(date -d "$ANCHOR_DATE" +%s)
+            CURRENT_SECONDS=$(date +%s)
+            DIFF_DAYS=$(((CURRENT_SECONDS - ANCHOR_SECONDS) / 86400))
+            CYCLE_DAY=$((DIFF_DAYS % 4))
+            if [[ $CYCLE_DAY -eq 0 || $CYCLE_DAY -eq 1 ]]; then
+              echo "Hoje é dia de TRABALHO. A limpeza VAI rodar."
+              echo "should_run=true" >> $GITHUB_OUTPUT
+            else
+              echo "Hoje é dia de FOLGA. A limpeza NÃO vai rodar."
+              echo "should_run=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: Instalar dependências
+        if: steps.verificar-dia.outputs.should_run == 'true'
+        run: npm install
+
+      - name: Rodar script de limpeza
+        if: steps.verificar-dia.outputs.should_run == 'true'
+        run: node scripts/limpar-firebase.cjs 
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
