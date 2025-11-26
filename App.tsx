@@ -5,6 +5,7 @@ import EmployeeCard from './components/EmployeeCard';
 import SpecialTeamPanel from './components/SpecialTeamPanel';
 import Modal from './components/Modal';
 import Notification from './components/Notification';
+import Footer from './components/Footer';
 import { SubjectIcon, UserIcon } from './components/icons';
 import { Employee, StatusType, ModalType, ManualRegistration } from './types';
 import type { NotificationData } from './components/Notification';
@@ -834,6 +835,7 @@ const App: React.FC = () => {
                             onRegister={() => handleManualRegister('6H')}
                         />
                     </div>
+                    <Footer />
                 </div>
             </div>
             
@@ -1143,6 +1145,17 @@ ${formatList(mainCat.mal)}
 
 PENDENTES / AUSENTES
 ${formatList(mainCat.pending)}
+
+TURNO 6H
+--------------------------------------------------
+ASS.DSS + ESTOU BEM
+${formatList(specialCat.ok)}
+
+ESTOU MAL
+${formatList(specialCat.mal)}
+
+PENDENTES / AUSENTES
+${formatList(specialCat.pending)}
 
 TURNO 6H
 --------------------------------------------------
