@@ -1,6 +1,8 @@
+
 import React from 'react';
 import DarkModeToggle from './DarkModeToggle';
 import { AdminIcon } from './icons';
+import { LOGO_BASE_64 } from './logoConstants';
 
 interface HeaderProps {
     stats: {
@@ -29,9 +31,13 @@ const Header: React.FC<HeaderProps> = ({ stats, loading, onAdminClick, isDarkMod
                 {loading ? (
                     <div className="w-10 h-10 border-4 border-primary-light border-t-primary rounded-full animate-spin"></div>
                 ) : (
-                    <div className="text-4xl text-primary">
-                      🛡️
-                    </div>
+                    LOGO_BASE_64 ? (
+                        <img src={LOGO_BASE_64} alt="Logo" className="h-12 w-auto object-contain" />
+                    ) : (
+                        <div className="text-4xl text-primary">
+                          🛡️
+                        </div>
+                    )
                 )}
                 <div>
                     <h1 className="text-3xl font-bold text-light-text dark:text-dark-text">Painel de Acompanhamento DSS</h1>
