@@ -9,7 +9,7 @@ import { SubjectIcon, UserIcon } from './components/icons';
 import { Employee, StatusType, ModalType, ManualRegistration } from './types';
 import type { NotificationData } from './components/Notification';
 import { db, auth, isConfigured } from './firebase';
-import { LOGO_BASE_64 } from './components/logoConstants';
+import { MAIN_LOGO_URL, FALLBACK_LOGO } from './components/logoConstants';
 // FIX: Switched to scoped Firebase packages for imports to match project configuration and resolve module errors.
 import { 
     collection, 
@@ -65,17 +65,30 @@ const App: React.FC = () => {
         return window.matchMedia('(prefers-color-scheme: dark)').matches;
     });
     
-    // Effect to update Favicon dynamically
+    // Effect to update Favicon dynamically with Fallback check
     useEffect(() => {
-        if (LOGO_BASE_64) {
+        const updateFavicon = (src: string) => {
             let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
             if (!link) {
                 link = document.createElement('link');
                 link.rel = 'icon';
                 document.getElementsByTagName('head')[0].appendChild(link);
             }
-            link.href = LOGO_BASE_64;
-        }
+            link.href = src;
+        };
+
+        // Try to load the external logo
+        const img = new Image();
+        img.src = MAIN_LOGO_URL;
+        
+        img.onload = () => {
+            updateFavicon(MAIN_LOGO_URL);
+        };
+        
+        img.onerror = () => {
+            // If external fails, use fallback shield
+            updateFavicon(FALLBACK_LOGO);
+        };
     }, []);
 
     useEffect(() => {
