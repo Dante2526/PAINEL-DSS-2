@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Header from './components/Header';
 import EmployeeCard from './components/EmployeeCard';
@@ -1194,7 +1193,7 @@ ${manualRegistrations.map(reg => `• ${reg.matricula} - ${reg.assunto} (${reg.T
     const renderEmployeeList = (list: Employee[], emptyText: string = 'Ninguém') => (
         <ul className="list-none space-y-1 pl-1">
             {list.map(e => (
-                <li key={e.id} className="text-light-text dark:text-dark-text text-sm flex items-center gap-2">
+                <li key={e.id} className="text-light-text dark:text-dark-text text-base flex items-center gap-2">
                    {e.mal ? <span className="text-red-500 font-bold">⚠</span> : 
                     (e.bem && e.assDss) ? <span className="text-green-500 font-bold">✓</span> : 
                     <span className="text-gray-400">•</span>}
@@ -1240,8 +1239,9 @@ ${manualRegistrations.map(reg => `• ${reg.matricula} - ${reg.assunto} (${reg.T
     if (!isOpen) return null;
 
     const isMobile = scale > 1.1; 
-    const finalScale = isMobile ? scale * 0.45 : 0.85;
-    const maxWidthClass = isMobile ? 'max-w-2xl' : 'max-w-5xl';
+    // Aumentado o fator de escala (0.45 -> 0.52) e a largura máxima (max-w-4xl) para letras maiores
+    const finalScale = isMobile ? scale * 0.52 : 0.85;
+    const maxWidthClass = isMobile ? 'max-w-4xl' : 'max-w-5xl';
     const maxHeightClass = isMobile ? 'max-h-[40vh]' : 'max-h-[80vh]';
 
     const modalStyle = { 
