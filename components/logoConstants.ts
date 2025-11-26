@@ -1,6 +1,3 @@
 
-// URL da imagem externa (ImgBB)
-export const MAIN_LOGO_URL = "https://i.ibb.co/LhQG3b5x/MINHA-LOGO.png";
-
-// Backup Base64 (Escudo) para caso a imagem externa falhe
+// Escudo (SVG Base64) para uso no Header e Favicon
 export const FALLBACK_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzAwODBmZiIgc3Ryb2tlPSIjMDA4MGZmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTEyIDIyczgtNCA4LTEwVjVsLTgtMy04IDN2N2MwIDYgOCAxMCA4IDEweiIvPjwvc3ZnPg==";
