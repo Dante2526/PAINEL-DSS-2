@@ -96,7 +96,7 @@ async function gerarRelatorio() {
   htmlBody += `</ul>`;
 
   // --- EQUIPE TURNO 7H ---
-  htmlBody += `<h2>EQUIPE TURNO 7H-19H</h2>`; 
+  htmlBody += `<h2>EQUIPE TURNO 7H</h2>`; 
   htmlBody += `<hr>`;
   
   htmlBody += `<h3>STATUS: "ASS.DSS + ESTOU BEM"</h3>`;
@@ -152,10 +152,10 @@ async function gerarRelatorio() {
   }
   
   // --- REGISTROS DE ASSUNTO DSS (SEPARADOS) ---
-  htmlBody += `<br><h2>REGISTROS DSS (TURNO 7H-19H)</h2>`;
+  htmlBody += `<br><h2>REGISTROS DSS (TURNO 7H)</h2>`;
   htmlBody += `<hr>`;
   if (registros7H.length === 0) {
-    htmlBody += `Nenhum registro de assunto encontrado para 7H-19H.`;
+    htmlBody += `Nenhum registro de assunto encontrado para 7H.`;
   } else {
     htmlBody += `<ul>`;
     registros7H.forEach(reg => {
