@@ -6,7 +6,7 @@ import SpecialTeamPanel from './components/SpecialTeamPanel';
 import Modal from './components/Modal';
 import Notification from './components/Notification';
 import Footer from './components/Footer';
-import { SubjectIcon, UserIcon } from './components/icons';
+import { SubjectIcon, UserIcon, EraserIcon, FileTextIcon, SortIcon, UserPlusIcon } from './components/icons';
 import { Employee, StatusType, ModalType, ManualRegistration } from './types';
 import type { NotificationData } from './components/Notification';
 import { db, auth, isConfigured } from './firebase';
@@ -1023,10 +1023,22 @@ const AdminOptionsModal: React.FC<{
 }> = ({isOpen, onClose, onClear, onReorganize, onAddUser, onSendReport, scale}) => (
     <Modal isOpen={isOpen} onClose={onClose} title="Opções Administrativas" scale={scale}>
         <div className="space-y-4">
-            <button onClick={onClear} className="w-full py-4 font-bold text-white bg-orange rounded-lg hover:bg-orange-600 transition">LIMPAR STATUS DIÁRIO</button>
-            <button onClick={onSendReport} className="w-full py-4 font-bold text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition">GERAR RELATÓRIO</button>
-            <button onClick={onReorganize} className="w-full py-4 font-bold text-white bg-danger rounded-lg hover:bg-red-600 transition">REORGANIZAR PAINEL</button>
-            <button onClick={onAddUser} className="w-full py-4 font-bold text-white bg-success rounded-lg hover:bg-green-600 transition">NOVO USUÁRIO</button>
+            <button onClick={onClear} className="w-full py-4 font-bold text-white bg-orange rounded-lg hover:bg-orange-600 transition flex items-center justify-center gap-3">
+                <EraserIcon className="w-6 h-6" />
+                <span>LIMPAR STATUS DIÁRIO</span>
+            </button>
+            <button onClick={onSendReport} className="w-full py-4 font-bold text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition flex items-center justify-center gap-3">
+                <FileTextIcon className="w-6 h-6" />
+                <span>GERAR RELATÓRIO</span>
+            </button>
+            <button onClick={onReorganize} className="w-full py-4 font-bold text-white bg-danger rounded-lg hover:bg-red-600 transition flex items-center justify-center gap-3">
+                <SortIcon className="w-6 h-6" />
+                <span>REORGANIZAR PAINEL</span>
+            </button>
+            <button onClick={onAddUser} className="w-full py-4 font-bold text-white bg-success rounded-lg hover:bg-green-600 transition flex items-center justify-center gap-3">
+                <UserPlusIcon className="w-6 h-6" />
+                <span>NOVO USUÁRIO</span>
+            </button>
         </div>
     </Modal>
 );
@@ -1239,10 +1251,12 @@ ${manualRegistrations.map(reg => `• ${reg.matricula} - ${reg.assunto} (${reg.T
 
     if (!isOpen) return null;
 
+    // Mobile specific scale logic for ReportModal
+    // Using 0.48 as requested for mobile view
     const isMobile = scale > 1.1; 
-    const finalScale = isMobile ? scale * 0.45 : 0.85;
+    const finalScale = isMobile ? scale * 0.48 : 0.85;
     const maxWidthClass = isMobile ? 'max-w-2xl' : 'max-w-5xl';
-    const maxHeightClass = isMobile ? 'max-h-[40vh]' : 'max-h-[80vh]';
+    const maxHeightClass = isMobile ? 'max-h-[65vh]' : 'max-h-[80vh]';
 
     const modalStyle = { 
         transform: `scale(${finalScale})`, 
@@ -1263,7 +1277,7 @@ ${manualRegistrations.map(reg => `• ${reg.matricula} - ${reg.assunto} (${reg.T
                 <h2 className="text-xl font-bold uppercase text-light-text dark:text-dark-text mb-6">RELATÓRIO</h2>
                 
                 <div className={`text-left bg-light-bg dark:bg-dark-bg-secondary p-6 rounded-lg ${maxHeightClass} overflow-y-auto`}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className={`grid gap-8 ${isMobile ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-2'}`}>
                         {/* Column 7H */}
                         <div>
                             <h2 className="text-xl font-bold text-primary mb-4 border-b-2 border-primary pb-2">TURNO 7H</h2>
