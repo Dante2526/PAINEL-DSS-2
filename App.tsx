@@ -1239,10 +1239,10 @@ ${manualRegistrations.map(reg => `• ${reg.matricula} - ${reg.assunto} (${reg.T
     if (!isOpen) return null;
 
     const isMobile = scale > 1.1; 
-    // Aumentado o fator de escala (0.45 -> 0.52) e a largura máxima (max-w-4xl) para letras maiores
-    const finalScale = isMobile ? scale * 0.52 : 0.85;
-    const maxWidthClass = isMobile ? 'max-w-4xl' : 'max-w-5xl';
-    const maxHeightClass = isMobile ? 'max-h-[40vh]' : 'max-h-[80vh]';
+    // Interpreting "Largura: 2x1" as max-w-2xl and Scale: 0.48, Enforcing 2 columns
+    const finalScale = isMobile ? scale * 0.48 : 0.85;
+    const maxWidthClass = isMobile ? 'max-w-2xl' : 'max-w-5xl';
+    const maxHeightClass = isMobile ? 'max-h-[50vh]' : 'max-h-[80vh]';
 
     const modalStyle = { 
         transform: `scale(${finalScale})`, 
@@ -1263,7 +1263,7 @@ ${manualRegistrations.map(reg => `• ${reg.matricula} - ${reg.assunto} (${reg.T
                 <h2 className="text-xl font-bold uppercase text-light-text dark:text-dark-text mb-6">RELATÓRIO</h2>
                 
                 <div className={`text-left bg-light-bg dark:bg-dark-bg-secondary p-6 rounded-lg ${maxHeightClass} overflow-y-auto`}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="grid grid-cols-2 gap-8">
                         {/* Column 7H */}
                         <div>
                             <h2 className="text-xl font-bold text-primary mb-4 border-b-2 border-primary pb-2">TURNO 7H</h2>
