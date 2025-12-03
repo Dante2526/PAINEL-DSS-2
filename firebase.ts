@@ -47,7 +47,7 @@ if (isConfigured) {
 } else {
     // This warning will appear in the developer console if the API key is missing.
     // The main App.tsx component will show a user-facing notification.
-    console.warn("Firebase API key is missing. Please check your VITE_FIREBASE_API_KEY environment variable. The app is in preview mode.");
+    // Console warning removed as requested.
 }
 
 export { db, auth, app, isConfigured };
