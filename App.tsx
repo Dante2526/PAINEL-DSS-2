@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Header from './components/Header';
 import EmployeeCard from './components/EmployeeCard';
@@ -1231,7 +1230,8 @@ ${manualRegistrations.map(reg => `• ${reg.matricula} - ${reg.assunto} (${reg.T
         try {
             const today = new Date().toISOString().slice(0, 10);
             const filename = `relatorio-dss-${today}.txt`;
-            const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
+            // Add BOM for proper UTF-8 handling in Windows/Excel/Some browsers
+            const blob = new Blob(['\uFEFF' + reportText], { type: 'text/plain;charset=utf-8' });
             
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
